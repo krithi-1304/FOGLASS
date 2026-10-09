@@ -14,3 +14,10 @@
 - Pinterest blocked all six reference URLs; use supplied visual brief. Self-host fonts via npm assets.
 - Validation: build and lint pass; Playwright smoke 1/1 passes. M0 complete.
 - Next: WebGL composite; camera lifecycle/fallback; renderer tests and M1 commit.
+
+## M1 — 2026-10-09
+- Raw WebGL2 composite mirrors/crops camera, softens samples, adds grain/vignette; procedural dusk fallback and local fonts.
+- Start requests devices; denied camera keeps fallback, mic track released until M3; pointer/touch cursor and DPR≤1.5 resize work.
+- Validation: build/lint pass; 5/5 Playwright tests pass (4.3s). Fake-media startup transiently stalled; explicit grants and 15s startup allowance retained.
+- Test-only state/FPS/pixel API; fog APIs, CV/model, mask, audio, adaptive quality and physical latency validation remain pending. No screenshots viewed at M1.
+- Next: M2 float ping-pong mask; breath-key/wipe/regrowth API and tests; first screenshot review.

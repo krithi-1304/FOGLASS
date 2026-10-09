@@ -11,3 +11,12 @@ Start requests camera and microphone. Camera access needs localhost or HTTPS.
 No media is uploaded. Without permission, a procedural dusk scene remains available.
 Fog, breath detection, hand tracking and sound are planned for M2–M5.
 See docs/PRD.md, docs/DESIGN.md and docs/TEST_PLAN.md for scope and budgets.
+
+M1 includes mirrored cover-cropped camera video, blur/grain/vignette, a dusk fallback,
+pointer/touch cursor and responsive canvas (DPR capped at 1.5).
+H toggles the status hint. Pointer input does not wipe yet.
+The microphone track is released after permission checking until M3 adds analysis.
+Development instrumentation is available only at ?test=1:
+getState(), getFps(), samplePixel(x,y). Full fog injection APIs arrive in M2.
+Use ?seed=7 to freeze grain for deterministic rendering checks.
+Visual screenshot review is intentionally scheduled for M2 and M7.

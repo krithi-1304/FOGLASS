@@ -1,0 +1,227 @@
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource/inter/latin-400.css";
+:root {
+  font-family: Inter, sans-serif;
+  color: #edf0ea;
+  background: #173337;
+  font-synthesis: none;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}
+button {
+  font: inherit;
+}
+::selection {
+  background: #ffb36b55;
+}
+#app {
+  height: 100svh;
+  min-height: 480px;
+  position: relative;
+  isolation: isolate;
+}
+#mirror {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  touch-action: none;
+}
+.edge {
+  position: absolute;
+  inset: 16px;
+  border: 1px solid #d9e7e215;
+  pointer-events: none;
+}
+header,
+footer {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header {
+  top: 42px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+footer {
+  bottom: 38px;
+  font-size: 11px;
+  color: #d5dfdd;
+}
+footer span:first-child {
+  font-family: "Instrument Serif", serif;
+  font-size: 19px;
+  font-style: italic;
+}
+footer span:last-child {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+main {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 80px 24px;
+  transition:
+    opacity 0.9s,
+    filter 0.9s;
+}
+h1 {
+  font-family: "Instrument Serif", serif;
+  font-size: clamp(80px, 12vw, 144px);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  margin: 0 0 24px;
+  text-shadow: 0 8px 40px #17333755;
+}
+.invitation {
+  font-family: "Instrument Serif", serif;
+  font-size: 27px;
+  line-height: 1.15;
+  margin: 0 0 30px;
+}
+.instructions {
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 0 0 25px;
+  color: #e0e8e4;
+}
+button {
+  min-width: 126px;
+  min-height: 48px;
+  border: 1px solid #e8f0e377;
+  border-radius: 999px;
+  background: #e8f0e30d;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button span {
+  padding-left: 28px;
+}
+button:hover {
+  background: #e8f0e326;
+}
+button:focus-visible {
+  outline: 2px solid #ffb36b;
+  outline-offset: 6px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.privacy {
+  font-size: 10px;
+  margin: 18px 0 0;
+  color: #d6e0dc;
+}
+.stage {
+  font-size: 10px;
+  color: #d6e0dc;
+  margin-top: 12px;
+}
+body.started main {
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
+}
+#status {
+  position: absolute;
+  bottom: 80px;
+  left: 24px;
+  right: 24px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #e1e8e5;
+  pointer-events: none;
+}
+#cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin: -12px;
+  border: 1px solid #effaff60;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 2px 16px #cfd8de40;
+}
+#cursor.visible {
+  opacity: 0.65;
+}
+#cursor.down {
+  background: #cfd8de33;
+}
+@media (max-width: 600px) {
+  header,
+  footer {
+    left: 28px;
+    right: 28px;
+  }
+  header {
+    top: 30px;
+  }
+  header span:last-child {
+    font-size: 8px;
+  }
+  footer {
+    bottom: 28px;
+  }
+  footer span:last-child {
+    display: none;
+  }
+  .edge {
+    inset: 10px;
+  }
+  h1 {
+    font-size: 86px;
+  }
+  .invitation {
+    font-size: 25px;
+  }
+  #status {
+    bottom: 64px;
+  }
+}
+@media (max-height: 620px) {
+  h1 {
+    font-size: 72px;
+    margin-bottom: 15px;
+  }
+  .invitation {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+  .instructions {
+    margin-bottom: 14px;
+  }
+  header {
+    top: 24px;
+  }
+  footer {
+    bottom: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
