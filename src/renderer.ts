@@ -1,6 +1,8 @@
 import vertex from "./shaders/fullscreen.vert.glsl?raw";
 import fragment from "./shaders/composite.frag.glsl?raw";
+import { FogSim } from "./fogSim";
 export class Renderer {
+  readonly fog: FogSim;
   readonly gl: WebGL2RenderingContext;
   private program: WebGLProgram;
   private texture: WebGLTexture;
@@ -73,8 +75,10 @@ export class Renderer {
       "cameraMix",
       "time",
       "seed",
+      "fogMask",
     ])
       this.locations.set(name, gl.getUniformLocation(this.program, name)!);
+    this.fog = new FogSim(gl);
     this.frame = requestAnimationFrame(this.render);
   }
   private render = (now: number) => {
@@ -91,6 +95,7 @@ export class Renderer {
       this.canvas.width = w;
       this.canvas.height = h;
     }
+    this.fog.update(dt, w / h);
     gl.viewport(0, 0, w, h);
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
@@ -124,6 +129,9 @@ export class Renderer {
       new URLSearchParams(location.search).has("seed") ? 0 : now / 1000,
     );
     gl.uniform1f(this.locations.get("seed")!, this.seed);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, this.fog.texture);
+    gl.uniform1i(this.locations.get("fogMask")!, 1);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.frames++;
     this.frame = requestAnimationFrame(this.render);
@@ -143,6 +151,7 @@ export class Renderer {
   }
   dispose() {
     cancelAnimationFrame(this.frame);
+    this.fog.dispose();
     this.gl.deleteTexture(this.texture);
     this.gl.deleteVertexArray(this.vao);
     this.gl.deleteProgram(this.program);

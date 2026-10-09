@@ -10,47 +10,66 @@ export class Camera {
     this.video.style.display = "none";
     document.body.append(this.video);
   }
+  private async request(constraints: MediaStreamConstraints) {
+    let expired = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const request = navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        if (expired || this.disposed) {
+          stream.getTracks().forEach((t) => t.stop());
+          throw new Error("Request ended");
+        }
+        this.streams.push(stream);
+        return stream;
+      });
+    try {
+      return await Promise.race([
+        request,
+        new Promise<MediaStream>((_, reject) => {
+          timer = setTimeout(() => {
+            expired = true;
+            reject(new Error("Permission request timed out"));
+          }, 12000);
+        }),
+      ]);
+    } finally {
+      clearTimeout(timer!);
+    }
+  }
   async start(): Promise<string> {
     if (!navigator.mediaDevices?.getUserMedia)
-      return "Camera unavailable. The dusk preview is ready.";
+      return "Camera unavailable. Hold B to fog; drag to draw.";
     this.phase = "requesting";
-    const results = await Promise.allSettled([
-      navigator.mediaDevices.getUserMedia({
+    try {
+      const stream = await this.request({
         video: {
           facingMode: "user",
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
         audio: false,
-      }),
-      navigator.mediaDevices.getUserMedia({ audio: true, video: false }),
-    ]);
-    this.phase = "permissions-resolved";
-    for (const result of results) {
-      if (result.status === "fulfilled") {
-        if (this.disposed) result.value.getTracks().forEach((t) => t.stop());
-        else this.streams.push(result.value);
-      }
-    }
-    if (this.disposed) return "";
-    const camera = results[0];
-    // Mic permission is requested here; audio processing begins in M3.
-    if (results[1].status === "fulfilled")
-      results[1].value.getTracks().forEach((t) => t.stop());
-    if (camera.status === "rejected")
-      return "Camera unavailable or permission denied. Enjoy the dusk preview.";
-    this.video.srcObject = camera.value;
-    try {
+      });
+      if (this.disposed) return "";
       this.phase = "playing";
+      this.video.srcObject = stream;
       await this.video.play();
       this.phase = "ready";
+      return "Hold B to fog · drag to draw · C clear · S save";
     } catch {
-      this.stop();
-      return "Camera could not play. The dusk preview is ready.";
+      this.phase = "fallback";
+      return "Camera unavailable or permission denied. Hold B to fog; drag to draw.";
     }
-    return results[1].status === "rejected"
-      ? "Mirror ready. Microphone unavailable; breath-key fallback arrives with fog."
-      : "Mirror ready. Breath and finger drawing are coming in the next milestones.";
+  }
+  async microphone() {
+    return this.request({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+      video: false,
+    });
   }
   stop() {
     this.disposed = true;

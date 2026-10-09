@@ -21,7 +21,7 @@
 - Run tests with --reporter=line; print only failing test output on failure.
 - lil-gui g toggle development only; stats.js f toggle.
 - Milestones M0 scaffold, M1 render, M2 fog, M3 audio, M4 hands,
-  M5 realism, M6 polish, M7 final QA. Current authorization: M0 and M1.
+  M5 realism, M6 polish, M7 final QA. Initial delivery: M0 and M1; subsequent fixes follow the user’s reported failures.
 - Stop at each milestone to test, append memory, and commit a short message.
 - Memory entries max 5 lines: decisions, gotchas, status, next 3 tasks.
 - Plan under 15 lines; status 1–3 lines; no large logs or unnecessary rereads.

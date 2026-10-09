@@ -3,6 +3,7 @@ precision highp float;
 in vec2 uv;
 out vec4 color;
 uniform sampler2D camera;
+uniform sampler2D fogMask;
 uniform vec2 resolution;
 uniform vec2 videoSize;
 uniform float cameraMix;
@@ -26,7 +27,8 @@ vec3 feed(vec2 p){
  vec2 crop=vec2(min(1.,screenAspect/videoAspect),min(1.,videoAspect/screenAspect));
  vec2 q=(p-.5)*crop+.5;
  q.x=1.-q.x;
- vec2 d=.8/videoSize;
+ float fog=texture(fogMask,p).r;
+ vec2 d=(.8+fog*12.)/videoSize;
  vec3 c=texture(camera,q).rgb*.4;
  c+=texture(camera,q+vec2(d.x,d.y)).rgb*.15;
  c+=texture(camera,q-vec2(d.x,d.y)).rgb*.15;
@@ -36,6 +38,10 @@ vec3 feed(vec2 p){
 }
 void main(){
  vec3 c=mix(room(uv),feed(uv),cameraMix);
+ float fog=texture(fogMask,uv).r;
+ vec3 frost=mix(vec3(.56,.65,.69),vec3(.81,.85,.87),uv.y);
+ float textureNoise=hash(floor(uv*resolution*.65));
+ c=mix(c,frost,fog*(.84+textureNoise*.06));
  float vignette=smoothstep(.18,.82,length((uv-.5)*vec2(1.,.85)));
  c*=1.-vignette*.24;
  c+=(hash(gl_FragCoord.xy+mod(time,100.)*.73)-.5)*.024;

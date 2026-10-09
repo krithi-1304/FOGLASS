@@ -18,14 +18,19 @@ try {
   ui.start.disabled = true;
   mode = "unsupported";
 }
-ui.start.addEventListener("click", async () => {
-  ui.start.disabled = true;
-  ui.start.textContent = "Opening…";
-  ui.status.textContent = "Allow camera and microphone to enter your mirror.";
-  const message = await camera.start();
-  mode = camera.video.srcObject ? "camera" : "fallback";
+function enter() {
   document.body.classList.add("started");
   ui.welcome.inert = true;
+  mode = "fallback";
+  ui.status.textContent = "Hold B to fog · drag to draw · C clear · S save";
+}
+ui.fallback.addEventListener("click", enter);
+ui.start.addEventListener("click", async () => {
+  enter();
+  ui.status.textContent =
+    "Allow camera access, or use B and drag while you wait.";
+  const message = await camera.start();
+  mode = camera.video.srcObject ? "camera" : "fallback";
   ui.status.textContent = message;
 });
 const move = (e: PointerEvent) => {
@@ -36,16 +41,19 @@ const move = (e: PointerEvent) => {
   };
   ui.cursor.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
   ui.cursor.classList.add("visible");
+  renderer?.fog.finger(pointer.x, pointer.y, pointer.down);
 };
 ui.canvas.addEventListener("pointermove", move);
 ui.canvas.addEventListener("pointerdown", (e) => {
   move(e);
   pointer.down = true;
+  renderer?.fog.finger(pointer.x, pointer.y, true);
   ui.canvas.setPointerCapture(e.pointerId);
   ui.cursor.classList.add("down");
 });
 const release = () => {
   pointer.down = false;
+  renderer?.fog.finger(pointer.x, pointer.y, false);
   ui.cursor.classList.remove("down");
 };
 ui.canvas.addEventListener("pointerup", release);
@@ -61,7 +69,29 @@ ui.canvas.addEventListener("webglcontextlost", (e) => {
   ui.status.textContent = "The mirror paused. Reload this page to restore it.";
 });
 addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "h") ui.status.hidden = !ui.status.hidden;
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (key === "h") ui.status.hidden = !ui.status.hidden;
+  if (key === "b") renderer?.fog.setBreathing(true);
+  if (key === "c") renderer?.fog.clear();
+  if (key === "s") {
+    e.preventDefault();
+    ui.canvas.toBlob((blob) => {
+      if (!blob) return;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "foglass.png";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+  }
+});
+addEventListener("keyup", (e) => {
+  if (e.key.toLowerCase() === "b") renderer?.fog.setBreathing(false);
+});
+addEventListener("blur", () => {
+  renderer?.fog.setBreathing(false);
+  release();
 });
 addEventListener("pagehide", () => {
   camera.stop();
@@ -70,9 +100,15 @@ addEventListener("pagehide", () => {
 if (new URLSearchParams(location.search).get("test") === "1") {
   Object.assign(window, {
     __foglass: {
+      injectBreath: (strength: number, ms: number) =>
+        renderer?.fog.injectBreath(strength, ms),
+      injectFinger: (x: number, y: number, down: boolean) =>
+        renderer?.fog.finger(x, y, down),
+      getFogCoverage: () => renderer?.fog.coverage() || 0,
+      sampleMask: (x: number, y: number) => renderer?.fog.sample(x, y) || 0,
       getFps: () => renderer?.fps || 0,
       getState: () => ({
-        milestone: 1,
+        milestone: 2,
         mediaPhase: camera.phase,
         videoReady: camera.video.readyState,
         mode,
