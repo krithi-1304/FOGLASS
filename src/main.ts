@@ -1,4 +1,5 @@
 import "./style.css";
+import { BreathMonitor } from "./breath";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { createUI } from "./ui";
@@ -43,6 +44,63 @@ const interaction = new Interaction(
     ui.tools.hidden = !interaction.palette;
   },
 );
+let breath: BreathMonitor | undefined;
+let microphoneContext: AudioContext | undefined;
+let micState = "off",
+  micAttempt = 0;
+let micPoll: ReturnType<typeof setInterval> | undefined;
+function disableMicrophone() {
+  micAttempt++;
+  clearInterval(micPoll);
+  breath?.stop();
+  breath = undefined;
+  if (microphoneContext && microphoneContext.state !== "closed")
+    void microphoneContext.close();
+  microphoneContext = undefined;
+  micState = "off";
+  ui.microphone.textContent = "Enable breath";
+  ui.microphone.setAttribute("aria-pressed", "false");
+}
+ui.microphone.addEventListener("click", async () => {
+  if (micState !== "off") {
+    disableMicrophone();
+    return;
+  }
+  const attempt = ++micAttempt;
+  micState = "requesting";
+  ui.microphone.textContent = "Cancel microphone";
+  try {
+    microphoneContext = new AudioContext();
+    await microphoneContext.resume();
+    const stream = await camera.microphone();
+    if (attempt !== micAttempt) {
+      stream.getTracks().forEach((t) => t.stop());
+      return;
+    }
+    breath = new BreathMonitor(microphoneContext, stream, (strength) =>
+      renderer?.fog.injectBreath(strength, 120),
+    );
+    micState = "calibrating";
+    ui.microphone.textContent = "Calibrating…";
+    ui.microphone.setAttribute("aria-pressed", "true");
+    ui.status.textContent =
+      "Stay quiet briefly while the microphone learns the room.";
+    micPoll = setInterval(() => {
+      if (breath?.detector.calibrated) {
+        micState = "on";
+        ui.microphone.textContent = "Breath on · disable";
+        ui.status.textContent =
+          "Blow gently toward your microphone to add steam. B also works.";
+        clearInterval(micPoll);
+      }
+    }, 100);
+  } catch {
+    if (attempt !== micAttempt) return;
+    disableMicrophone();
+    ui.status.textContent =
+      "Microphone unavailable or permission denied. Hold B or choose Add steam.";
+  }
+});
 let revealFile: File | undefined;
 let revealGeneration = 0;
 async function refreshReveal() {
@@ -141,6 +199,7 @@ ui.skipCalibration.addEventListener("click", () => {
 });
 ui.exit.addEventListener("click", () => {
   camera.stop();
+  disableMicrophone();
   hand?.stop();
   renderer?.dispose();
   location.reload();
@@ -203,6 +262,7 @@ ui.canvas.addEventListener("webglcontextlost", (e) => {
   e.preventDefault();
   mode = "context-lost";
   camera.stop();
+  disableMicrophone();
   hand?.stop();
   renderer?.dispose();
   ui.status.textContent = "The mirror paused. Reload this page to restore it.";
@@ -254,6 +314,7 @@ addEventListener("blur", () => {
 });
 addEventListener("pagehide", () => {
   camera.stop();
+  disableMicrophone();
   hand?.stop();
   renderer?.dispose();
 });
@@ -274,6 +335,8 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         milestone: "V1 writing",
         paused: interaction.paused,
         mirrorMode: interaction.mode,
+        microphone: micState,
+        breathStrength: breath?.detector.strength || 0,
         revealReady: revealGeneration,
         palette: interaction.palette,
         canUndo: renderer?.fog.canUndo,

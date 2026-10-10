@@ -56,3 +56,10 @@
 - Fixed mode accessible label and prevented keyboard shortcuts inside fields; tests check typed C/S cannot clear/download.
 - Validation: 27 committed unit tests + 17 E2E pass (35.3s); lint/types/build/diff pass. No backend/off-origin requests.
 - Next: optional audio/capture; realism/performance; lab/replay and final visual baselines.
+
+## V1 optional breath — 2026-10-10
+- Explicit opt-in local microphone, 800ms room calibration, weighted spectral-noise detector, adaptive floor and hysteresis; clean disable/exit.
+- Synthetic live Web Audio noise triggers actual fog; denied mic retains B/Add steam. This is an experimental audio cue, not breath recognition.
+- Validation: 29 committed unit tests + 19 E2E pass (46.2s), build/lint/types clean. Real-mouth onset and false triggers remain manual.
+- Latest user steering: detailed current tracking/condensation research, five new pins/three reels, minimal cute feminine UI, VR clarification asked.
+- Next: reference/research report; precision upgrades; realism/UI and remaining capture/lab QA.

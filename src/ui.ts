@@ -30,6 +30,8 @@ export function createUI() {
         <button id="apply-message">Use message</button>
         <label class="file-label">Use a photo<input id="reveal-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
       </div>
+      <button id="microphone" aria-pressed="false">Enable breath</button>
+      <p class="microphone-note">Experimental audio trigger. Microphone stays off until enabled.</p>
       <button id="recalibrate">Calibrate hand</button>
       <button id="clear">Clear</button>
       <button id="undo">Undo</button>
@@ -40,6 +42,7 @@ export function createUI() {
     <footer><span>Take a breath. Stay a while.</span><span id="footer-note">MADE TO DISAPPEAR</span></footer>`;
   return {
     canvas: document.querySelector<HTMLCanvasElement>("#mirror")!,
+    microphone: document.querySelector<HTMLButtonElement>("#microphone")!,
     modeSelect: document.querySelector<HTMLSelectElement>("#mirror-mode")!,
     density: document.querySelector<HTMLInputElement>("#density")!,
     revealEditor: document.querySelector<HTMLElement>("#reveal-editor")!,

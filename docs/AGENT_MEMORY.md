@@ -4,7 +4,7 @@ Read at session start alongside AGENTS.md; historical notes remain in MEMORY.md.
 
 ## Current milestone
 
-V1 Magic Reveal complete; optional microphone/capture next. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
+V1 optional microphone complete; latest steering prioritizes tracking research, realistic glass and simpler feminine UI. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
 half-float ping-pong fog, mouse/touch wiping, regrowth, B/C/S/H, startup fallback.
 
 ## Stable architecture
@@ -14,7 +14,7 @@ New brief recommends React/Canvas; stack decision asked, existing code preserved
 
 ## Current validation
 
-Build/lint/typecheck pass; 27 committed unit tests and 17 Playwright tests pass (35.3s); isolated audio/capture tests also pass. Four M2 captures inspected.
+Build/lint/typecheck pass; 29 committed unit tests and 19 Playwright tests pass (46.2s); standalone capture-format test also passes. Four M2 captures inspected.
 A real physical camera/hand/breath session has NOT been validated.
 
 ## Known issues
@@ -33,6 +33,6 @@ MASTER_BUILD_PROMPT.md preserves the user-provided local build brief.
 
 ## Next 3 actions
 
-1. Wire optional calibrated microphone and photo/video controls.
-2. Finish realism and adaptive performance.
+1. Research latest references/physics/precision and document evidence.
+2. Improve tracking latency/stability and simplify visual direction.
 3. Finish realism/performance, lab/replay and final visual regression.

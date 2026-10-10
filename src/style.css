@@ -388,3 +388,5 @@ input[type="file"] {
   background: #8fa3b077;
   border-radius: 4px;
 }
+
+.microphone-note{font-size:10px;color:#b9c9ca;line-height:1.5;margin:0;width:100%;text-align:center}
