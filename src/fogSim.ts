@@ -5,9 +5,19 @@ export class FogSim {
   private buffers: WebGLFramebuffer[] = [];
   private program: WebGLProgram;
   private index = 0;
-  private points: { x: number; y: number; down: boolean }[] = [];
+  private points: {
+    x: number;
+    y: number;
+    down: boolean;
+    radius: number;
+    palm: boolean;
+  }[] = [];
   private last: { x: number; y: number } | null = null;
   private held = false;
+  private history: Float32Array[] = [];
+  private future: Float32Array[] = [];
+  paused = false;
+  density = 1;
   private strength = 0;
   private until = 0;
   readonly size = 192;
@@ -65,6 +75,9 @@ export class FogSim {
     }
     this.clear();
   }
+  setTimeScale(value: number) {
+    if (Number.isFinite(value)) this.speed = Math.max(0, Math.min(30, value));
+  }
   get texture() {
     return this.textures[this.index];
   }
@@ -75,11 +88,13 @@ export class FogSim {
   setBreathing(value: boolean) {
     this.held = value;
   }
-  finger(x: number, y: number, down: boolean) {
+  finger(x: number, y: number, down: boolean, radius = 0.028, palm = false) {
     this.points.push({
       x: Math.max(0, Math.min(1, x)),
       y: 1 - Math.max(0, Math.min(1, y)),
       down,
+      radius,
+      palm,
     });
   }
   update(dt: number, aspect: number) {
@@ -88,6 +103,11 @@ export class FogSim {
     const steps = Math.max(1, points.length);
     for (let i = 0; i < steps; i++) {
       const point = points[i];
+      if (point?.down && !this.last) {
+        this.history.push(this.pixels());
+        if (this.history.length > 12) this.history.shift();
+        this.future = [];
+      }
       const start = this.last || point || { x: 0, y: 0 };
       const end = point || start;
       const target = 1 - this.index;
@@ -98,15 +118,23 @@ export class FogSim {
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       const loc = (name: string) => gl.getUniformLocation(this.program, name);
       gl.uniform1i(loc("previous"), 0);
-      gl.uniform1f(loc("dt"), (dt * this.speed) / steps);
+      gl.uniform1f(loc("dt"), this.paused ? 0 : (dt * this.speed) / steps);
       gl.uniform1f(
         loc("breath"),
-        this.held ? 1 : performance.now() < this.until ? this.strength : 0,
+        this.paused
+          ? 0
+          : this.held
+            ? this.density
+            : performance.now() < this.until
+              ? this.strength * this.density
+              : 0,
       );
       gl.uniform2f(loc("from"), start.x, start.y);
       gl.uniform2f(loc("to"), end.x, end.y);
       gl.uniform1f(loc("drawing"), point?.down ? 1 : 0);
       gl.uniform1f(loc("aspect"), aspect);
+      gl.uniform1f(loc("radius"), point?.radius || 0.028);
+      gl.uniform1f(loc("palm"), point?.palm ? 1 : 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       this.index = target;
       if (point) this.last = point.down ? point : null;
@@ -136,6 +164,44 @@ export class FogSim {
       );
     return data[(py * this.size + px) * 4];
   }
+  undo() {
+    const snapshot = this.history.pop();
+    if (!snapshot) return false;
+    this.future.push(this.pixels());
+    this.restore(snapshot);
+    return true;
+  }
+  redo() {
+    const snapshot = this.future.pop();
+    if (!snapshot) return false;
+    this.history.push(this.pixels());
+    this.restore(snapshot);
+    return true;
+  }
+  get canUndo() {
+    return this.history.length > 0;
+  }
+  get canRedo() {
+    return this.future.length > 0;
+  }
+  private restore(data: Float32Array) {
+    this.points = [];
+    this.last = null;
+    const gl = this.gl;
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texSubImage2D(
+      gl.TEXTURE_2D,
+      0,
+      0,
+      0,
+      this.size,
+      this.size,
+      gl.RGBA,
+      gl.FLOAT,
+      data,
+    );
+  }
   clear() {
     const gl = this.gl;
     for (const buffer of this.buffers) {
@@ -145,6 +211,8 @@ export class FogSim {
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     this.last = null;
+    this.history = [];
+    this.future = [];
     this.points = [];
     this.until = 0;
     this.held = false;

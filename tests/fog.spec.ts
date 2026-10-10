@@ -56,6 +56,11 @@ test("unanswered permissions never block keyboard and mouse fallback", async ({
     .poll(() => run(page, (a) => a.getFogCoverage()))
     .toBeGreaterThan(0.5);
   await page.keyboard.up("b");
+  await page.evaluate(() =>
+    (
+      window as unknown as { __foglass: { setTimeScale: (n: number) => void } }
+    ).__foglass.setTimeScale(0),
+  );
   await page.mouse.move(200, 360);
   await page.mouse.down();
   await page.mouse.move(1000, 360, { steps: 12 });

@@ -2,6 +2,7 @@ import "./style.css";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { createUI } from "./ui";
+import { Interaction } from "./interaction";
 import { HandController } from "./hand";
 import { calibrationSteps } from "./calibration";
 import type { GestureRecording } from "./tracking/types";
@@ -24,6 +25,37 @@ try {
   ui.start.disabled = true;
   mode = "unsupported";
 }
+const interaction = new Interaction(
+  {
+    finger: (x, y, down, radius, palm) =>
+      renderer?.fog.finger(x, y, down, radius, palm),
+    clear: () => renderer?.fog.clear(),
+    injectBreath: (strength, ms) => renderer?.fog.injectBreath(strength, ms),
+  },
+  () => {
+    if (renderer) {
+      renderer.fog.paused = interaction.paused;
+      renderer.fog.density = interaction.density;
+    }
+    ui.pause.textContent = interaction.paused ? "Resume" : "Pause";
+    ui.tools.hidden = !interaction.palette;
+  },
+);
+ui.pause.addEventListener("click", () => interaction.togglePause());
+ui.clear.addEventListener("click", () => renderer?.fog.clear());
+ui.refog.addEventListener("click", () => renderer?.fog.injectBreath(1, 1800));
+ui.undo.addEventListener("click", () => {
+  interaction.lift();
+  renderer?.fog.undo();
+});
+ui.redo.addEventListener("click", () => {
+  interaction.lift();
+  renderer?.fog.redo();
+});
+ui.toolToggle.addEventListener("click", () => {
+  interaction.palette = !interaction.palette;
+  ui.tools.hidden = !interaction.palette;
+});
 function updateCalibration() {
   if (!hand) return;
   ui.calibration.hidden = !hand.calibration.active;
@@ -33,6 +65,7 @@ async function startHand(mock = false) {
   if (hand) return;
   hand = new HandController(camera.video, (state, point) => {
     updateCalibration();
+    interaction.update(state, point, hand?.calibration.active);
     if (!point) {
       ui.cursor.classList.remove("visible");
       return;
@@ -96,13 +129,17 @@ const move = (e: PointerEvent) => {
   };
   ui.cursor.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
   ui.cursor.classList.add("visible");
-  renderer?.fog.finger(pointer.x, pointer.y, pointer.down);
+  renderer?.fog.finger(
+    pointer.x,
+    pointer.y,
+    pointer.down && !interaction.paused,
+  );
 };
 ui.canvas.addEventListener("pointermove", move);
 ui.canvas.addEventListener("pointerdown", (e) => {
   move(e);
   pointer.down = true;
-  renderer?.fog.finger(pointer.x, pointer.y, true);
+  renderer?.fog.finger(pointer.x, pointer.y, !interaction.paused);
   ui.canvas.setPointerCapture(e.pointerId);
   ui.cursor.classList.add("down");
 });
@@ -128,6 +165,21 @@ addEventListener("keydown", (e) => {
   if (e.repeat) return;
   const key = e.key.toLowerCase();
   if (key === "h") ui.status.hidden = !ui.status.hidden;
+  if (key === " ") {
+    e.preventDefault();
+    interaction.togglePause();
+  }
+  if ((e.ctrlKey || e.metaKey) && key === "z") {
+    e.preventDefault();
+    interaction.lift();
+    if (e.shiftKey) renderer?.fog.redo();
+    else renderer?.fog.undo();
+  }
+  if ((e.ctrlKey || e.metaKey) && key === "y") {
+    e.preventDefault();
+    interaction.lift();
+    renderer?.fog.redo();
+  }
   if (key === "b") renderer?.fog.setBreathing(true);
   if (key === "c") renderer?.fog.clear();
   if (key === "s") {
@@ -165,9 +217,14 @@ if (new URLSearchParams(location.search).get("test") === "1") {
       sampleMask: (x: number, y: number) => renderer?.fog.sample(x, y) || 0,
       replay: (recording: GestureRecording, realtime = false) =>
         hand?.replay(recording, realtime),
+      setTimeScale: (value: number) => renderer?.fog.setTimeScale(value),
       getFps: () => renderer?.fps || 0,
       getState: () => ({
-        milestone: 2,
+        milestone: "V1 writing",
+        paused: interaction.paused,
+        palette: interaction.palette,
+        canUndo: renderer?.fog.canUndo,
+        canRedo: renderer?.fog.canRedo,
         mediaPhase: camera.phase,
         tracking: hand?.metrics() || { status: "off" },
         gesture: hand?.state?.gesture || "none",

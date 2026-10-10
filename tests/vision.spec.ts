@@ -21,6 +21,7 @@ test("mock provider drives the production recognizer and cursor", async ({
   }, point);
   await expect(page.locator("#cursor")).toHaveClass(/visible/);
   await expect(page.locator("#camera-state")).toContainText("POINT");
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await page.getByRole("button", { name: "Calibrate hand" }).click();
   await expect(
     page.getByRole("region", { name: "Hand calibration" }),

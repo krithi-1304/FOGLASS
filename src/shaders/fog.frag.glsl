@@ -9,6 +9,8 @@ uniform vec2 from;
 uniform vec2 to;
 uniform float drawing;
 uniform float aspect;
+uniform float radius;
+uniform float palm;
 void main(){
  vec2 p=uv*vec2(aspect,1.),a=from*vec2(aspect,1.),b=to*vec2(aspect,1.);
  vec2 ab=b-a;
@@ -21,7 +23,9 @@ void main(){
  reservoir=1.-(1.-reservoir)*exp(-deposition);
  float fog=mix(old.r,reservoir,1.-exp(-dt/3.2));
  fog=1.-(1.-fog)*exp(-deposition);
- float wipe=(1.-smoothstep(.023,.042,d))*drawing;
+ float streak=.93+.07*sin(dot(p,normalize(vec2(-ab.y,ab.x)+vec2(.00001)))*280.);
+ float brush=radius*(1.+.06*palm*sin(uv.y*90.+uv.x*25.));
+ float wipe=(1.-smoothstep(brush*.65,brush*1.25,d))*drawing*(1.-.08*palm)*mix(1.,streak,palm);
  fog*=1.-wipe;
  result=vec4(clamp(fog,0.,1.),reservoir,0.,1.);
 }

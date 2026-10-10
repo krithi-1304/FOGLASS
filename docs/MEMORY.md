@@ -42,3 +42,10 @@
 - Fixed Vite first-dynamic-import reload by pre-optimizing MediaPipe; retained bundled licenses and fonts.
 - Validation: 24 unit tests + 11 E2E pass, local model inference and failure included; build/lint/types green. Physical camera accuracy remains unverified.
 - Next: palm/point → fog; undo/redo and gesture conflict journeys; reveal modes.
+
+## V1 physical wiping / writing — 2026-10-10
+- Stable gestures drive variable palm capsules/residual streaks and Catmull-Rom fingertip paths; no draw when lost/low-confidence/calibrating.
+- Added pause/palette/clear/reset, pinch density adjustment, conventional controls and bounded mask snapshot undo/redo.
+- Accelerated regrowth affected UI-driven history tests; explicit test-only clock freeze now isolates mask identity while separate regrowth test remains live.
+- Validation: 26 unit + 14 E2E pass (56.8s); lint/types/build and diff checks pass. Physical feel remains manual.
+- Next: three V1 modes/reveal; optional microphone/capture; realism and final QA.
