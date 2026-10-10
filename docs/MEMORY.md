@@ -28,3 +28,10 @@
 - Start now enters fallback immediately; camera request independent with 12s permission timeout, late tracks stopped; camera-free entry added.
 - Build/lint and 8/8 Playwright tests pass; reviewed none/light/heavy/stroke captures. First none capture caught entry transition; capture wait corrected.
 - Next: actual microphone breath detection; local MediaPipe hand tracking; live interaction validation.
+
+## V1 foundation — 2026-10-10
+- Preserved user master brief; created current memory, architecture/decisions/feature/test/manual matrices and roadmap.
+- Added provider interface, validated recording schema, mock replay, 13 original synthetic fixtures, Vitest and CI.
+- Existing renderer retained provisionally; stack clarification asked. No backend/paid service introduced.
+- Validation: lint/typecheck/build pass; 2 unit tests and 8 E2E pass; diff whitespace check clean.
+- Next: local MediaPipe; stable gestures/calibration; palm/writing integration.

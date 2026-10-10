@@ -28,3 +28,7 @@
 - Batch independent commands and install dependencies together.
 - Screenshots viewed only at M2 and M7; M7 none/light/heavy/mid-stroke.
 - Maximum three visual iterations. Do not delegate without explicit request.
+- Updated V1 brief: read docs/AGENT_MEMORY.md and docs/DECISIONS.md before coding.
+- Track feature/test matrices, manual limits and known issues; conventional logical commits.
+- Provider/mock and landmark regression fixtures mandatory; new open-palm gesture wipes.
+- No paid APIs, media uploads, speculative backend or unsupported completion claims.
