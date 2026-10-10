@@ -49,3 +49,10 @@
 - Accelerated regrowth affected UI-driven history tests; explicit test-only clock freeze now isolates mask identity while separate regrowth test remains live.
 - Validation: 26 unit + 14 E2E pass (56.8s); lint/types/build and diff checks pass. Physical feel remains manual.
 - Next: three V1 modes/reveal; optional microphone/capture; realism and final QA.
+
+## V1 Magic Reveal — 2026-10-10
+- Added Real Mirror/Fog Writing/Magic Reveal; message or validated local photo uses same persistent fog mask.
+- Entry now condenses automatically; conventional steam strength control, local font/text rendering, original procedural stars.
+- Fixed mode accessible label and prevented keyboard shortcuts inside fields; tests check typed C/S cannot clear/download.
+- Validation: 27 committed unit tests + 17 E2E pass (35.3s); lint/types/build/diff pass. No backend/off-origin requests.
+- Next: optional audio/capture; realism/performance; lab/replay and final visual baselines.

@@ -325,3 +325,66 @@ body.started footer {
   min-height: 40px;
   padding: 0 14px;
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  font-size: 11px;
+  color: #dce6e3;
+}
+select,
+textarea {
+  font: inherit;
+  font-size: 12px;
+  color: #edf0ea;
+  background: #234247;
+  border: 1px solid #cfd8de55;
+  border-radius: 6px;
+  padding: 10px;
+  max-width: 100%;
+  width: 100%;
+  resize: vertical;
+}
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 2px solid #ffb36b;
+  outline-offset: 3px;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: #ffb36b;
+}
+#reveal-editor {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.file-label {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 0;
+}
+input[type="file"] {
+  font: inherit;
+  max-width: 220px;
+  color: #dce6e3;
+}
+#tools {
+  max-height: calc(100svh - 210px);
+  overflow: auto;
+}
+#tools::-webkit-scrollbar {
+  width: 5px;
+}
+#tools::-webkit-scrollbar-thumb {
+  background: #8fa3b077;
+  border-radius: 4px;
+}

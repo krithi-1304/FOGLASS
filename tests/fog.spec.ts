@@ -70,6 +70,7 @@ test("unanswered permissions never block keyboard and mouse fallback", async ({
 test("capture M2 glass states", async ({ page }) => {
   await page.goto("/?test=1&seed=7");
   await page.getByRole("button", { name: "Try without camera" }).click();
+  await page.keyboard.press("c");
   await page.waitForTimeout(1000);
   await page.screenshot({ path: "test-results/m2-none.png" });
   await run(page, (a) => a.injectBreath(0.5, 700));

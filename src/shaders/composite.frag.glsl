@@ -4,6 +4,8 @@ in vec2 uv;
 out vec4 color;
 uniform sampler2D camera;
 uniform sampler2D fogMask;
+uniform sampler2D revealImage;
+uniform float revealMode;
 uniform vec2 resolution;
 uniform vec2 videoSize;
 uniform float cameraMix;
@@ -39,9 +41,10 @@ vec3 feed(vec2 p){
 void main(){
  vec3 c=mix(room(uv),feed(uv),cameraMix);
  float fog=texture(fogMask,uv).r;
+ c=mix(c,texture(revealImage,uv).rgb,revealMode);
  vec3 frost=mix(vec3(.56,.65,.69),vec3(.81,.85,.87),uv.y);
  float textureNoise=hash(floor(uv*resolution*.65));
- c=mix(c,frost,fog*(.84+textureNoise*.06));
+ c=mix(c,frost,smoothstep(0.,.9,fog)*(.96+textureNoise*.04));
  float vignette=smoothstep(.18,.82,length((uv-.5)*vec2(1.,.85)));
  c*=1.-vignette*.24;
  c+=(hash(gl_FragCoord.xy+mod(time,100.)*.73)-.5)*.024;

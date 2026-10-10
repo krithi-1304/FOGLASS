@@ -7,6 +7,8 @@ export class Renderer {
   private program: WebGLProgram;
   private texture: WebGLTexture;
   private vao: WebGLVertexArrayObject;
+  private revealTexture: WebGLTexture;
+  reveal = false;
   private locations = new Map<string, WebGLUniformLocation>();
   private frame = 0;
   private previous = 0;
@@ -68,6 +70,23 @@ export class Renderer {
       gl.UNSIGNED_BYTE,
       new Uint8Array([0, 0, 0, 255]),
     );
+    this.revealTexture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, this.revealTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([0, 0, 0, 255]),
+    );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     for (const name of [
       "camera",
       "resolution",
@@ -76,6 +95,8 @@ export class Renderer {
       "time",
       "seed",
       "fogMask",
+      "revealImage",
+      "revealMode",
     ])
       this.locations.set(name, gl.getUniformLocation(this.program, name)!);
     this.fog = new FogSim(gl);
@@ -132,10 +153,21 @@ export class Renderer {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.fog.texture);
     gl.uniform1i(this.locations.get("fogMask")!, 1);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, this.revealTexture);
+    gl.uniform1i(this.locations.get("revealImage")!, 2);
+    gl.uniform1f(this.locations.get("revealMode")!, this.reveal ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.frames++;
     this.frame = requestAnimationFrame(this.render);
   };
+  setReveal(source: HTMLCanvasElement) {
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, this.revealTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+  }
   sample(x: number, y: number) {
     const pixel = new Uint8Array(4);
     this.gl.readPixels(
@@ -153,6 +185,7 @@ export class Renderer {
     cancelAnimationFrame(this.frame);
     this.fog.dispose();
     this.gl.deleteTexture(this.texture);
+    this.gl.deleteTexture(this.revealTexture);
     this.gl.deleteVertexArray(this.vao);
     this.gl.deleteProgram(this.program);
   }

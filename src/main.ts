@@ -2,6 +2,7 @@ import "./style.css";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
 import { createUI } from "./ui";
+import { messageLayer, imageLayer } from "./reveal";
 import { Interaction } from "./interaction";
 import { HandController } from "./hand";
 import { calibrationSteps } from "./calibration";
@@ -38,9 +39,53 @@ const interaction = new Interaction(
       renderer.fog.density = interaction.density;
     }
     ui.pause.textContent = interaction.paused ? "Resume" : "Pause";
+    ui.density.value = String(Math.round(interaction.density * 100));
     ui.tools.hidden = !interaction.palette;
   },
 );
+let revealFile: File | undefined;
+let revealGeneration = 0;
+async function refreshReveal() {
+  const generation = ++revealGeneration;
+  const width = Math.round((720 * innerWidth) / innerHeight),
+    height = 720;
+  try {
+    const layer = revealFile
+      ? await imageLayer(revealFile, width, height)
+      : await messageLayer(ui.revealMessage.value, width, height);
+    if (generation === revealGeneration) renderer?.setReveal(layer);
+  } catch (e) {
+    ui.status.textContent = (e as Error).message;
+  }
+}
+ui.modeSelect.addEventListener("change", () => {
+  const mode = ui.modeSelect.value as "mirror" | "writing" | "reveal";
+  interaction.setMode(mode);
+  if (renderer) renderer.reveal = mode === "reveal";
+  ui.revealEditor.hidden = mode !== "reveal";
+  if (mode === "reveal") {
+    void refreshReveal();
+    renderer?.fog.injectBreath(1, 1500);
+  }
+});
+ui.density.addEventListener("input", () => {
+  interaction.density = Number(ui.density.value) / 100;
+  if (renderer) renderer.fog.density = interaction.density;
+});
+ui.applyMessage.addEventListener("click", () => {
+  revealFile = undefined;
+  void refreshReveal();
+});
+ui.revealFile.addEventListener("change", () => {
+  revealFile = ui.revealFile.files?.[0];
+  if (revealFile) void refreshReveal();
+});
+let revealResize: ReturnType<typeof setTimeout>;
+addEventListener("resize", () => {
+  clearTimeout(revealResize);
+  if (interaction.mode === "reveal")
+    revealResize = setTimeout(() => void refreshReveal(), 150);
+});
 ui.pause.addEventListener("click", () => interaction.togglePause());
 ui.clear.addEventListener("click", () => renderer?.fog.clear());
 ui.refog.addEventListener("click", () => renderer?.fog.injectBreath(1, 1800));
@@ -105,6 +150,7 @@ function enter() {
   ui.welcome.inert = true;
   mode = "fallback";
   ui.dock.hidden = false;
+  renderer?.fog.injectBreath(0.85, 1200);
   if (isTest && params.get("mock") === "1") void startHand(true);
   ui.status.textContent = "Hold B to fog · drag to draw · C clear · S save";
 }
@@ -162,7 +208,12 @@ ui.canvas.addEventListener("webglcontextlost", (e) => {
   ui.status.textContent = "The mirror paused. Reload this page to restore it.";
 });
 addEventListener("keydown", (e) => {
-  if (e.repeat) return;
+  if (
+    e.repeat ||
+    (e.target instanceof HTMLElement &&
+      e.target.matches("input,textarea,select"))
+  )
+    return;
   const key = e.key.toLowerCase();
   if (key === "h") ui.status.hidden = !ui.status.hidden;
   if (key === " ") {
@@ -222,6 +273,8 @@ if (new URLSearchParams(location.search).get("test") === "1") {
       getState: () => ({
         milestone: "V1 writing",
         paused: interaction.paused,
+        mirrorMode: interaction.mode,
+        revealReady: revealGeneration,
         palette: interaction.palette,
         canUndo: renderer?.fog.canUndo,
         canRedo: renderer?.fog.canRedo,

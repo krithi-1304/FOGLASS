@@ -4,7 +4,7 @@ Read at session start alongside AGENTS.md; historical notes remain in MEMORY.md.
 
 ## Current milestone
 
-V1 physical wiping/writing complete; Magic Reveal next. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
+V1 Magic Reveal complete; optional microphone/capture next. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
 half-float ping-pong fog, mouse/touch wiping, regrowth, B/C/S/H, startup fallback.
 
 ## Stable architecture
@@ -14,7 +14,7 @@ New brief recommends React/Canvas; stack decision asked, existing code preserved
 
 ## Current validation
 
-Build/lint/typecheck pass; 26 Vitest tests and 14 Playwright tests pass (56.8s). Four M2 captures inspected.
+Build/lint/typecheck pass; 27 committed unit tests and 17 Playwright tests pass (35.3s); isolated audio/capture tests also pass. Four M2 captures inspected.
 A real physical camera/hand/breath session has NOT been validated.
 
 ## Known issues
@@ -33,6 +33,6 @@ MASTER_BUILD_PROMPT.md preserves the user-provided local build brief.
 
 ## Next 3 actions
 
-1. Add three V1 modes and a local message/image reveal layer.
-2. Add optional microphone and capture controls.
+1. Wire optional calibrated microphone and photo/video controls.
+2. Finish realism and adaptive performance.
 3. Finish realism/performance, lab/replay and final visual regression.

@@ -23,6 +23,13 @@ export function createUI() {
       <button id="exit">Close mirror</button>
     </nav>
     <section id="tools" hidden aria-label="Mirror tools">
+      <label class="field">Mode<select id="mirror-mode" aria-label="Mode"><option value="mirror">Real Mirror</option><option value="writing">Fog Writing</option><option value="reveal">Magic Reveal</option></select></label>
+      <label class="field">Steam strength<input aria-label="Steam strength" id="density" type="range" min="10" max="100" value="75"></label>
+      <div id="reveal-editor" hidden>
+        <label class="field">Hidden message<textarea aria-label="Hidden message" id="reveal-message" maxlength="180" rows="2">You are here. That is enough.</textarea></label>
+        <button id="apply-message">Use message</button>
+        <label class="file-label">Use a photo<input id="reveal-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      </div>
       <button id="recalibrate">Calibrate hand</button>
       <button id="clear">Clear</button>
       <button id="undo">Undo</button>
@@ -33,6 +40,13 @@ export function createUI() {
     <footer><span>Take a breath. Stay a while.</span><span id="footer-note">MADE TO DISAPPEAR</span></footer>`;
   return {
     canvas: document.querySelector<HTMLCanvasElement>("#mirror")!,
+    modeSelect: document.querySelector<HTMLSelectElement>("#mirror-mode")!,
+    density: document.querySelector<HTMLInputElement>("#density")!,
+    revealEditor: document.querySelector<HTMLElement>("#reveal-editor")!,
+    revealMessage:
+      document.querySelector<HTMLTextAreaElement>("#reveal-message")!,
+    applyMessage: document.querySelector<HTMLButtonElement>("#apply-message")!,
+    revealFile: document.querySelector<HTMLInputElement>("#reveal-file")!,
     refog: document.querySelector<HTMLButtonElement>("#refog")!,
     toolToggle: document.querySelector<HTMLButtonElement>("#tool-toggle")!,
     pause: document.querySelector<HTMLButtonElement>("#pause")!,
