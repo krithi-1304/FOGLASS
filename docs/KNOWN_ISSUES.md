@@ -1,6 +1,7 @@
 # Known issues
 
-- Physical hand tracking and microphone accuracy not yet implemented/verified.
+- Physical hand tracking accuracy unverified; MediaPipe local initialization/inference is automated.
+- Microphone trigger not implemented yet.
 - Six Pinterest references inaccessible; no claim of matching their unseen content.
 - Canvas-only fallback for WebGL2/float-texture absence not yet implemented.
 - Current fog is functional but needs spatial texture, droplets, refraction and residual streaks.

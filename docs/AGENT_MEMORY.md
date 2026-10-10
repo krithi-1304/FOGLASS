@@ -4,7 +4,7 @@ Read at session start alongside AGENTS.md; historical notes remain in MEMORY.md.
 
 ## Current milestone
 
-Updated V1 foundation complete. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
+Updated V1 vision/calibration complete; physical wiping next. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
 half-float ping-pong fog, mouse/touch wiping, regrowth, B/C/S/H, startup fallback.
 
 ## Stable architecture
@@ -14,12 +14,13 @@ New brief recommends React/Canvas; stack decision asked, existing code preserved
 
 ## Current validation
 
-Build/lint/typecheck pass; 2 Vitest tests and 8 Playwright tests pass (14.8s). Four M2 captures inspected.
+Build/lint/typecheck pass; 24 Vitest tests and 11 Playwright tests pass (20.7s). Four M2 captures inspected.
 A real physical camera/hand/breath session has NOT been validated.
 
 ## Known issues
 
-No real hand integration or calibrated mic trigger yet. Provider/mock replay tests pass.
+Local GPU MediaPipe infers fake video; mock and real providers share the recognizer.
+Actual physical hand/breath behavior still requires manual verification.
 Initial fallback screenshot caught fade transition; capture wait now corrected.
 Media permission prompts may remain open, but fallback no longer waits for them.
 
@@ -32,6 +33,6 @@ MASTER_BUILD_PROMPT.md preserves the user-provided local build brief.
 
 ## Next 3 actions
 
-1. Integrate MediaPipe provider and pure gesture recognizer using recorded fixtures.
-2. Integrate local MediaPipe, gesture features/stability and guided calibration.
+1. Connect stable palm/point gestures to brush commands, pause and reset.
+2. Add mask history and gesture-to-mask replay journeys.
 3. Connect palm/write gestures to persistent fog and validate failure states.

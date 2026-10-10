@@ -35,3 +35,10 @@
 - Existing renderer retained provisionally; stack clarification asked. No backend/paid service introduced.
 - Validation: lint/typecheck/build pass; 2 unit tests and 8 E2E pass; diff whitespace check clean.
 - Next: local MediaPipe; stable gestures/calibration; palm/writing integration.
+
+## V1 vision/calibration — 2026-10-10
+- Local GPU MediaPipe provider (2 hands) and mock share frame schema; One-Euro, cover mapping and stable gesture engine added.
+- Guided palm/range/point/pinch calibration, validated local preferences, cursor and explicit tracking-failure fallback.
+- Fixed Vite first-dynamic-import reload by pre-optimizing MediaPipe; retained bundled licenses and fonts.
+- Validation: 24 unit tests + 11 E2E pass, local model inference and failure included; build/lint/types green. Physical camera accuracy remains unverified.
+- Next: palm/point → fog; undo/redo and gesture conflict journeys; reveal modes.

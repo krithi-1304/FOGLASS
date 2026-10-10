@@ -235,3 +235,70 @@ body.started main {
   text-underline-offset: 4px;
   font-size: 11px;
 }
+
+[hidden] {
+  display: none !important;
+}
+#dock {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+  align-items: center;
+}
+#dock button {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 17px;
+  background: #173337b8;
+  font-size: 11px;
+}
+#calibration {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100% - 40px));
+  padding: 30px;
+  background: #173337ed;
+  border: 1px solid #cfd8de40;
+  text-align: center;
+  z-index: 4;
+  border-radius: 12px;
+}
+#calibration-step {
+  font:
+    32px "Instrument Serif",
+    serif;
+  margin: 0 0 12px;
+}
+.calibration-detail {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #cfd8de;
+}
+#skip-calibration {
+  font-size: 11px;
+  margin-top: 14px;
+}
+body.started footer {
+  opacity: 0;
+  pointer-events: none;
+}
+#status {
+  bottom: 82px;
+}
+@media (max-width: 600px) {
+  #dock {
+    bottom: 20px;
+    width: calc(100% - 32px);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #status {
+    bottom: 90px;
+  }
+}
