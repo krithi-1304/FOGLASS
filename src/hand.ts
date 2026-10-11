@@ -112,6 +112,7 @@ export class HandController {
     return {
       status: provider?.error ? "unavailable" : this.status,
       inferenceMs: provider?.inferenceMs || 0,
+      deliveryMs: provider?.deliveryMs || 0,
       inferenceFps: provider?.fps || 0,
       handCount: this.state?.count || 0,
       frames: provider?.frames || 0,
