@@ -183,3 +183,13 @@ The fog mask is now 512² (previously 192²), with eight bounded undo snapshots.
 The index brush radius is halved. Filtering follows the raw fingertip during
 gesture dwell and resets when switching between palm and fingertip coordinates.
 Primary hand selection preserves proximity/handedness when detection order changes.
+
+## Browser VR implementation and limits
+
+The optional WebXR path now requests `immersive-vr` with the `hand-tracking`
+feature, renders a fixed stereo glass plane, and maps `index-finger-tip` poses
+into it. Entry/exit depth hysteresis avoids rapid contact toggling. This follows
+the [W3C Hand Input specification](https://www.w3.org/TR/webxr-hand-input-1/).
+The existing webcam/reveal texture is displayed; no headset passthrough or
+3D reconstructed self-reflection is claimed. Contact projection is unit tested;
+physical headset placement, latency and comfort still require manual verification.

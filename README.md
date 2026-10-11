@@ -1,22 +1,77 @@
 # FOGLASS
 
-A browser-local fog mirror in progress. Current delivery: M0 scaffold, M1 mirror renderer.
+A private, browser-based fog mirror. Blow to bloom condensation, point to write,
+or move your palm to wipe. Cleared marks gradually steam over again.
 
-Use Node 22+ and pnpm. Run `pnpm install`, then `pnpm dev`.
-`pnpm build` checks TypeScript and bundles; `pnpm lint` checks source.
-`pnpm exec playwright install chromium` installs the browser.
-Run `pnpm test --reporter=line` for automated checks.
+## Run
 
-Start requests camera and microphone. Camera access needs localhost or HTTPS.
-No media is uploaded. Without permission, a procedural dusk scene remains available.
-Fog, breath detection, hand tracking and sound are planned for M2–M5.
-See docs/PRD.md, docs/DESIGN.md and docs/TEST_PLAN.md for scope and budgets.
+Node 22+ and pnpm:
 
-M1 includes mirrored cover-cropped camera video, blur/grain/vignette, a dusk fallback,
-pointer/touch cursor and responsive canvas (DPR capped at 1.5).
-H toggles the status hint. Pointer input does not wipe yet.
-The microphone track is released after permission checking until M3 adds analysis.
-Development instrumentation is available only at ?test=1:
-getState(), getFps(), samplePixel(x,y). Full fog injection APIs arrive in M2.
-Use ?seed=7 to freeze grain for deterministic rendering checks.
-Visual screenshot review is intentionally scheduled for M2 and M7.
+```sh
+pnpm install
+pnpm dev
+```
+
+Open the localhost address shown by Vite. Camera, microphone and WebXR require
+localhost or HTTPS. All models, WASM and fonts are served locally; no API key,
+account, backend or media upload is involved.
+
+## Use
+
+Start enables the front camera. Follow the short hand calibration or skip it.
+Point with only your index finger extended to write; move an open palm to wipe.
+Hold a fist to pause; two palms clear; two fingers open Tools. Tracking needs a
+well-lit, visible hand and cannot guarantee accuracy through occlusion.
+
+Tools contains optional **Enable breath**. Stay quiet during calibration, then
+blow gently towards the microphone. This is an experimental local noise detector,
+not speech recognition. Disable it anytime. A laptop mic may respond to fans or
+speech, and hardware testing is still required.
+
+**Try without camera** supports mouse/touch drawing. Hold **B** to add steam,
+**C** to clear, **S** to save PNG, **H** to toggle hints, **Space** to pause, **M** to toggle optional synthesized sound (off by default).
+Undo/redo use Ctrl/Cmd+Z and Shift+Ctrl/Cmd+Z. Tools also contains Real Mirror,
+Fog Writing, Magic Reveal, local photo/message reveal and ten-second video export.
+
+## VR
+
+Tools enables **Enter VR** only when the browser reports immersive VR support.
+The session requires headset hand tracking. A glass panel is anchored in front
+of your initial head position; touch it with your index fingertip to write.
+The bottom strip offers steam, clear and exit. Headset system controls can also exit.
+This is an experimental WebXR path, not a claim that a webcam supplies VR poses.
+It displays the existing mirror/reveal texture; it does not provide headset
+passthrough or a reconstructed reflection. Physical headset validation is pending.
+
+## Tune and diagnose
+
+Press **G** in development for the tuning panel (enable breath first for mic sliders).
+Press **F** for render statistics. `/lab` displays tracking metrics and records
+landmark JSON locally. Upload a recording there to replay it through the same
+recognizer and fog engine; video is never included in a gesture recording.
+
+Core tuning lives in `src/filters.ts`, `src/gestures.ts`, `src/breath.ts`, and
+`src/shaders/`. Hand inference runs in a worker with one frame in flight; old
+results are dropped. Resolution adapts while the 512² fog state is preserved.
+
+## Verify
+
+```sh
+pnpm exec playwright install chromium
+pnpm lint
+pnpm typecheck
+pnpm test:unit
+pnpm test --reporter=line
+pnpm build
+```
+
+Playwright uses fake media and deterministic landmark fixtures. `?test=1` exposes
+`window.__foglass` for breath/finger injection, mask sampling, replay and metrics.
+`?seed=7` freezes visual noise; `?speed=4` accelerates fog time. Tests also cover
+real local model initialization, microphone analyser input, denied devices,
+export, visual baselines and software-GL performance. Inspect screenshots before
+intentionally updating them with `--update-snapshots`.
+
+Research, limitations and manual hardware checks live in `docs/RESEARCH.md`,
+`docs/KNOWN_ISSUES.md`, and `docs/MANUAL_CAMERA_TESTS.md`. Automated passing tests
+are not proof of physical hand accuracy, real-mouth onset or headset compatibility.

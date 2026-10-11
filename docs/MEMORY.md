@@ -114,3 +114,11 @@
 - Added /lab landmark-only record/export/replay, development G tuning, F statistics and optional synthesized sound/M mute.
 - Contact mapping unit tests and lab/export/sound/drainage browser checks pass; narrowed writing visual reviewed on desktop and mobile.
 - Next: finish fixed-baseline full regression; record final metrics and commit; leave local preview running.
+
+## Final QA / performance report — 2026-10-11
+
+- All 33 unit and 25 Playwright tests pass (1.1m); lint, TypeScript, production build and diff checks pass.
+- Reviewed six snapshots: desktop/mobile invitation, no/light/heavy fog and thin heart writing; fixed-baseline comparison passes.
+- Software GL: initial 41.2 FPS failure corrected; final 53.1 FPS at 0.60 resolution scale (earlier reruns 54.8–55 at 0.69); no native-resolution/hardware latency claim.
+- Physical hand, real-mouth and headset tests remain NOT RUN; public user master prompt preserved; local preview http://127.0.0.1:5174/.
+- Next: physical camera/mouth matrix; headset contact/comfort matrix; tune recorded regressions if hardware evidence warrants.

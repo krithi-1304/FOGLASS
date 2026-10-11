@@ -17,3 +17,15 @@
 | Privacy                                                            | preferences validation          | no off-origin requests; exit stops | visible state    | permission UX             |
 | Performance                                                        | quality state                   | FPS/latency log                    | adaptive sizes   | midrange laptop/mobile    |
 | Tests never substitute synthetic pass for human/device validation. |
+
+## Latest precision / final QA additions
+
+| Requirement                              | Automated evidence                             | Hardware limit                         |
+| ---------------------------------------- | ---------------------------------------------- | -------------------------------------- |
+| Lower writing lag / stable hand identity | precision.test.ts synthetic ramp/noise/order   | real camera latency unmeasured         |
+| Background GPU inference                 | vision.spec.ts local worker/model/failure      | actual hands need manual matrix        |
+| Photo/video local export                 | capture.spec.ts and capture.test.ts            | codecs vary by browser                 |
+| WebXR contact depth/hysteresis           | xr.test.ts; unsupported browser in lab.spec.ts | headset NOT RUN                        |
+| Landmark laboratory/replay               | lab.spec.ts through production recognizer      | live recorded dataset needs user hands |
+| Minimal UI/four fog states               | final-qa.spec.ts reviewed snapshots            | platform rasterization tolerance       |
+| >45 FPS software GL                      | final-qa.spec.ts wall-clock throughput         | desktop/headset target not inferred    |

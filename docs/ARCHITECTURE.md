@@ -34,3 +34,15 @@ On exit stop tracks/inference/audio/timers; revoke object URLs and release GL re
 
 Unit logic tests + landmark fixture regressions + Playwright journeys + seeded snapshots.
 Physical accuracy is recorded separately in MANUAL_CAMERA_TESTS.md.
+
+## Implemented runtime refinements
+
+MediaPipe 1.1.0 runs inside tracking/hand.worker.ts with matching module WASM.
+The provider schedules decoded video frames, transfers one ImageBitmap at a time,
+and rejects observations older than 180 ms. Gesture state remains on the UI thread.
+The 512² RGBA16F mask stores fog, moisture reservoir and advected stroke water.
+Resolution adapts independently; undo keeps eight bounded mask snapshots.
+XRGlass uses a separate compatible GL context for stereo presentation and transfers
+the composed glass texture. A headset index joint touches a fixed plane with depth
+hysteresis; headset frames drive the renderer while its normal RAF is suspended.
+Lab and debug tools consume existing controllers, rather than duplicating vision.

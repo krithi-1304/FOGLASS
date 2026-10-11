@@ -19,3 +19,8 @@ Only ?test=1 exposes instrumentation; ?seed pins noise; ?speed scales fog time.
 | Real microphone onset and physical pointing latency require hardware manual QA.     |
 | Screenshots: none/light/heavy/mid-stroke, inspect only at M2 and M7.                |
 | M1 verifies actual rendered pixel variation and camera texture upload via test API. |
+
+Final evidence: `final-qa.spec.ts` covers six reviewed visual baselines and measured
+wall-clock FPS; `water.spec.ts` checks stroke-water deposition and downward drainage.
+`lab.spec.ts` covers landmark JSON replay/export and optional sound; `xr.test.ts`
+checks 3D contact projection and hysteresis. Headset stereo/comfort remain manual.

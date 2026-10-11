@@ -3,15 +3,15 @@
 - Read this file and the tail of docs/MEMORY.md at session start.
 - Build an aesthetic, analog fog mirror with local webcam and microphone processing.
 - Stack: Vite, TypeScript, vanilla, pnpm; raw WebGL2, ping-pong float fog masks.
-- CV: MediaPipe HandLandmarker GPU VIDEO, one hand; self-host model and WASM.
+- CV: MediaPipe HandLandmarker GPU VIDEO, up to two hands; self-host model and WASM.
 - Audio: analyser noise energy, adaptive floor, threshold and hysteresis; no speech recognition.
 - Smooth landmark 8 with One-Euro; continuous Catmull-Rom strokes.
-- Point draws, palm hovers; optional pinch thickens brush.
+- Point draws; open palm wipes per updated brief; pinch adjusts steam.
 - Breath ramps fog in 1.5s; onset <500ms; cleared trails regrow in 8–15s.
 - Heavy strokes spawn wobbling drips with thin trails.
 - Composite camera blur, refraction, droplets, grain, vignette and warm bloom.
 - Self-host Instrument Serif or Fraunces and Inter. Tiny, quiet UI.
-- Start requests camera/mic; denied devices retain mouse/touch and B fallback.
+- Start requests camera; microphone is an explicit optional toggle; retain mouse/touch and B fallback.
 - C clears, S saves PNG, H toggles hints, M toggles sound (off initially).
 - Cap DPR at 1.5; adaptive resolution above 20ms; CV 30Hz, render 60Hz.
 - Preserve fog across resize/orientation. Target finger latency <80ms.

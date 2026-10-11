@@ -1,38 +1,34 @@
 # Current project memory
 
-Read at session start alongside AGENTS.md; historical notes remain in MEMORY.md.
+Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
-## Current milestone
+## State
 
-V1 optional microphone complete; latest steering prioritizes tracking research, realistic glass and simpler feminine UI. Prior M0–M2 committed: vanilla Vite/TS, WebGL2 mirror,
-half-float ping-pong fog, mouse/touch wiping, regrowth, B/C/S/H, startup fallback.
+Implemented: local mirrored camera, half-float fog/writing/regrowth, palm gestures,
+undo/redo, guided calibration, Magic Reveal, optional calibrated microphone,
+photo/video export, pearl/rose minimal UI, wet-edge optics and draining moisture.
+MediaPipe 1.1.0 GPU now runs in a worker; frame scheduling has one in-flight frame.
+512² mask, tuned One-Euro, narrower writing brush and stable hand identity are covered.
+Added /lab local landmark recording/replay, G development tuning, F statistics,
+optional M sound, and capability-checked WebXR glass with index-joint contact.
 
-## Stable architecture
+## Validation
 
-Browser only, no backend, no uploads, local fonts. Existing renderer is tested.
-New brief recommends React/Canvas; stack decision asked, existing code preserved.
+Final: 33 unit tests + 25 Playwright tests pass (browser suite 1.1m).
+Lint, TypeScript, production build and diff checks pass.
+Six visual baselines reviewed: desktop/mobile invitation and four glass states.
+Final software-GL measurement: 53.1 FPS at 0.60 resolution scale; previous runs 54.8–55 FPS at 0.69.
+Physical camera/mouth and headset tests remain NOT RUN.
 
-## Current validation
+## Constraints
 
-Build/lint/typecheck pass; 29 committed unit tests and 19 Playwright tests pass (46.2s); standalone capture-format test also passes. Four M2 captures inspected.
-A real physical camera/hand/breath session has NOT been validated.
-
-## Known issues
-
-Local GPU MediaPipe infers fake video; mock and real providers share the recognizer.
-Actual physical hand/breath behavior still requires manual verification.
-Initial fallback screenshot caught fade transition; capture wait now corrected.
-Media permission prompts may remain open, but fallback no longer waits for them.
-
-## Decisions / constraints
-
-New user brief supersedes old open-palm hover: open palm now wipes, two hands allowed.
-Keep tested implementation; no paid services, account, media upload, speculative backend.
-Six Pinterest links blocked; follow written visual direction without claiming pin inspection.
-MASTER_BUILD_PROMPT.md preserves the user-provided local build brief.
+Preserve vanilla TS/raw WebGL architecture, no paid APIs, backend or uploads.
+Original user public/models/MASTER_PROMPT.md remains untouched/untracked.
+Five newer Pinterest stills and three Instagram covers inspected; full reels unavailable.
+No promise of perfect tracking, real headset passthrough or reconstructed reflection.
 
 ## Next 3 actions
 
-1. Research latest references/physics/precision and document evidence.
-2. Improve tracking latency/stability and simplify visual direction.
-3. Finish realism/performance, lab/replay and final visual regression.
+1. Open the running preview at http://127.0.0.1:5174/.
+2. Run the manual camera/mouth/headset matrix on actual hardware.
+3. Tune only against recorded evidence; preserve the green replay/visual suites.
