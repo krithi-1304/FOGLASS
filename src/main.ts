@@ -366,6 +366,8 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         videoReady: camera.video.readyState,
         mode,
         frames: renderer?.frames || 0,
+        quality: renderer?.quality || 1,
+        frameMs: renderer?.frameMs || 0,
         uploads: renderer?.uploads || 0,
         width: ui.canvas.width,
         height: ui.canvas.height,

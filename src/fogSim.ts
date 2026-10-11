@@ -20,6 +20,7 @@ export class FogSim {
   density = 1;
   private strength = 0;
   private until = 0;
+  private bloomAge = 0;
   readonly size = 512;
   private speed = Math.min(
     30,
@@ -99,6 +100,9 @@ export class FogSim {
   }
   update(dt: number, aspect: number) {
     const gl = this.gl;
+    const breathing = this.held || performance.now() < this.until;
+    if (!this.paused)
+      this.bloomAge = breathing ? this.bloomAge + dt * this.speed : 0;
     const points = this.points.splice(0);
     const steps = Math.max(1, points.length);
     for (let i = 0; i < steps; i++) {
@@ -118,6 +122,10 @@ export class FogSim {
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       const loc = (name: string) => gl.getUniformLocation(this.program, name);
       gl.uniform1i(loc("previous"), 0);
+      gl.uniform1f(
+        loc("bloomRadius"),
+        Math.min(1.5, 0.18 + this.bloomAge * 1.1),
+      );
       gl.uniform1f(loc("dt"), this.paused ? 0 : (dt * this.speed) / steps);
       gl.uniform1f(
         loc("breath"),

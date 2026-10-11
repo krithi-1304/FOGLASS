@@ -16,6 +16,10 @@ export class Renderer {
   frames = 0;
   uploads = 0;
   fps = 60;
+  quality = 1;
+  frameMs = 16.67;
+  private qualitySince = 0;
+  private lastVideoTime = -1;
   constructor(
     readonly canvas: HTMLCanvasElement,
     private video: HTMLVideoElement,
@@ -108,8 +112,16 @@ export class Renderer {
       ? Math.min((now - this.previous) / 1000, 0.1)
       : 1 / 60;
     this.previous = now;
-    this.fps += (1 / dt - this.fps) * 0.03;
-    const dpr = Math.min(devicePixelRatio, 1.5);
+    const elapsed = this.previous ? dt * 1000 : 16.67;
+    this.frameMs += (elapsed - this.frameMs) * 0.03;
+    this.fps = 1000 / this.frameMs;
+    if (now - this.qualitySince > 2500 && !document.hidden) {
+      if (this.frameMs > 20) this.quality = Math.max(0.6, this.quality - 0.1);
+      else if (this.frameMs < 17.5)
+        this.quality = Math.min(1, this.quality + 0.05);
+      this.qualitySince = now;
+    }
+    const dpr = Math.min(devicePixelRatio, 1.5) * this.quality;
     const w = Math.max(1, Math.round(this.canvas.clientWidth * dpr)),
       h = Math.max(1, Math.round(this.canvas.clientHeight * dpr));
     if (this.canvas.width !== w || this.canvas.height !== h) {
@@ -123,7 +135,8 @@ export class Renderer {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     const ready = this.video.readyState >= 2 && this.video.videoWidth > 0;
-    if (ready) {
+    if (ready && this.video.currentTime !== this.lastVideoTime) {
+      this.lastVideoTime = this.video.currentTime;
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(
         gl.TEXTURE_2D,

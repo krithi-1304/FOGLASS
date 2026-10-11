@@ -99,3 +99,9 @@
 - Added local photo button and bounded 10-second MediaRecorder export with teardown; S remains the PNG shortcut.
 - Validation: 32 unit + 20 browser tests, lint and production build pass; visual review reserved for final four-state batch.
 - Next: condensation/refraction/drainage; adaptive performance and diagnostics; final visual QA.
+
+## Wet-glass rendering milestone — 2026-10-11
+- Fog now blooms centre-outward, retains uneven optical transmission, refracts wipe edges and carries procedural microbeads plus draining stroke water.
+- Renderer skips duplicate camera uploads and scales resolution after sustained >20ms frame times; fog state remains fixed-resolution across resize.
+- Validation: 20 browser regressions pass (49.6s), lint/build pass. Visual review and measured performance remain final QA tasks.
+- Next: diagnostics/replay; actual WebXR entry with device capability checks; final visual and performance QA.
