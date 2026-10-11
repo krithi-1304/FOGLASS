@@ -34,3 +34,19 @@ Installed Vite: MIT; TypeScript/Playwright/MediaPipe: Apache-2.0. Fonts: OFL.
 Use bundled official model/WASM and original procedural imagery/text, no external paid API.
 Retain third-party notices. No claims about free hosting quotas needed: deployment excluded.
 Revisit: any new dependency or externally sourced visual asset.
+
+## D-006 — 2026-10-10 — Research-led precision improvements, not a heavy model swap
+Reason: current defects include low mask resolution, normalized-unit filter tuning,
+hand identity and blocking inference; a new reconstruction model does not fix these.
+Alternatives: WiLoR/MANO stack (Python/CUDA/assets), optical flow, native headset tracking.
+Consequences: retain browser-local MediaPipe, benchmark filters, improve mask/identity,
+test worker execution and new-frame scheduling. WebXR is a separate device-specific path.
+Revisit: measured recordings demonstrate a model limitation after pipeline fixes.
+Evidence: docs/RESEARCH.md. No guarantee of perfect physical tracking.
+
+## D-007 — 2026-10-10 — Simpler pearl/rose interface
+Reason: user explicitly requests minimal, cute, feminine styling and fewer visible options.
+Alternatives: prior cool editorial hero and permanently visible multi-action dock.
+Consequences: one primary start action, small fallback/privacy, secondary tool panel;
+glass stays visually realistic. Preserve all existing functional controls/tests.
+Revisit: reviewed desktop/mobile captures and user feedback.

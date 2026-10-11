@@ -63,3 +63,10 @@
 - Validation: 29 committed unit tests + 19 E2E pass (46.2s), build/lint/types clean. Real-mouth onset and false triggers remain manual.
 - Latest user steering: detailed current tracking/condensation research, five new pins/three reels, minimal cute feminine UI, VR clarification asked.
 - Next: reference/research report; precision upgrades; realism/UI and remaining capture/lab QA.
+
+## Reference / research findings — 2026-10-10
+- Viewed five new Pinterest images via public metadata and all three Instagram covers; full reels unavailable, no inferred tracking-speed claim.
+- Added detailed primary-source research: condensation/wetting, One-Euro tuning, browser scheduling, WiLoR tradeoffs and WebXR hardware distinction.
+- Identified coarse 192² mask, poorly scaled beta, palm-to-finger filter transition and hand-order risks; registry stable MediaPipe is 1.1.0.
+- Current app baseline remains 29 committed unit + 19 E2E green; VR/headset meaning not answered, no hardware claim.
+- Next: stable-version validation and precision benchmark; glass physics/minimal feminine UI; remaining capture/lab/QA.
