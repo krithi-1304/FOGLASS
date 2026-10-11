@@ -20,7 +20,7 @@ export class FogSim {
   density = 1;
   private strength = 0;
   private until = 0;
-  readonly size = 192;
+  readonly size = 512;
   private speed = Math.min(
     30,
     Math.max(
@@ -105,7 +105,7 @@ export class FogSim {
       const point = points[i];
       if (point?.down && !this.last) {
         this.history.push(this.pixels());
-        if (this.history.length > 12) this.history.shift();
+        if (this.history.length > 8) this.history.shift();
         this.future = [];
       }
       const start = this.last || point || { x: 0, y: 0 };

@@ -70,3 +70,9 @@
 - Identified coarse 192² mask, poorly scaled beta, palm-to-finger filter transition and hand-order risks; registry stable MediaPipe is 1.1.0.
 - Current app baseline remains 29 committed unit + 19 E2E green; VR/headset meaning not answered, no hardware claim.
 - Next: stable-version validation and precision benchmark; glass physics/minimal feminine UI; remaining capture/lab/QA.
+
+## Precision milestone — 2026-10-11
+- Upgraded MediaPipe 1.1.0 plus matching local WASM; increased mask to 512², narrower index brush, eight undo snapshots.
+- Tuned normalized One-Euro response, reset palm/tip transitions, preserved hand identity across output reordering.
+- Validation: 32 unit tests (one pending capture test), 19 E2E pass in 1.1m; build and lint pass; physical tracking accuracy not measured.
+- Next: worker inference; minimal blush UI and wet-glass realism; capture/lab/final QA.

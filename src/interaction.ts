@@ -87,7 +87,7 @@ export class Interaction {
           0.05,
           Math.min(0.14, state.hand.width * 0.55 + state.speed * 0.018),
         )
-      : 0.022;
+      : 0.011;
     if (!this.previous)
       this.target.finger(point.x, point.y, true, radius, palm);
     else {

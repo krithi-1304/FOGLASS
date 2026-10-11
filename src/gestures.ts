@@ -71,13 +71,22 @@ export class GestureEngine {
   private prior: { p: Vec2; t: number } | null = null;
   private stationarySince = 0;
   private pinched = false;
+  private primary: HandFeatures | null = null;
   update(frame: HandFrame): GestureState {
     const valid = frame.hands
       .filter(
         (h) => h.confidence >= this.confidence && h.landmarks.length === 21,
       )
       .map(features);
+    if (this.primary) {
+      const previous = this.primary;
+      const score = (h: HandFeatures) =>
+        distance(h.palm, previous.palm) +
+        (h.handedness === previous.handedness ? 0 : 0.3);
+      valid.sort((a, b) => score(a) - score(b));
+    }
     const hand = valid[0] || null;
+    this.primary = hand;
     let raw: Gesture = "none";
     if (hand) {
       const e = hand.extended;
@@ -147,6 +156,7 @@ export class GestureEngine {
   }
   reset() {
     this.candidate = this.stable = "none";
+    this.primary = null;
     this.prior = null;
     this.fired = false;
     this.pinched = false;

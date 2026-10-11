@@ -15,6 +15,7 @@ export class HandController {
   private filterX = new OneEuro();
   private filterY = new OneEuro();
   private stopped = false;
+  private tipMode = false;
   state: GestureState | null = null;
   point: Vec2 | null = null;
   status = "off";
@@ -40,8 +41,14 @@ export class HandController {
       this.filterY.reset();
       this.point = null;
     } else {
-      const raw =
-        state.gesture === "point" ? state.hand.index : state.hand.palm;
+      const tipMode = state.raw === "point" || state.raw === "pinch";
+      if (tipMode !== this.tipMode) {
+        this.filterX.reset();
+        this.filterY.reset();
+        this.point = null;
+      }
+      this.tipMode = tipMode;
+      const raw = tipMode ? state.hand.index : state.hand.palm;
       const mapped = mirrorPoint(
         raw,
         (this.video.videoWidth || 1280) / (this.video.videoHeight || 720),

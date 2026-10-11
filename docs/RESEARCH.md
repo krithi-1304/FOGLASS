@@ -1,19 +1,21 @@
 # Real fog glass and precise air writing
+
 Research date: 2026-10-10. This is an engineering recommendation, not a claim of
 perfect tracking or a measured physical-camera accuracy improvement.
 
 ## Reference inspection: what was actually visible
+
 Public page metadata and image URLs were accessible by direct HTTP even when the
 browsing tool failed. These reference images were downloaded temporarily and viewed;
 none is bundled as an app asset.
 
-| Reference | Observed quality |
-|---|---|
-| [442267625931671994](https://www.pinterest.com/pin/442267625931671994/) | Warm bathroom light, translucent grey fog, irregular dark wet handprint, tiny beads and long drips. |
-| [802766702349608873](https://www.pinterest.com/pin/802766702349608873/) | Nonuniform fog, different wet handprints, surviving streaks; not uniform digital erasure. |
-| [398568635786919997](https://www.pinterest.com/pin/398568635786919997/) | Textured/frosted glass and a hand behind it; this is not identical to removable condensation. |
-| [1053490537808449907](https://www.pinterest.com/pin/1053490537808449907/) | Narrow smooth finger-cleared curve; surrounding reflection blurred; cleared curve has a wet edge. |
-| [991214199229074027](https://www.pinterest.com/pin/991214199229074027/) | Thin connected heart strokes, crisp local reflection, bright light blooming in fog. |
+| Reference                                                                 | Observed quality                                                                                    |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [442267625931671994](https://www.pinterest.com/pin/442267625931671994/)   | Warm bathroom light, translucent grey fog, irregular dark wet handprint, tiny beads and long drips. |
+| [802766702349608873](https://www.pinterest.com/pin/802766702349608873/)   | Nonuniform fog, different wet handprints, surviving streaks; not uniform digital erasure.           |
+| [398568635786919997](https://www.pinterest.com/pin/398568635786919997/)   | Textured/frosted glass and a hand behind it; this is not identical to removable condensation.       |
+| [1053490537808449907](https://www.pinterest.com/pin/1053490537808449907/) | Narrow smooth finger-cleared curve; surrounding reflection blurred; cleared curve has a wet edge.   |
+| [991214199229074027](https://www.pinterest.com/pin/991214199229074027/)   | Thin connected heart strokes, crisp local reflection, bright light blooming in fog.                 |
 
 Instagram public cover images/captions were inspected, but full video playback was
 not available. Therefore no FPS, lag or accuracy claim is inferred from those reels:
@@ -25,6 +27,7 @@ air-written strokes. Their visual simplicity, rather than their unmeasured track
 performance, is the relevant interface reference.
 
 ## What real exhalation does to a cold mirror
+
 Warm humid breath raises the water-vapor supply near cooler glass. When conditions
 permit condensation, liquid forms on the surface. Water vapor itself is invisible;
 the visible fog comes from condensed droplets. Surface temperature, room humidity
@@ -45,7 +48,9 @@ For this app, small beads stay pinned and only accumulated larger drops slide.
 [Nature Communications study](https://www.nature.com/articles/s41467-021-23708-6)
 
 ## Required visual qualities and implementation
+
 These are design/engineering approximations, not a fluid-dynamics solver.
+
 1. **Local breath bloom:** a soft center plume expands while breath is sustained.
 2. **Uneven deposition:** low-frequency density variation plus fine droplet texture.
 3. **Real reflection retained:** fog lowers contrast and increases blur; no flat white sheet.
@@ -60,12 +65,13 @@ These are design/engineering approximations, not a fluid-dynamics solver.
 12. **Personal reflection:** camera cover mapping, mirroring and fingertip mapping must agree.
 
 ## Tracking method comparison
-| Method | Strength | Constraint here | Decision |
-|---|---|---|---|
-| MediaPipe Tasks HandLandmarker | Official browser API, local GPU/WASM, temporal ROI reuse | Monocular ambiguity, occlusion, no per-joint certainty exposed | Retain, improve entire input pipeline |
-| WiLoR (CVPR 2025; repo fast mode updated March 2026) | Strong 3D hand localization/reconstruction | Official path uses PyTorch/CUDA and separately licensed MANO data | Not a drop-in browser writing upgrade |
-| Headset WebXR articulated hands | Device-native 3D joint positions in XR space | Requires compatible physical headset/browser and different scene/camera permissions | Separate provider if actual headset VR is wanted |
-| Optical-flow-only fingertip tracker | Can interpolate local image motion | Drifts, loses finger identity and fails on occlusion | Not primary; reconsider only after measured need |
+
+| Method                                               | Strength                                                 | Constraint here                                                                     | Decision                                         |
+| ---------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
+| MediaPipe Tasks HandLandmarker                       | Official browser API, local GPU/WASM, temporal ROI reuse | Monocular ambiguity, occlusion, no per-joint certainty exposed                      | Retain, improve entire input pipeline            |
+| WiLoR (CVPR 2025; repo fast mode updated March 2026) | Strong 3D hand localization/reconstruction               | Official path uses PyTorch/CUDA and separately licensed MANO data                   | Not a drop-in browser writing upgrade            |
+| Headset WebXR articulated hands                      | Device-native 3D joint positions in XR space             | Requires compatible physical headset/browser and different scene/camera permissions | Separate provider if actual headset VR is wanted |
+| Optical-flow-only fingertip tracker                  | Can interpolate local image motion                       | Drifts, loses finger identity and fails on occlusion                                | Not primary; reconsider only after measured need |
 
 MediaPipe's official guide describes internal hand-presence/tracking thresholds and
 warns that synchronous detection blocks the UI thread. Google's 2026 sample includes
@@ -86,6 +92,7 @@ that one model is universally best for all people, hands and environments.
 [Study/preprint](https://arxiv.org/abs/2606.17427)
 
 ## Concrete precision defects in the current implementation
+
 - The fog mask was 192×192: at 1280px width, one horizontal texel spans ~6.7px.
   Fine lines need a higher-resolution mask, not merely smoother landmarks.
 - One-Euro beta=0.12 with normalized coordinates barely raises cutoff during motion.
@@ -102,6 +109,7 @@ that one model is universally best for all people, hands and environments.
   thresholds, geometry sanity and temporal continuity; document the limitation.
 
 ## Filtering, interpolation and stroke policy
+
 The One-Euro authors recommend tuning stationary jitter first, then increasing beta
 to reduce motion lag; beta depends on measurement units. Our tuning is based on
 normalized coordinates and a deterministic ramp/noise benchmark, then requires
@@ -120,6 +128,7 @@ they are a scheduling aid, not proof of camera-to-photon latency.
 [Browser API documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestVideoFrameCallback)
 
 ## Breath trigger design
+
 Microphone stays off until explicitly enabled. Calibrate room noise, then use weighted
 spectral noise energy, a sustained onset and release hysteresis. Reject tonal hum and
 single-frame impulses. A detected burst feeds the visual moisture source; duration
@@ -127,6 +136,7 @@ and strength determine growth. This remains an experimental local audio trigger:
 speech, wind or fans can confuse it. B/Add steam remain alternatives.
 
 ## VR clarification
+
 A webcam virtual mirror is an interactive screen experience, not headset VR.
 Actual WebXR requires an XR session and the hand-tracking feature on supported
 hardware. Its joint poses are 3D and should be projected onto a mirror plane, with
@@ -135,6 +145,7 @@ available to ordinary webcam APIs. User's intended device is currently unresolve
 [W3C hand-input specification](https://www.w3.org/TR/webxr-hand-input-1/)
 
 ## Minimal feminine direction
+
 Warm pearl and dusty rose, soft serif lettering, one short invitation and one Start
 button. A small camera-free link and one privacy sentence are enough. Once inside,
 the reflection dominates; only a small steam action and Tools need to remain visible.
@@ -142,6 +153,7 @@ Modes, calibration, microphone and recording live in the secondary tools panel.
 No giant title repeated in the header, no technical status dashboard, no skeleton.
 
 ## Evaluation gates
+
 - Synthetic stationary jitter: RMS and peak-to-peak pixels at a fixed viewport.
 - Synthetic moving line: lag/error vs previous settings; label it synthetic.
 - No unwanted connector across hand loss, identity switch or discontinuity.
@@ -153,7 +165,21 @@ No giant title repeated in the header, no technical status dashboard, no skeleto
   “100% accurate” or “100% better” tracking for this app.
 
 ## Version check
+
 The npm registry was queried directly on 2026-10-10:
 latest = 1.1.0; nightly = 1.1.1-rc.20261010.
 Installed baseline was 0.10.35. Evaluate stable 1.1.0 with the local model and bundled
 matching WASM; do not use the nightly or claim improvement from version number alone.
+
+## Precision implementation — 2026-10-11
+
+The stable 1.1.0 package now uses its matching self-hosted WASM files.
+Normalized-coordinate One-Euro parameters are 2.4 Hz minimum cutoff and beta 18.
+A deterministic 30 Hz ramp regression requires less than half the old filter's
+accumulated lag; a stationary sinusoidal-jitter regression requires less than
+40% of input noise energy. These are synthetic filter tests, not measured human
+writing accuracy or camera-to-screen latency.
+The fog mask is now 512² (previously 192²), with eight bounded undo snapshots.
+The index brush radius is halved. Filtering follows the raw fingertip during
+gesture dwell and resets when switching between palm and fingertip coordinates.
+Primary hand selection preserves proximity/handedness when detection order changes.

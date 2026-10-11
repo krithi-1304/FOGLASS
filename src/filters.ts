@@ -10,8 +10,8 @@ export class OneEuro {
   private derivative = 0;
   private last = 0;
   constructor(
-    public minCutoff = 1.7,
-    public beta = 0.12,
+    public minCutoff = 2.4,
+    public beta = 18,
   ) {}
   filter(value: number, time: number) {
     if (this.value === null) {
