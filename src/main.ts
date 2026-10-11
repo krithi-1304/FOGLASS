@@ -1,4 +1,8 @@
 import "./style.css";
+import { RoomSound } from "./sound";
+import { installDebug } from "./debug";
+import { installLab } from "./lab";
+import { XRGlass, supportsVR } from "./xr";
 import { MirrorRecorder, savePhoto } from "./capture";
 import { BreathMonitor } from "./breath";
 import { Camera } from "./camera";
@@ -14,6 +18,17 @@ const isTest = params.get("test") === "1";
 const ui = createUI();
 const camera = new Camera();
 const recorder = new MirrorRecorder();
+const sound = new RoomSound();
+const toggleSound = async () => {
+  try {
+    const enabled = await sound.toggle();
+    ui.sound.textContent = enabled ? "Mute sound" : "Enable sound";
+    ui.sound.setAttribute("aria-pressed", String(enabled));
+  } catch {
+    ui.status.textContent = "Sound is unavailable in this browser.";
+  }
+};
+ui.sound.addEventListener("click", () => void toggleSound());
 const photo = () =>
   void savePhoto(ui.canvas).catch((e) => {
     ui.status.textContent = e.message;
@@ -36,6 +51,19 @@ let renderer: Renderer | undefined;
 let mode = "onboarding";
 let hand: HandController | undefined;
 let pointer = { x: 0.5, y: 0.5, down: false };
+let hintInteracted = false;
+function successfulStroke() {
+  sound.stroke();
+  if (hintInteracted) return;
+  hintInteracted = true;
+  const text = ui.status.textContent;
+  setTimeout(() => {
+    if (ui.status.textContent === text) ui.status.style.opacity = "0";
+  }, 4000);
+}
+new MutationObserver(() => {
+  ui.status.style.opacity = "1";
+}).observe(ui.status, { childList: true, characterData: true, subtree: true });
 try {
   renderer = new Renderer(
     ui.canvas,
@@ -49,8 +77,10 @@ try {
 }
 const interaction = new Interaction(
   {
-    finger: (x, y, down, radius, palm) =>
-      renderer?.fog.finger(x, y, down, radius, palm),
+    finger: (x, y, down, radius, palm) => {
+      renderer?.fog.finger(x, y, down, radius, palm);
+      if (down) successfulStroke();
+    },
     clear: () => renderer?.fog.clear(),
     injectBreath: (strength, ms) => renderer?.fog.injectBreath(strength, ms),
   },
@@ -185,7 +215,7 @@ function updateCalibration() {
   ui.calibrationStep.textContent = calibrationSteps[hand.calibration.step];
 }
 async function startHand(mock = false) {
-  if (hand) return;
+  if (hand) return hand;
   hand = new HandController(camera.video, (state, point) => {
     updateCalibration();
     interaction.update(state, point, hand?.calibration.active);
@@ -208,6 +238,7 @@ async function startHand(mock = false) {
     hand.beginCalibration();
     updateCalibration();
   }
+  return hand;
 }
 ui.recalibrate.addEventListener("click", () => {
   hand?.beginCalibration();
@@ -219,6 +250,7 @@ ui.skipCalibration.addEventListener("click", () => {
 });
 ui.exit.addEventListener("click", () => {
   recorder.dispose();
+  sound.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();
@@ -253,6 +285,7 @@ const move = (e: PointerEvent) => {
     y: e.clientY / innerHeight,
     down: pointer.down,
   };
+  if (pointer.down && !interaction.paused) successfulStroke();
   ui.cursor.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
   ui.cursor.classList.add("visible");
   renderer?.fog.finger(
@@ -283,6 +316,7 @@ ui.canvas.addEventListener("webglcontextlost", (e) => {
   e.preventDefault();
   mode = "context-lost";
   recorder.dispose();
+  sound.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();
@@ -297,7 +331,11 @@ addEventListener("keydown", (e) => {
   )
     return;
   const key = e.key.toLowerCase();
-  if (key === "h") ui.status.hidden = !ui.status.hidden;
+  if (key === "m") void toggleSound();
+  if (key === "h") {
+    ui.status.style.opacity = "1";
+    ui.status.hidden = !ui.status.hidden;
+  }
   if (key === " ") {
     e.preventDefault();
     interaction.togglePause();
@@ -329,6 +367,7 @@ addEventListener("blur", () => {
 });
 addEventListener("pagehide", () => {
   recorder.dispose();
+  sound.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();
@@ -340,11 +379,13 @@ if (new URLSearchParams(location.search).get("test") === "1") {
       injectBreath: (strength: number, ms: number) =>
         renderer?.fog.injectBreath(strength, ms),
       injectFinger: (x: number, y: number, down: boolean) =>
-        renderer?.fog.finger(x, y, down),
+        renderer?.fog.finger(x, y, down, 0.011),
       getFogCoverage: () => renderer?.fog.coverage() || 0,
       sampleMask: (x: number, y: number) => renderer?.fog.sample(x, y) || 0,
       replay: (recording: GestureRecording, realtime = false) =>
         hand?.replay(recording, realtime),
+      getWater: () => renderer?.fog.waterStats(),
+      seedCoverage: (value: number) => renderer?.fog.seedCoverage(value),
       setTimeScale: (value: number) => renderer?.fog.setTimeScale(value),
       getFps: () => renderer?.fps || 0,
       getState: () => ({
@@ -378,3 +419,44 @@ if (new URLSearchParams(location.search).get("test") === "1") {
     },
   });
 }
+
+const xr = new XRGlass();
+void supportsVR().then((supported) => {
+  ui.vr.disabled = !supported;
+  ui.vr.textContent = supported ? "Enter VR" : "VR needs a headset";
+});
+ui.vr.addEventListener("click", async () => {
+  if (!renderer) return;
+  try {
+    await xr.start(renderer, () => {
+      if (mode === "camera") void startHand();
+    });
+    hand?.stop();
+    hand = undefined;
+    ui.calibration.hidden = true;
+    interaction.lift();
+  } catch (error) {
+    ui.status.textContent = (error as Error).message;
+  }
+});
+const disposeDebug = renderer ? installDebug(renderer, () => breath) : () => {};
+const disposeLab =
+  location.pathname.replace(/\/$/, "") === "/lab"
+    ? installLab(
+        () => hand,
+        async (record) => {
+          enter();
+          hand?.stop();
+          hand = undefined;
+          const replayHand = await startHand(true);
+          replayHand?.skipCalibration();
+          updateCalibration();
+          await replayHand?.replay(record as GestureRecording, true);
+        },
+      )
+    : () => {};
+addEventListener("pagehide", () => {
+  xr.stop();
+  disposeLab();
+  disposeDebug();
+});

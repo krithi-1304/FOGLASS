@@ -157,6 +157,26 @@ export class FogSim {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return data;
   }
+  seedCoverage(value: number) {
+    this.clear();
+    const data = new Float32Array(this.size * this.size * 4);
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = data[i + 1] = Math.max(0, Math.min(1, value));
+      data[i + 3] = 1;
+    }
+    this.restore(data);
+  }
+  waterStats() {
+    const data = this.pixels();
+    let mass = 0,
+      weightedY = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const water = data[i + 2];
+      mass += water;
+      weightedY += (water * (Math.floor(i / 4 / this.size) + 0.5)) / this.size;
+    }
+    return { mass, y: mass ? weightedY / mass : 0 };
+  }
   coverage() {
     const data = this.pixels();
     let sum = 0;

@@ -592,3 +592,44 @@ input[type="range"] {
     display: none;
   }
 }
+.lab {
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  z-index: 8;
+  width: 280px;
+  max-height: calc(100svh - 160px);
+  overflow: auto;
+  padding: 18px;
+  color: #56434d;
+  background: #f3eae9f5;
+  border-radius: 16px;
+  font-size: 11px;
+}
+.lab h2 {
+  font:
+    26px "Instrument Serif",
+    serif;
+  margin: 0 0 8px;
+}
+.lab pre {
+  font-size: 10px;
+  white-space: pre-wrap;
+}
+.lab button {
+  min-height: 40px;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+.lab label {
+  display: block;
+}
+.lab input {
+  display: block;
+  margin-top: 8px;
+  width: 100%;
+}
+
+#status {
+  transition: opacity 1.5s;
+}

@@ -11,6 +11,7 @@ export class Renderer {
   reveal = false;
   private locations = new Map<string, WebGLUniformLocation>();
   private frame = 0;
+  private externalFrame = false;
   private previous = 0;
   private cameraMix = 0;
   frames = 0;
@@ -115,8 +116,15 @@ export class Renderer {
     const elapsed = this.previous ? dt * 1000 : 16.67;
     this.frameMs += (elapsed - this.frameMs) * 0.03;
     this.fps = 1000 / this.frameMs;
-    if (now - this.qualitySince > 2500 && !document.hidden) {
-      if (this.frameMs > 20) this.quality = Math.max(0.6, this.quality - 0.1);
+    if (
+      now - this.qualitySince > 1000 &&
+      !document.hidden &&
+      !(
+        new URLSearchParams(location.search).get("visual") === "1" &&
+        new URLSearchParams(location.search).get("test") === "1"
+      )
+    ) {
+      if (this.frameMs > 20) this.quality = Math.max(0.6, this.quality * 0.8);
       else if (this.frameMs < 17.5)
         this.quality = Math.min(1, this.quality + 0.05);
       this.qualitySince = now;
@@ -172,8 +180,17 @@ export class Renderer {
     gl.uniform1f(this.locations.get("revealMode")!, this.reveal ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.frames++;
-    this.frame = requestAnimationFrame(this.render);
+    if (!this.externalFrame) this.frame = requestAnimationFrame(this.render);
   };
+  setExternalFrame(active: boolean) {
+    this.externalFrame = active;
+    cancelAnimationFrame(this.frame);
+    this.previous = 0;
+    if (!active) this.frame = requestAnimationFrame(this.render);
+  }
+  renderExternal(now: number) {
+    this.render(now);
+  }
   setReveal(source: HTMLCanvasElement) {
     const gl = this.gl;
     gl.activeTexture(gl.TEXTURE2);

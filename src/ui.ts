@@ -32,6 +32,8 @@ export function createUI() {
       <button id="microphone" aria-pressed="false">Enable breath</button>
       <p class="microphone-note">Experimental audio trigger. Microphone stays off until enabled.</p>
       <button id="recalibrate">Calibrate hand</button>
+      <button id="sound" aria-pressed="false">Enable sound</button>
+      <button id="vr" disabled>VR unavailable</button>
       <button id="photo">Save photo</button>
       <button id="record">Record 10s</button>
       <button id="pause">Pause</button>
@@ -44,6 +46,8 @@ export function createUI() {
     <div id="cursor" aria-hidden="true"></div>
     <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
   return {
+    sound: document.querySelector<HTMLButtonElement>("#sound")!,
+    vr: document.querySelector<HTMLButtonElement>("#vr")!,
     photo: document.querySelector<HTMLButtonElement>("#photo")!,
     record: document.querySelector<HTMLButtonElement>("#record")!,
     canvas: document.querySelector<HTMLCanvasElement>("#mirror")!,
