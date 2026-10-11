@@ -29,3 +29,11 @@ Honor reduced motion for decorative drift. Pointer cursor fades when idle.
 
 M1 implements camera, procedural fallback, base blur/grain, vignette and tint.
 Fog, wipe physics and CV are later milestones; UI must not imply they work yet.
+
+## Pearl and rose refinement — 2026-10-11
+Landing: pearl #ece5e2, rose #d9b8c6, plum ink #51434b, primary #775569.
+One serif title, one invitation, one primary action; camera/privacy stays explicit.
+In-session dock contains only Add steam and Tools; other actions are tucked away.
+Glass preserves the camera colours, with cold condensation and a restrained warm bloom.
+Writing radius .011 viewport height; mask 512²; wet edge offset .014 × mask gradient.
+Microbeads use bounded procedural cells; residual stroke water drains downward and fades.

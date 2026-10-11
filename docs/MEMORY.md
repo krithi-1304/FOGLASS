@@ -93,3 +93,9 @@
 - New-video-frame scheduling avoids duplicate inference; observations older than 180ms release the pen; delivery latency is exposed.
 - Validation: production build/lint pass; all three model/mock/failure browser checks pass (10.9s), local assets only.
 - Next: simplify landing page; wet-glass rendering and capture; full regression/performance/visual QA.
+
+## Minimal interface / capture milestone — 2026-10-11
+- Pearl/rose landing reduces copy and hierarchy; session dock has only Steam/Tools; secondary actions remain accessible inside Tools.
+- Added local photo button and bounded 10-second MediaRecorder export with teardown; S remains the PNG shortcut.
+- Validation: 32 unit + 20 browser tests, lint and production build pass; visual review reserved for final four-state batch.
+- Next: condensation/refraction/drainage; adaptive performance and diagnostics; final visual QA.

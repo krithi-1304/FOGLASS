@@ -4,11 +4,11 @@ export function createUI() {
     <div class="edge" aria-hidden="true"></div>
     <header><span>FOGLASS</span><span id="camera-state">CAMERA OFF</span></header>
     <main id="welcome">
-      <h1>FOGLASS</h1>
-      <p class="invitation">Leave a little of yourself.<br>Let it disappear.</p>
-      <p class="instructions">Move your palm to wipe the glass.<br>Point a finger to leave a trace.</p>
+      <span class="little-star" aria-hidden="true">✧</span><h1>FOGLASS</h1>
+      <p class="invitation">a little space to leave a trace.</p>
+      <p class="instructions">Breathe. Draw. Let it disappear.</p>
       <button id="start">Start <span aria-hidden="true">↗</span></button>
-      <p class="privacy">Your camera is processed locally. Video is never uploaded.</p>
+      <p class="privacy">Just you and the glass. Camera stays on your device.</p>
       <button id="fallback" class="text-button">Try without camera</button>
     </main>
     <section id="calibration" hidden aria-label="Hand calibration">
@@ -19,8 +19,7 @@ export function createUI() {
     <nav id="dock" aria-label="Mirror controls" hidden>
       <button id="refog">Add steam</button>
       <button id="tool-toggle" aria-controls="tools">Tools</button>
-      <button id="pause">Pause</button>
-      <button id="exit">Close mirror</button>
+      
     </nav>
     <section id="tools" hidden aria-label="Mirror tools">
       <label class="field">Mode<select id="mirror-mode" aria-label="Mode"><option value="mirror">Real Mirror</option><option value="writing">Fog Writing</option><option value="reveal">Magic Reveal</option></select></label>
@@ -33,14 +32,20 @@ export function createUI() {
       <button id="microphone" aria-pressed="false">Enable breath</button>
       <p class="microphone-note">Experimental audio trigger. Microphone stays off until enabled.</p>
       <button id="recalibrate">Calibrate hand</button>
+      <button id="photo">Save photo</button>
+      <button id="record">Record 10s</button>
+      <button id="pause">Pause</button>
+      <button id="exit">Close mirror</button>
       <button id="clear">Clear</button>
       <button id="undo">Undo</button>
       <button id="redo">Redo</button>
     </section>
     <p id="status" role="status" aria-live="polite"></p>
     <div id="cursor" aria-hidden="true"></div>
-    <footer><span>Take a breath. Stay a while.</span><span id="footer-note">MADE TO DISAPPEAR</span></footer>`;
+    <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
   return {
+    photo: document.querySelector<HTMLButtonElement>("#photo")!,
+    record: document.querySelector<HTMLButtonElement>("#record")!,
     canvas: document.querySelector<HTMLCanvasElement>("#mirror")!,
     microphone: document.querySelector<HTMLButtonElement>("#microphone")!,
     modeSelect: document.querySelector<HTMLSelectElement>("#mirror-mode")!,

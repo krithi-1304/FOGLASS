@@ -88,6 +88,7 @@ test("model failure retains conventional controls", async ({ page }) => {
     "Hand tracking unavailable",
     { timeout: 30000 },
   );
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Close mirror" }),
   ).toBeVisible();

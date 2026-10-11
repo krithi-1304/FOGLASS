@@ -45,8 +45,8 @@ test("recorded pointing mutates mask and supports undo/redo", async ({
   );
   await replay(page, "index-draw-line");
   await expect.poll(() => sample(page, 0.5, 0.37)).toBeLessThan(0.25);
-  await page.getByRole("button", { name: "Pause", exact: true }).click();
   await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect.poll(() => sample(page, 0.5, 0.37)).toBeGreaterThan(0.5);
   await page.getByRole("button", { name: "Redo", exact: true }).click();
@@ -73,10 +73,12 @@ test("fist pauses, victory opens palette, lost hands release strokes", async ({
   await page.goto("/?test=1&mock=1");
   await page.getByRole("button", { name: "Try without camera" }).click();
   await replay(page, "fist");
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Resume", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Resume", exact: true }).click();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await replay(page, "two-finger-palette");
   await expect(
     page.getByRole("region", { name: "Mirror tools" }),

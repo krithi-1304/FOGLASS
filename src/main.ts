@@ -1,4 +1,5 @@
 import "./style.css";
+import { MirrorRecorder, savePhoto } from "./capture";
 import { BreathMonitor } from "./breath";
 import { Camera } from "./camera";
 import { Renderer } from "./renderer";
@@ -12,6 +13,25 @@ const params = new URLSearchParams(location.search);
 const isTest = params.get("test") === "1";
 const ui = createUI();
 const camera = new Camera();
+const recorder = new MirrorRecorder();
+const photo = () =>
+  void savePhoto(ui.canvas).catch((e) => {
+    ui.status.textContent = e.message;
+  });
+ui.photo.addEventListener("click", photo);
+ui.record.addEventListener("click", () => {
+  try {
+    if (recorder.active) recorder.stop();
+    else {
+      recorder.start(ui.canvas, () => {
+        ui.record.textContent = "Record 10s";
+      });
+      ui.record.textContent = "Stop recording";
+    }
+  } catch (e) {
+    ui.status.textContent = (e as Error).message;
+  }
+});
 let renderer: Renderer | undefined;
 let mode = "onboarding";
 let hand: HandController | undefined;
@@ -198,6 +218,7 @@ ui.skipCalibration.addEventListener("click", () => {
   updateCalibration();
 });
 ui.exit.addEventListener("click", () => {
+  recorder.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();
@@ -261,6 +282,7 @@ ui.canvas.addEventListener("pointerleave", () =>
 ui.canvas.addEventListener("webglcontextlost", (e) => {
   e.preventDefault();
   mode = "context-lost";
+  recorder.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();
@@ -295,14 +317,7 @@ addEventListener("keydown", (e) => {
   if (key === "c") renderer?.fog.clear();
   if (key === "s") {
     e.preventDefault();
-    ui.canvas.toBlob((blob) => {
-      if (!blob) return;
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "foglass.png";
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    });
+    photo();
   }
 });
 addEventListener("keyup", (e) => {
@@ -313,6 +328,7 @@ addEventListener("blur", () => {
   release();
 });
 addEventListener("pagehide", () => {
+  recorder.dispose();
   camera.stop();
   disableMicrophone();
   hand?.stop();

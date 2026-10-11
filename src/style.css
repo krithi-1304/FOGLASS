@@ -389,4 +389,206 @@ input[type="file"] {
   border-radius: 4px;
 }
 
-.microphone-note{font-size:10px;color:#b9c9ca;line-height:1.5;margin:0;width:100%;text-align:center}
+.microphone-note {
+  font-size: 10px;
+  color: #b9c9ca;
+  line-height: 1.5;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+/* Pearl, rose and ink: a quiet invitation; the live mirror stays full screen. */
+:root {
+  color: #51434b;
+  background: #ece5e2;
+  color-scheme: light;
+}
+#app {
+  min-height: 0;
+}
+body:not(.started) #mirror {
+  opacity: 0.3;
+  filter: blur(18px) saturate(0.55);
+}
+body:not(.started) #app {
+  background:
+    radial-gradient(ellipse at 28% 30%, #fff9f2, transparent 60%),
+    radial-gradient(ellipse at 80% 75%, #d9b8c6, transparent 60%), #e3dce0;
+}
+.edge {
+  border-color: #fff8;
+  border-radius: 28px;
+}
+header {
+  top: 32px;
+  left: 36px;
+  right: 36px;
+  font-size: 9px;
+  color: #66525e;
+}
+body:not(.started) header span:first-child {
+  visibility: hidden;
+}
+body:not(.started) #camera-state {
+  visibility: hidden;
+}
+main {
+  padding: 60px 24px;
+}
+.little-star {
+  font-size: 32px;
+  color: #9a6d80;
+  margin-bottom: 25px;
+}
+h1 {
+  font-size: clamp(62px, 10vw, 108px);
+  letter-spacing: -0.045em;
+  margin-bottom: 20px;
+  text-shadow: none;
+}
+.invitation {
+  font-size: clamp(22px, 3vw, 28px);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+.instructions {
+  font-size: 11px;
+  color: #725d68;
+  margin-bottom: 32px;
+  letter-spacing: 0.025em;
+}
+button {
+  color: #58434e;
+  border-color: #9e7e8d66;
+  background: #fff5;
+}
+button:hover {
+  background: #fff9;
+}
+button:focus-visible {
+  outline-color: #865c72;
+}
+#start {
+  background: #775569;
+  color: #fff8f5;
+  border: 0;
+  min-width: 150px;
+  box-shadow: 0 5px 25px #79536618;
+}
+#start:hover {
+  background: #654559;
+}
+.privacy {
+  font-size: 10px;
+  color: #715c68;
+  max-width: 260px;
+  line-height: 1.6;
+  margin-top: 24px;
+}
+.text-button {
+  font-size: 10px;
+  margin-top: 2px;
+  color: #735c68;
+  text-decoration-color: #a28a9680;
+}
+footer {
+  justify-content: center;
+  color: #796471;
+  bottom: 36px;
+}
+footer span:first-child {
+  font-size: 17px;
+}
+body.started header {
+  color: #fff5f4;
+  text-shadow: 0 1px 10px #152b2d;
+  pointer-events: none;
+}
+body.started .edge {
+  border-color: #ffffff14;
+}
+#dock {
+  bottom: max(22px, env(safe-area-inset-bottom));
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid #fff5;
+  border-radius: 30px;
+  background: #f1e6e5da;
+  backdrop-filter: blur(15px);
+}
+#dock button {
+  background: transparent;
+  color: #614957;
+  border: 0;
+  min-height: 40px;
+}
+#dock button:hover {
+  background: #fff8;
+}
+#status {
+  color: #fff;
+  text-shadow: 0 1px 6px #183136;
+  font-size: 11px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+body:not(.started) #status {
+  color: #715366;
+  text-shadow: none;
+}
+#tools,
+#calibration {
+  background: #f3eae9f5;
+  color: #56434d;
+  border: 1px solid #fff9;
+  border-radius: 20px;
+  box-shadow: 0 12px 60px #24323725;
+}
+#tools {
+  bottom: 120px;
+  max-height: calc(100svh - 155px);
+}
+.field,
+.calibration-detail,
+.microphone-note,
+input[type="file"] {
+  color: #705965;
+}
+select,
+textarea {
+  background: #fffc;
+  color: #56434d;
+  border-color: #aa899b55;
+}
+input[type="range"] {
+  accent-color: #9a7388;
+}
+#cursor {
+  width: 14px;
+  height: 14px;
+  margin: -7px;
+  border-color: #fff9;
+  box-shadow: 0 0 16px #ffe3ee80;
+}
+@media (max-height: 550px) {
+  .little-star {
+    display: none;
+  }
+  h1 {
+    font-size: 56px;
+    margin-bottom: 10px;
+  }
+  .invitation {
+    margin-bottom: 12px;
+  }
+  .instructions {
+    margin-bottom: 16px;
+  }
+  .privacy {
+    margin-top: 12px;
+  }
+  footer {
+    display: none;
+  }
+}
