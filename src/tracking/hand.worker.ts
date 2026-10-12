@@ -1,5 +1,9 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 let model: HandLandmarker | undefined;
+let delegate: "GPU" | "CPU" = "GPU";
+let samples: number[] = [];
+let gpuMs = 0;
+let compared = false;
 self.onmessage = async (event: MessageEvent) => {
   const data = event.data;
   try {
@@ -21,15 +25,38 @@ self.onmessage = async (event: MessageEvent) => {
       });
       self.postMessage({ type: "ready" });
     } else if (data.type === "frame" && model) {
+      const inferenceDelegate = delegate;
       const start = performance.now();
       const result = model.detectForVideo(data.bitmap, data.timestamp);
+      const inferenceMs = performance.now() - start;
+      samples.push(inferenceMs);
+      if (!compared && samples.length >= 8) {
+        const average = samples.slice(-4).reduce((a, b) => a + b, 0) / 4;
+        if (delegate === "GPU" && average > 90) {
+          gpuMs = average;
+          delegate = "CPU";
+          samples = [];
+          await model.setOptions({ baseOptions: { delegate } });
+        } else if (delegate === "CPU") {
+          compared = true;
+          if (average > gpuMs * 1.1) {
+            delegate = "GPU";
+            await model.setOptions({ baseOptions: { delegate } });
+          }
+        } else compared = true;
+      }
       self.postMessage({
         type: "frame",
+        delegate: inferenceDelegate,
         timestamp: data.timestamp,
-        inferenceMs: performance.now() - start,
+        inferenceMs,
         hands: result.landmarks.map((landmarks, i) => ({
           landmarks,
-          confidence: result.handedness[i]?.[0]?.score || 0,
+          // Model presence/detection thresholds already accepted this hand.
+          // Handedness probability describes left/right, not tracking quality.
+          confidence: 1,
+          handednessConfidence: result.handedness[i]?.[0]?.score || 0,
+          worldLandmarks: result.worldLandmarks[i],
           handedness:
             result.handedness[i]?.[0]?.categoryName === "Left"
               ? "Left"

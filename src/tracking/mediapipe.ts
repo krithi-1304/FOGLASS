@@ -17,6 +17,8 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   frames = 0;
   handCount = 0;
   error = "";
+  stage = "loading";
+  delegate = "GPU";
   interval = 33;
   initialize() {
     return new Promise<void>((resolve, reject) => {
@@ -45,17 +47,24 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
         }
         if (data.type === "frame") {
           this.busy = false;
+          this.stage = "waiting";
           const now = performance.now();
           this.inferenceMs = data.inferenceMs;
+          this.delegate = data.delegate;
           this.deliveryMs = now - data.timestamp;
           this.fps = this.lastResult ? 1000 / (now - this.lastResult) : 0;
           this.lastResult = now;
           this.frames++;
           this.handCount = data.hands.length;
-          // Never draw an old observation after tab suspension or a stalled inference.
+          // Reject suspension/queue stalls, not every valid result from a slower backend.
           const frame: HandFrame = {
             timestamp: data.timestamp,
-            hands: this.deliveryMs < 180 ? data.hands : [],
+            hands:
+              !document.hidden &&
+              this.deliveryMs < 400 &&
+              this.deliveryMs - this.inferenceMs < 150
+                ? data.hands
+                : [],
           };
           for (const cb of this.listeners) cb(frame);
         }
@@ -89,6 +98,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
         now - this.lastSent >= this.interval - 2
       ) {
         this.busy = true;
+        this.stage = "copying frame";
         this.lastVideo = video.currentTime;
         this.lastSent = now;
         void createImageBitmap(video)
@@ -97,6 +107,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
               bitmap.close();
               return;
             }
+            this.stage = "running inference";
             this.worker.postMessage({ type: "frame", bitmap, timestamp: now }, [
               bitmap,
             ]);

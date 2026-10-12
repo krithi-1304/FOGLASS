@@ -97,3 +97,21 @@ describe("filters and mapping", () => {
     expect(catmullRom(a, a, b, b, 1)).toEqual(b);
   });
 });
+it("recognizes a foreshortened pointing hand from world geometry", () => {
+  const hand = structuredClone(fixture("index-draw-line").frames[0].hands[0]);
+  hand.worldLandmarks = hand.landmarks.map((p) => ({ x: p.x, y: 0, z: p.y }));
+  hand.landmarks = hand.landmarks.map((p) => ({ ...p, y: 0.5, z: 0 }));
+  expect(features(hand).extended).toEqual([true, false, false, false]);
+});
+it("brief finger classification noise does not break writing but hand loss releases immediately", () => {
+  const point = fixture("index-draw-line").frames[0].hands;
+  const victory = fixture("two-finger-palette").frames[0].hands;
+  const engine = new GestureEngine();
+  engine.update({ timestamp: 0, hands: point });
+  expect(engine.update({ timestamp: 66, hands: point }).gesture).toBe("point");
+  expect(engine.update({ timestamp: 100, hands: victory }).gesture).toBe(
+    "point",
+  );
+  expect(engine.update({ timestamp: 133, hands: point }).gesture).toBe("point");
+  expect(engine.update({ timestamp: 166, hands: [] }).gesture).toBe("none");
+});

@@ -5,6 +5,8 @@ export interface Point {
 }
 export interface TrackedHand {
   landmarks: Point[];
+  worldLandmarks?: Point[];
+  handednessConfidence?: number;
   confidence: number;
   handedness: "Left" | "Right";
 }
@@ -57,7 +59,12 @@ export function parseRecording(value: unknown): GestureRecording {
         h.landmarks.length !== 21
       )
         throw new Error("Invalid hand");
-      for (const p of h.landmarks)
+      if (
+        h.worldLandmarks &&
+        (!Array.isArray(h.worldLandmarks) || h.worldLandmarks.length !== 21)
+      )
+        throw new Error("Invalid world landmarks");
+      for (const p of [...h.landmarks, ...(h.worldLandmarks || [])])
         if (
           !p ||
           ![p.x, p.y, p.z].every(Number.isFinite) ||

@@ -108,6 +108,7 @@ function disableMicrophone() {
     void microphoneContext.close();
   microphoneContext = undefined;
   micState = "off";
+  ui.breathFeedback.hidden = true;
   ui.microphone.textContent = "Enable breath";
   ui.microphone.setAttribute("aria-pressed", "false");
 }
@@ -131,17 +132,31 @@ ui.microphone.addEventListener("click", async () => {
       renderer?.fog.injectBreath(strength, 120),
     );
     micState = "calibrating";
+    breath.detector.sensitivity = Number(ui.breathSensitivity.value);
+    ui.breathFeedback.hidden = false;
     ui.microphone.textContent = "Calibrating…";
     ui.microphone.setAttribute("aria-pressed", "true");
     ui.status.textContent =
       "Stay quiet briefly while the microphone learns the room.";
     micPoll = setInterval(() => {
-      if (breath?.detector.calibrated) {
+      if (!breath) return;
+      const detector = breath.detector;
+      ui.breathMeter.value = Math.min(
+        3,
+        detector.energy / Math.max(detector.threshold, 1e-8),
+      );
+      ui.breathMessage.textContent = !detector.calibrated
+        ? "Stay quiet for a moment…"
+        : detector.active
+          ? "Breath detected"
+          : detector.energy < 0.00001
+            ? "No sound reaching the microphone"
+            : "Listening · blow toward your microphone";
+      if (detector.calibrated && micState !== "on") {
         micState = "on";
         ui.microphone.textContent = "Breath on · disable";
         ui.status.textContent =
           "Blow gently toward your microphone to add steam. B also works.";
-        clearInterval(micPoll);
       }
     }, 100);
   } catch {
@@ -150,6 +165,18 @@ ui.microphone.addEventListener("click", async () => {
     ui.status.textContent =
       "Microphone unavailable or permission denied. Hold B or choose Add steam.";
   }
+});
+ui.breathSensitivity.addEventListener("input", () => {
+  if (breath) breath.detector.sensitivity = Number(ui.breathSensitivity.value);
+});
+ui.recalibrateBreath.addEventListener("click", () => {
+  if (!breath) {
+    ui.status.textContent = "Enable breath first, then stay quiet briefly.";
+    return;
+  }
+  breath.detector.recalibrate();
+  micState = "calibrating";
+  ui.microphone.textContent = "Calibrating…";
 });
 let revealFile: File | undefined;
 let revealGeneration = 0;
@@ -219,6 +246,11 @@ async function startHand(mock = false) {
   hand = new HandController(camera.video, (state, point) => {
     updateCalibration();
     interaction.update(state, point, hand?.calibration.active);
+    ui.cameraState.textContent =
+      mode === "camera"
+        ? "CAMERA ON · " +
+          (state.hand ? state.gesture.toUpperCase() : "SHOW YOUR HAND")
+        : "REPLAY · " + state.gesture.toUpperCase();
     if (!point) {
       ui.cursor.classList.remove("visible");
       return;
@@ -235,8 +267,8 @@ async function startHand(mock = false) {
     ui.status.textContent =
       "Hand tracking unavailable. Hold B to fog; drag to draw.";
   else if (!isTest) {
-    hand.beginCalibration();
-    updateCalibration();
+    ui.status.textContent =
+      "Point to write · open palm to wipe · Enable breath to fog.";
   }
   return hand;
 }
@@ -394,6 +426,15 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         mirrorMode: interaction.mode,
         microphone: micState,
         breathStrength: breath?.detector.strength || 0,
+        breathSignal: breath
+          ? {
+              energy: breath.detector.energy,
+              floor: breath.detector.floor,
+              threshold: breath.detector.threshold,
+              flatness: breath.detector.flatness,
+              noiseLike: breath.detector.noiseLike,
+            }
+          : null,
         revealReady: revealGeneration,
         palette: interaction.palette,
         canUndo: renderer?.fog.canUndo,

@@ -39,7 +39,7 @@ Physical accuracy is recorded separately in MANUAL_CAMERA_TESTS.md.
 
 MediaPipe 1.1.0 runs inside tracking/hand.worker.ts with matching module WASM.
 The provider schedules decoded video frames, transfers one ImageBitmap at a time,
-and rejects observations older than 180 ms. Gesture state remains on the UI thread.
+and distinguishes inference cost from delivery stalls (400 ms absolute / 150 ms queue bound). Slow GPU processing triggers a bounded CPU comparison. Gesture state remains on the UI thread.
 The 512² RGBA16F mask stores fog, moisture reservoir and advected stroke water.
 Resolution adapts independently; undo keeps eight bounded mask snapshots.
 XRGlass uses a separate compatible GL context for stereo presentation and transfers

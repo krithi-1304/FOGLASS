@@ -18,14 +18,14 @@ account, backend or media upload is involved.
 
 ## Use
 
-Start enables the front camera. Follow the short hand calibration or skip it.
+Start enables the front camera and tracking immediately. Optional hand calibration is in Tools.
 Point with only your index finger extended to write; move an open palm to wipe.
 Hold a fist to pause; two palms clear; two fingers open Tools. Tracking needs a
 well-lit, visible hand and cannot guarantee accuracy through occlusion.
 
-Tools contains optional **Enable breath**. Stay quiet during calibration, then
+The mirror dock contains **Enable breath**. Stay quiet during calibration, then
 blow gently towards the microphone. This is an experimental local noise detector,
-not speech recognition. Disable it anytime. A laptop mic may respond to fans or
+not speech recognition. A live meter confirms the microphone is receiving input. Tools contains sensitivity and quiet-room recalibration. Disable it anytime. A laptop mic may respond to fans or
 speech, and hardware testing is still required.
 
 **Try without camera** supports mouse/touch drawing. Hold **B** to add steam,
@@ -51,8 +51,7 @@ landmark JSON locally. Upload a recording there to replay it through the same
 recognizer and fog engine; video is never included in a gesture recording.
 
 Core tuning lives in `src/filters.ts`, `src/gestures.ts`, `src/breath.ts`, and
-`src/shaders/`. Hand inference runs in a worker with one frame in flight; old
-results are dropped. Resolution adapts while the 512² fog state is preserved.
+`src/shaders/`. Hand inference runs in a worker with one frame in flight. Slow GPU inference triggers a measured CPU comparison; stale queued results are dropped. Resolution adapts while the 512² fog state is preserved.
 
 ## Verify
 

@@ -93,3 +93,36 @@ test("model failure retains conventional controls", async ({ page }) => {
     page.getByRole("button", { name: "Close mirror" }),
   ).toBeVisible();
 });
+
+test("real hand image reaches the worker and produces detected hands without forced calibration", async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  const photo = fs
+    .readFileSync(new URL("./fixtures/vision/woman_hands.jpg", import.meta.url))
+    .toString("base64");
+  await page.addInitScript(async (data) => {
+    navigator.mediaDevices.getUserMedia = async () => {
+      const image = new Image();
+      image.src = "data:image/jpeg;base64," + data;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext("2d")!;
+      const tick = () => {
+        ctx.drawImage(image, 0, 0);
+        requestAnimationFrame(tick);
+      };
+      tick();
+      return canvas.captureStream(30);
+    };
+  }, photo);
+  await page.goto("/?vision=1");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page.locator("#cursor")).toHaveClass(/visible/, {
+    timeout: 45000,
+  });
+  await expect(page.locator("#calibration")).toBeHidden();
+  await expect(page.locator("#cursor")).toHaveClass(/visible/);
+});

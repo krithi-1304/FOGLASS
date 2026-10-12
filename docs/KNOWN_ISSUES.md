@@ -7,3 +7,5 @@
 - Devices without WebGL2 plus floating-point render targets receive an explanatory error; a Canvas2D renderer is not implemented.
 - Condensation and water drainage are artistic approximations, not a thermodynamic simulation.
 - Original user-supplied public/models/MASTER_PROMPT.md is preserved; MASTER_BUILD_PROMPT.md is its documentation copy.
+
+- 2026-10-12: real-hand-photo inference now tested through a canvas camera stream. This validates the model/input path but not live occlusion or physical mouth accuracy.

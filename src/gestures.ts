@@ -16,18 +16,21 @@ export const distance = (a: Vec2, b: Vec2) => Math.hypot(a.x - b.x, a.y - b.y);
 export function features(hand: TrackedHand): HandFeatures {
   const p = hand.landmarks;
   const width = Math.max(0.015, distance(p[5], p[17]));
+  const geometry = hand.worldLandmarks || p;
+  const length = (a: Point, b: Point) =>
+    Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
   const extended = [8, 12, 16, 20].map((tip) => {
-    const a = p[tip - 2],
-      b = p[tip - 1],
-      c = p[tip];
-    const ux = a.x - b.x,
-      uy = a.y - b.y,
-      vx = c.x - b.x,
-      vy = c.y - b.y;
+    const a = geometry[tip - 3],
+      b = geometry[tip - 2],
+      c = geometry[tip];
+    const u = { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z },
+      v = { x: c.x - b.x, y: c.y - b.y, z: c.z - b.z };
     const cosine =
-      (ux * vx + uy * vy) /
-      Math.max(0.000001, Math.hypot(ux, uy) * Math.hypot(vx, vy));
-    return cosine < -0.55 && distance(c, p[0]) > distance(a, p[0]) * 1.12;
+      (u.x * v.x + u.y * v.y + u.z * v.z) /
+      Math.max(1e-8, Math.hypot(u.x, u.y, u.z) * Math.hypot(v.x, v.y, v.z));
+    return (
+      cosine < -0.45 && length(c, geometry[0]) > length(b, geometry[0]) * 1.08
+    );
   });
   const palm = [0, 5, 9, 13, 17]
     .map((i) => p[i])
@@ -108,8 +111,16 @@ export class GestureEngine {
       this.candidateSince = frame.timestamp;
       this.fired = false;
     }
-    if (raw === "none" || raw !== this.stable) this.stable = "none";
-    if (raw !== "none" && frame.timestamp - this.candidateSince >= this.dwell) {
+    const candidateAge = frame.timestamp - this.candidateSince;
+    const keepWriting =
+      this.stable === "point" &&
+      hand?.extended[0] &&
+      raw !== "pinch" &&
+      candidateAge < 75;
+    if ((raw === "none" || raw !== this.stable) && !keepWriting)
+      this.stable = "none";
+    if (!hand) this.stable = "none";
+    if (raw !== "none" && candidateAge >= (raw === "point" ? 60 : this.dwell)) {
       if (this.stable !== raw) {
         this.stable = raw;
         this.since = this.candidateSince;

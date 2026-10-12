@@ -193,3 +193,38 @@ the [W3C Hand Input specification](https://www.w3.org/TR/webxr-hand-input-1/).
 The existing webcam/reveal texture is displayed; no headset passthrough or
 3D reconstructed self-reflection is claimed. Contact projection is unit tested;
 physical headset placement, latency and comfort still require manual verification.
+
+## Input failure audit — 2026-10-12
+
+Confirmed defects: hidden microphone activation; mandatory calibration before writing;
+handedness probability misused as hand presence confidence; brittle 2D extension tests;
+140ms reacquisition after brief gesture flicker; rejection of coloured airflow spectra.
+A new low-frequency synthetic spectrum reproduced the breath rejection before repair.
+Browser testing now sends low-pass noise through the actual Web Audio analyser.
+These tests do not identify the user's microphone waveform or prove live-mouth accuracy.
+
+Real-glass qualities to preserve:
+
+- Local condensation begins where warm humid air meets cooler glass.
+- Microscopic droplets scatter light; density and blur vary over the surface.
+- Droplets grow and coalesce; accumulated water drains with gravity.
+- Wiping redistributes moisture, leaving a clearer centre and a wet edge.
+- Duration and airflow affect deposition; evaporation clears the glass gradually.
+  These are qualitative targets, not measured temperature/humidity simulation.
+  Sources: [condensation observations](https://www.nature.com/articles/srep06300),
+  [droplet growth research](https://www.nature.com/articles/s41467-022-32873-1).
+
+[Google's API guide](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js)
+distinguishes handedness from presence/tracking thresholds and provides 3D world joints.
+We now use those joints for finger extension and retain image coordinates for screen mapping.
+Stable package remains 1.1.0; nightly is not an accuracy guarantee. Full Instagram reels
+remain inaccessible; previous covers cannot establish their latency or accuracy.
+
+The real-hand-photo diagnostic found a further confirmed failure: 2 hands were
+returned by the model, but ~199 ms GPU inference exceeded the fixed 180 ms
+cutoff, so the application accepted zero hands. The worker now compares CPU
+when sustained GPU inference exceeds 90 ms; it keeps the faster measured path.
+Queue/suspension delays are separated from inference cost, with an absolute
+400 ms safety bound. In the same diagnostic, CPU reported 32.5 ms inference,
+37.3 ms delivery and 2 accepted hands. These are individual software-GL samples,
+not a hardware-independent benchmark or measured physical writing latency.

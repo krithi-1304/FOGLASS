@@ -41,7 +41,11 @@ export class HandController {
       this.filterY.reset();
       this.point = null;
     } else {
-      const tipMode = state.raw === "point" || state.raw === "pinch";
+      const tipMode =
+        state.gesture === "point" ||
+        state.raw === "point" ||
+        state.raw === "pinch" ||
+        (state.raw === "none" && this.tipMode);
       if (tipMode !== this.tipMode) {
         this.filterX.reset();
         this.filterY.reset();
@@ -61,7 +65,7 @@ export class HandController {
       if (
         !this.point ||
         Math.hypot(next.x - this.point.x, next.y - this.point.y) >
-          Math.max(0.001, this.profile.jitter * 0.5)
+          Math.max(0.0007, Math.min(0.002, this.profile.jitter * 0.5))
       )
         this.point = next;
     }
@@ -116,6 +120,10 @@ export class HandController {
       inferenceFps: provider?.fps || 0,
       handCount: this.state?.count || 0,
       frames: provider?.frames || 0,
+      detectedHands: provider?.handCount || 0,
+      error: provider?.error || "",
+      stage: provider?.stage || "mock",
+      delegate: provider?.delegate || "mock",
     };
   }
   stop() {

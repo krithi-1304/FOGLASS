@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test("microphone noise triggers real analyser and disabling stops it", async ({
+test("low-frequency airflow reaches the real analyser from the visible breath control", async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -22,7 +22,12 @@ test("microphone noise triggers real analyser and disabling stops it", async ({
       const gain = ctx.createGain();
       gain.gain.value = 0.0001;
       const out = ctx.createMediaStreamDestination();
-      source.connect(gain);
+      const lowpass = ctx.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.value = 250;
+      lowpass.Q.value = 0.7;
+      source.connect(lowpass);
+      lowpass.connect(gain);
       gain.connect(out);
       source.start();
       await ctx.resume();
@@ -36,14 +41,13 @@ test("microphone noise triggers real analyser and disabling stops it", async ({
   });
   await page.goto("/?test=1&seed=7");
   await page.getByRole("button", { name: "Try without camera" }).click();
-  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await page
     .getByRole("button", { name: "Enable breath", exact: true })
     .click();
   await expect(
     page.getByRole("button", { name: "Breath on · disable" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Clear", exact: true }).click();
+  await page.keyboard.press("c");
   await page.evaluate(() =>
     (window as unknown as { testBlow: () => void }).testBlow(),
   );

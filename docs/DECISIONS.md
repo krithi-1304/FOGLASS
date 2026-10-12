@@ -60,3 +60,7 @@ Use MediaPipe 1.1.0 GPU in a module worker, one transferred frame in flight; dis
 ## D009 — Adaptive software rendering (2026-10-11)
 
 The initial software GL benchmark measured 41.2 FPS. Quality now reacts after one sustained second and reduces pixel resolution multiplicatively, while the 512² fog mask is unchanged. The subsequent measurement was 54.8 FPS at 0.69 quality; this does not establish native 1280×720/60 FPS on real hardware. Deterministic visual fixtures lock output resolution explicitly in test mode.
+
+## D010 — Evidence-driven input repair (2026-10-12)
+
+A real hand-image camera test detected two hands but the 180ms age cutoff discarded them all under slow software GPU inference. Separate queue stalls from compute latency and compare CPU after sustained GPU slowness; preserve the faster measured backend. Stop treating handedness certainty as hand presence. Use world joints for extension and 75ms exit hysteresis while the index remains extended; missing hands still release immediately. Breath regressions now cover coloured and low-gain airflow, not just loud white noise. Surface activation and signal feedback before asking users to tune.

@@ -17,6 +17,7 @@ export function createUI() {
       <button id="skip-calibration">Skip calibration</button>
     </section>
     <nav id="dock" aria-label="Mirror controls" hidden>
+      <button id="microphone" aria-pressed="false">Enable breath</button>
       <button id="refog">Add steam</button>
       <button id="tool-toggle" aria-controls="tools">Tools</button>
       
@@ -29,8 +30,9 @@ export function createUI() {
         <button id="apply-message">Use message</button>
         <label class="file-label">Use a photo<input id="reveal-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
       </div>
-      <button id="microphone" aria-pressed="false">Enable breath</button>
-      <p class="microphone-note">Experimental audio trigger. Microphone stays off until enabled.</p>
+      <label class="field">Breath sensitivity<input id="breath-sensitivity" aria-label="Breath sensitivity" type="range" min="0.5" max="4" step="0.1" value="1"></label>
+      <button id="recalibrate-breath">Recalibrate breath</button>
+      <p class="microphone-note">Blow toward your microphone. Audio stays on this device.</p>
       <button id="recalibrate">Calibrate hand</button>
       <button id="sound" aria-pressed="false">Enable sound</button>
       <button id="vr" disabled>VR unavailable</button>
@@ -42,6 +44,7 @@ export function createUI() {
       <button id="undo">Undo</button>
       <button id="redo">Redo</button>
     </section>
+    <div id="breath-feedback" hidden><meter id="breath-meter" aria-label="Microphone input relative to trigger" min="0" max="3" value="0"></meter><span id="breath-message">Listening</span></div>
     <p id="status" role="status" aria-live="polite"></p>
     <div id="cursor" aria-hidden="true"></div>
     <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
@@ -51,6 +54,15 @@ export function createUI() {
     photo: document.querySelector<HTMLButtonElement>("#photo")!,
     record: document.querySelector<HTMLButtonElement>("#record")!,
     canvas: document.querySelector<HTMLCanvasElement>("#mirror")!,
+    breathFeedback: document.querySelector<HTMLElement>("#breath-feedback")!,
+    breathMeter: document.querySelector<HTMLMeterElement>("#breath-meter")!,
+    breathMessage: document.querySelector<HTMLElement>("#breath-message")!,
+    breathSensitivity: document.querySelector<HTMLInputElement>(
+      "#breath-sensitivity",
+    )!,
+    recalibrateBreath: document.querySelector<HTMLButtonElement>(
+      "#recalibrate-breath",
+    )!,
     microphone: document.querySelector<HTMLButtonElement>("#microphone")!,
     modeSelect: document.querySelector<HTMLSelectElement>("#mirror-mode")!,
     density: document.querySelector<HTMLInputElement>("#density")!,

@@ -122,3 +122,11 @@
 - Software GL: initial 41.2 FPS failure corrected; final 53.1 FPS at 0.60 resolution scale (earlier reruns 54.8–55 at 0.69); no native-resolution/hardware latency claim.
 - Physical hand, real-mouth and headset tests remain NOT RUN; public user master prompt preserved; local preview http://127.0.0.1:5174/.
 - Next: physical camera/mouth matrix; headset contact/comfort matrix; tune recorded regressions if hardware evidence warrants.
+
+## Input failure repair — 2026-10-12
+
+- Reproduced coloured/low-gain breath rejection; corrected spectral gate and floor, exposed microphone activation, live signal, sensitivity and recalibration.
+- Reproduced real hand-photo failure: 2 detections discarded by 180ms cutoff; separated compute/queue delay and added bounded GPU/CPU comparison (sample ~199ms GPU → 32.5ms CPU, 37.3ms delivery).
+- Corrected handedness confidence misuse, used world-joint geometry, added short writing hysteresis, capped dead zone and removed forced calibration.
+- Validation: 38 unit + 26 browser tests pass (1.2m), lint/build clean; reviewed visible microphone dock/mobile UI. Physical mouth/hand and headset remain unverified.
+- Fixed snapshot comparison passes (2 tests, 12s); render throughput 54.0 FPS at 0.79 scale. Next: physical microphone check; live hand recording; headset check.

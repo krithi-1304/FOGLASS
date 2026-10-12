@@ -4,7 +4,21 @@ export class BreathDetector {
   active = false;
   calibrated = false;
   thresholdMultiplier = 2.8;
-  minEnergy = 0.0012;
+  minEnergy = 0.00012;
+  energy = 0;
+  threshold = 0.0012;
+  flatness = 0;
+  noiseLike = false;
+  sensitivity = 1;
+  private calibration: number[] = [];
+  recalibrate() {
+    this.started = -1;
+    this.calibration = [];
+    this.active = false;
+    this.calibrated = false;
+    this.attack = this.release = 0;
+    this.strength = 0;
+  }
   private started = -1;
   private attack = 0;
   private release = 0;
@@ -19,7 +33,9 @@ export class BreathDetector {
       weights = 0,
       log = 0,
       powerSum = 0,
-      count = 0;
+      count = 0,
+      peak = 0;
+    const powers: number[] = [];
     for (let i = 1; i < spectrum.length; i++) {
       const f = (i * sampleRate) / fftSize;
       if (f < 70 || f > 2400) continue;
@@ -31,23 +47,33 @@ export class BreathDetector {
         log += Math.log(Math.max(power, 1e-14));
         powerSum += power;
         count++;
+        peak = Math.max(peak, power);
+        powers.push(power);
       }
     }
     const energy = Math.sqrt(sum / Math.max(1, weights));
     const flatness =
       Math.exp(log / Math.max(1, count)) /
       (powerSum / Math.max(1, count) + 1e-14);
+    this.energy = energy;
+    this.flatness = flatness;
     if (time - this.started < 800) {
-      this.floor += 0.12 * (energy - this.floor);
+      this.calibration.push(energy);
+      const sorted = [...this.calibration].sort((a, b) => a - b);
+      this.floor = sorted[Math.floor((sorted.length - 1) * 0.2)];
       this.strength = 0;
       return 0;
     }
     this.calibrated = true;
-    const threshold = Math.max(
-      this.minEnergy,
-      this.floor * this.thresholdMultiplier,
-    );
-    const noise = flatness > 0.12;
+    const threshold =
+      Math.max(this.minEnergy, this.floor * this.thresholdMultiplier) /
+      this.sensitivity;
+    this.threshold = threshold;
+    const spread = powers.filter((power) => power >= peak * 0.01).length;
+    const noise =
+      flatness > 0.12 ||
+      (spread >= 4 && peak / Math.max(powerSum, 1e-14) < 0.8);
+    this.noiseLike = noise;
     const above = energy > threshold * (this.active ? 0.58 : 1) && noise;
     if (above) {
       this.release = 0;
@@ -59,9 +85,13 @@ export class BreathDetector {
       if (time - this.release > 180) this.active = false;
     }
     if (!this.active && energy < threshold)
-      this.floor += 0.006 * (energy - this.floor);
+      this.floor +=
+        (energy < this.floor ? 0.08 : 0.002) * (energy - this.floor);
     this.strength = this.active
-      ? Math.min(1, Math.max(0.15, (energy / threshold - 1) / 5))
+      ? Math.min(
+          1,
+          Math.max(0.25, Math.log2(Math.max(1, energy / threshold)) / 2),
+        )
       : 0;
     return this.strength;
   }

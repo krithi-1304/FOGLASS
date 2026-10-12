@@ -29,3 +29,5 @@
 | Landmark laboratory/replay               | lab.spec.ts through production recognizer      | live recorded dataset needs user hands |
 | Minimal UI/four fog states               | final-qa.spec.ts reviewed snapshots            | platform rasterization tolerance       |
 | >45 FPS software GL                      | final-qa.spec.ts wall-clock throughput         | desktop/headset target not inferred    |
+
+Input repair: breath.test.ts now includes coloured/low-gain spectra and noisy-startup recalibration; breath.spec.ts sends actual low-pass Web Audio noise through the analyser. Gesture tests cover foreshortened world geometry and brief classification flicker. vision.spec.ts feeds Google's sample hand photograph through the normal camera/worker path and verifies usable hand output without mandatory calibration. Physical input remains a separate manual stage.
