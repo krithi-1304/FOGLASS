@@ -43,12 +43,19 @@ export function catmullRom(
   d: Vec2,
   t: number,
 ): Vec2 {
-  const axis = (k: "x" | "y") =>
-    0.5 *
-    (2 * b[k] +
-      (-a[k] + c[k]) * t +
-      (2 * a[k] - 5 * b[k] + 4 * c[k] - d[k]) * t * t +
-      (-a[k] + 3 * b[k] - 3 * c[k] + d[k]) * t * t * t);
+  const axis = (k: "x" | "y") => {
+    const value =
+      0.5 *
+      (2 * b[k] +
+        (-a[k] + c[k]) * t +
+        (2 * a[k] - 5 * b[k] + 4 * c[k] - d[k]) * t * t +
+        (-a[k] + 3 * b[k] - 3 * c[k] + d[k]) * t * t * t);
+    // Bound each segment: uneven inference timing must not invent hooks.
+    return Math.max(
+      Math.min(b[k], c[k]),
+      Math.min(Math.max(b[k], c[k]), value),
+    );
+  };
   return { x: axis("x"), y: axis("y") };
 }
 export function mirrorPoint(

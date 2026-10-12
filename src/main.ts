@@ -463,8 +463,9 @@ if (new URLSearchParams(location.search).get("test") === "1") {
 
 const xr = new XRGlass();
 void supportsVR().then((supported) => {
+  ui.vr.hidden = !supported;
   ui.vr.disabled = !supported;
-  ui.vr.textContent = supported ? "Enter VR" : "VR needs a headset";
+  ui.vr.textContent = "Optional headset mode";
 });
 ui.vr.addEventListener("click", async () => {
   if (!renderer) return;

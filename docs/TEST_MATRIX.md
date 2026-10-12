@@ -31,3 +31,9 @@
 | >45 FPS software GL                      | final-qa.spec.ts wall-clock throughput         | desktop/headset target not inferred    |
 
 Input repair: breath.test.ts now includes coloured/low-gain spectra and noisy-startup recalibration; breath.spec.ts sends actual low-pass Web Audio noise through the analyser. Gesture tests cover foreshortened world geometry and brief classification flicker. vision.spec.ts feeds Google's sample hand photograph through the normal camera/worker path and verifies usable hand output without mandatory calibration. Physical input remains a separate manual stage.
+
+Input audit: breath unit regressions cover maximum sensitivity/background-only and
+release into room noise; gesture regressions cover projected thumb overlap with
+separate 3D joints and interpolation corner overshoot. `breath.spec.ts` exercises
+slider/recalibration/release through real Web Audio; `lab.spec.ts` verifies the
+unsupported headset control stays hidden. Physical microphone/hand checks remain manual.

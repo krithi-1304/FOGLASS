@@ -20,7 +20,7 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
       source.buffer = buffer;
       source.loop = true;
       const gain = ctx.createGain();
-      gain.gain.value = 0.0001;
+      gain.gain.value = 0.01;
       const out = ctx.createMediaStreamDestination();
       const lowpass = ctx.createBiquadFilter();
       lowpass.type = "lowpass";
@@ -32,6 +32,9 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
       source.start();
       await ctx.resume();
       Object.assign(window, {
+        testQuiet: () => {
+          gain.gain.value = 0.01;
+        },
         testBlow: () => {
           gain.gain.value = 0.8;
         },
@@ -47,6 +50,12 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
   await expect(
     page.getByRole("button", { name: "Breath on · disable" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("slider", { name: "Breath sensitivity" }).fill("4");
+  await page.waitForTimeout(600);
+  await expect(page.locator("#breath-message")).not.toHaveText(
+    "Breath detected",
+  );
   await page.keyboard.press("c");
   await page.evaluate(() =>
     (window as unknown as { testBlow: () => void }).testBlow(),
@@ -62,6 +71,18 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
       { timeout: 4000 },
     )
     .toBeGreaterThan(0.3);
+  await page.evaluate(() =>
+    (window as unknown as { testQuiet: () => void }).testQuiet(),
+  );
+  await expect(page.locator("#breath-message")).not.toHaveText(
+    "Breath detected",
+  );
+  await page
+    .getByRole("button", { name: "Recalibrate breath", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Breath on · disable" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Breath on · disable" }).click();
   await expect(
     page.getByRole("button", { name: "Enable breath", exact: true }),

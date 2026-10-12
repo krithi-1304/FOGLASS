@@ -74,3 +74,10 @@ intentionally updating them with `--update-snapshots`.
 Research, limitations and manual hardware checks live in `docs/RESEARCH.md`,
 `docs/KNOWN_ISSUES.md`, and `docs/MANUAL_CAMERA_TESTS.md`. Automated passing tests
 are not proof of physical hand accuracy, real-mouth onset or headset compatibility.
+
+Webcam hand writing and breath input require no VR headset. The optional headset
+control appears only on compatible browsers/devices. Breath sensitivity adjusts
+the increase above room noise; recalibrate in a quiet moment after changing rooms.
+If the meter stays empty while blowing, check the browser’s selected microphone
+and system voice-isolation settings. Research and reproduced algorithm fixes are
+recorded in `docs/RESEARCH.md`.

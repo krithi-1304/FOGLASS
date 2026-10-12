@@ -228,3 +228,66 @@ Queue/suspension delays are separated from inference cost, with an absolute
 400 ms safety bound. In the same diagnostic, CPU reported 32.5 ms inference,
 37.3 ms delivery and 2 accepted hands. These are individual software-GL samples,
 not a hardware-independent benchmark or measured physical writing latency.
+
+## Sensitivity and writing algorithm audit — 2026-10-12
+
+The webcam mirror requires no headset. Immersive WebXR is an optional capability;
+its control is now hidden when unsupported. Webcam drawing and microphone input
+are tested without an XR session.
+
+### Evidence and corrective decisions
+
+1. **Sensitivity was mathematically unsafe.** The old threshold was
+   `max(minEnergy, roomFloor * 2.8) / sensitivity`. At sensitivity 4, a normal
+   room could exceed the trigger; release at 58% of that value also stayed below
+   the room. Two failing tests reproduced continuous activation. The new trigger
+   is `max(minEnergy / sensitivity, roomFloor * (1 + 1.8 / sensitivity))`.
+   Release reduces only the excess above the floor. Sensitivity now lowers the
+   required *increase* without treating the background itself as a breath.
+2. **Pinch used projected distance despite available 3D joints.** Thumb and index
+   can overlap on screen while remaining separated in depth. A failing world-joint
+   regression reproduced interrupted pointing. Pinch now uses world-space
+   thumb/index distance normalized by world palm width, with image fallback when
+   world joints are absent. [Google's guide](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js)
+   documents separate image and world landmark outputs. These are estimated
+   coordinates, not a depth-camera measurement.
+3. **Uniform Catmull–Rom invented hooks at corners.** With an 0.8-unit preceding
+   movement and a 0.01-unit vertical segment, interpolation incorrectly moved x
+   from 0.8 to 0.8324 at t=0.1. Bound each interpolated axis to its segment endpoints
+   so irregular frame spacing cannot add a stroke outside the observed segment.
+   This favors faithful corner geometry over overshooting decorative curves;
+   it is not a claim that the resulting curve is globally C1 continuous.
+4. **Do not blindly add more smoothing.** The [One-Euro authors](https://gery.casiez.net/1euro/)
+   distinguish stationary jitter (minimum cutoff) from fast-motion lag (beta).
+   Existing speed-adaptive filtering remains; its jitter/lag tests pass. A fixed
+   heavy low-pass filter or extrapolating unseen finger positions would hide
+   jitter at the expense of lag or false strokes.
+
+### Breath capture and real condensation
+
+[MDN's capture settings reference](https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack/getSettings)
+explains that actual device settings must be distinguished from requested
+constraints. We request noise suppression, gain control and echo cancellation
+**off**; this cannot override every OS microphone mode or repair a wrong input
+selected in browser settings. [Analyser smoothing](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/smoothingTimeConstant)
+adds temporal averaging; the existing 0.25 value and 60ms attack remain to balance
+onset against impulse rejection. Tests now exercise the visible sensitivity and
+recalibration controls through an actual Web Audio analyser, including returning
+to audible background noise after the burst.
+
+Real fog is condensation of humid breath on a cooler surface, followed by droplet
+nucleation, growth and coalescence; humidity, temperature, surface properties and
+airflow affect it. [Primary glass-condensation study](https://www.nature.com/articles/srep06300).
+For this simulation the relevant qualities are a localized soft bloom, increasing
+coverage during exhalation, irregular scattering, persistent wet wipe edges,
+coalescing/draining drops and slow clearing/regrowth. A microphone measures sound,
+not humidity: a silent exhale far from the microphone is not reliably observable,
+and broad environmental noise can resemble blowing. Neither perfect breath
+classification nor exact physical writing precision is established by fixtures.
+
+### Validation boundary
+
+Four regressions failed before the changes and pass afterward. The full browser
+suite additionally exercises the real model on a public hand photograph, mock
+moving landmarks and generated audio. Physical camera/microphone verification
+remains necessary; no user recording or live hardware measurement was available.

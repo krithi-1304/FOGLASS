@@ -130,3 +130,9 @@
 - Corrected handedness confidence misuse, used world-joint geometry, added short writing hysteresis, capped dead zone and removed forced calibration.
 - Validation: 38 unit + 26 browser tests pass (1.2m), lint/build clean; reviewed visible microphone dock/mobile UI. Physical mouth/hand and headset remain unverified.
 - Fixed snapshot comparison passes (2 tests, 12s); render throughput 54.0 FPS at 0.79 scale. Next: physical microphone check; live hand recording; headset check.
+
+## Input algorithm audit — 2026-10-12
+- Four regressions reproduced sensitivity self-trigger/stuck release, false projected pinch and stroke corner overshoot; all corrected.
+- Webcam/microphone need no headset; unsupported optional XR control is hidden. Research with primary sources appended to RESEARCH.md.
+- Validation: 42 unit + 26 browser tests pass (1.2m), lint/build/diff checks and unchanged visual baselines pass. Physical input remains unverified.
+- Next: verify selected physical microphone; record a live writing sequence locally; tune against that recording rather than assumed hardware behavior.

@@ -35,7 +35,7 @@ export function createUI() {
       <p class="microphone-note">Blow toward your microphone. Audio stays on this device.</p>
       <button id="recalibrate">Calibrate hand</button>
       <button id="sound" aria-pressed="false">Enable sound</button>
-      <button id="vr" disabled>VR unavailable</button>
+      <button id="vr" hidden disabled>Optional headset mode</button>
       <button id="photo">Save photo</button>
       <button id="record">Record 10s</button>
       <button id="pause">Pause</button>

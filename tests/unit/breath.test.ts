@@ -51,3 +51,21 @@ it("detects low-gain airflow above a quiet calibrated room", () => {
   for (let t = 1025; t <= 1250; t += 25) d.update(wind, 48000, 2048, t);
   expect(d.active).toBe(true);
 });
+
+it("maximum sensitivity never triggers on the calibrated room alone", () => {
+  const d = new BreathDetector();
+  d.sensitivity = 4;
+  for (let t = 0; t <= 2000; t += 25) d.update(spectrum(-65), 48000, 2048, t);
+  expect(d.active).toBe(false);
+});
+it("high sensitivity detects a quieter burst and releases back into room noise", () => {
+  const d = new BreathDetector();
+  d.sensitivity = 4;
+  for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-65), 48000, 2048, t);
+  for (let t = 1025; t <= 1300; t += 25)
+    d.update(spectrum(-60), 48000, 2048, t);
+  expect(d.active).toBe(true);
+  for (let t = 1325; t <= 2100; t += 25)
+    d.update(spectrum(-65), 48000, 2048, t);
+  expect(d.active).toBe(false);
+});

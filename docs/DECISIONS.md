@@ -64,3 +64,12 @@ The initial software GL benchmark measured 41.2 FPS. Quality now reacts after on
 ## D010 — Evidence-driven input repair (2026-10-12)
 
 A real hand-image camera test detected two hands but the 180ms age cutoff discarded them all under slow software GPU inference. Separate queue stalls from compute latency and compare CPU after sustained GPU slowness; preserve the faster measured backend. Stop treating handedness certainty as hand presence. Use world joints for extension and 75ms exit hysteresis while the index remains extended; missing hands still release immediately. Breath regressions now cover coloured and low-gain airflow, not just loud white noise. Surface activation and signal feedback before asking users to tune.
+
+## D011 — Floor-relative sensitivity and geometric writing fixes (2026-10-12)
+
+Keep webcam input independent of WebXR; hide unsupported optional headset control.
+Use floor-relative onset/release thresholds, world-space normalized pinch, and
+bounded stroke interpolation after four failing regressions demonstrated defects.
+Retain tested One-Euro parameters rather than blindly increasing smoothing.
+Revisit using physical hand/audio recordings; automated inputs do not establish
+perfect recognition or the cause of every user's hardware failure.

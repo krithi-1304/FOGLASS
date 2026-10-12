@@ -44,7 +44,10 @@ export function features(hand: TrackedHand): HandFeatures {
     index: p[8],
     thumb: p[4],
     width,
-    pinch: distance(p[4], p[8]) / width,
+    pinch: hand.worldLandmarks
+      ? length(geometry[4], geometry[8]) /
+        Math.max(1e-5, length(geometry[5], geometry[17]))
+      : distance(p[4], p[8]) / width,
     extended,
     confidence: hand.confidence,
     handedness: hand.handedness,

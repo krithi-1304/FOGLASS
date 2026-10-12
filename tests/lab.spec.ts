@@ -30,6 +30,7 @@ test("laboratory replays local landmark recordings and exports no video", async 
   expect(saved.frames.length).toBeGreaterThan(5);
   expect(Object.keys(saved.frames[0]).sort()).toEqual(["hands", "timestamp"]);
   await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await expect(page.locator("#vr")).toBeHidden();
   await expect(page.locator("#vr")).toBeDisabled();
   await expect(page.locator("#vr")).toContainText("headset");
 });

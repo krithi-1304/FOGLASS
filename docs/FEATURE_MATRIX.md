@@ -23,3 +23,8 @@ Automated coverage does not imply physical camera/headset verification.
 | Minimal rose/pearl UI                        | TESTED             | reviewed desktop/mobile and four glass states                   |
 | Backend / accounts / sharing                 | NOT STARTED        | intentionally unnecessary for local core                        |
 | Future frost/rain/neon modes                 | NOT STARTED        | outside V1                                                      |
+
+Input audit (2026-10-12): floor-relative breath sensitivity/release, world-space
+pinch separation and bounded letter corners are regression covered. Webcam mode
+requires no headset; unsupported XR control hidden. Physical precision remains
+unverified on user hardware.

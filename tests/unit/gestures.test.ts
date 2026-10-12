@@ -115,3 +115,23 @@ it("brief finger classification noise does not break writing but hand loss relea
   expect(engine.update({ timestamp: 133, hands: point }).gesture).toBe("point");
   expect(engine.update({ timestamp: 166, hands: [] }).gesture).toBe("none");
 });
+
+it("projected thumb overlap does not turn a 3D pointing hand into a pinch", () => {
+  const hand = structuredClone(fixture("index-draw-line").frames[0].hands[0]);
+  hand.worldLandmarks = structuredClone(hand.landmarks);
+  hand.landmarks[4] = { ...hand.landmarks[8] };
+  const e = new GestureEngine();
+  e.update({ timestamp: 0, hands: [hand] });
+  expect(e.update({ timestamp: 100, hands: [hand] }).gesture).toBe("point");
+});
+it("unevenly spaced stroke samples do not overshoot a letter corner", () => {
+  const a = { x: 0, y: 0 },
+    b = { x: 0.8, y: 0 },
+    c = { x: 0.8, y: 0.01 };
+  for (let t = 0; t <= 1; t += 0.1) {
+    const p = catmullRom(a, b, c, c, t);
+    expect(p.x).toBeCloseTo(0.8, 6);
+    expect(p.y).toBeGreaterThanOrEqual(0);
+    expect(p.y).toBeLessThanOrEqual(0.01);
+  }
+});

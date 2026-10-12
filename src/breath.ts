@@ -65,16 +65,20 @@ export class BreathDetector {
       return 0;
     }
     this.calibrated = true;
-    const threshold =
-      Math.max(this.minEnergy, this.floor * this.thresholdMultiplier) /
-      this.sensitivity;
+    const threshold = Math.max(
+      this.minEnergy / this.sensitivity,
+      this.floor * (1 + (this.thresholdMultiplier - 1) / this.sensitivity),
+    );
     this.threshold = threshold;
     const spread = powers.filter((power) => power >= peak * 0.01).length;
     const noise =
       flatness > 0.12 ||
       (spread >= 4 && peak / Math.max(powerSum, 1e-14) < 0.8);
     this.noiseLike = noise;
-    const above = energy > threshold * (this.active ? 0.58 : 1) && noise;
+    // Hysteresis applies to the excess above room noise, never below it.
+    const releaseThreshold = this.floor + (threshold - this.floor) * 0.58;
+    const above =
+      energy > (this.active ? releaseThreshold : threshold) && noise;
     if (above) {
       this.release = 0;
       if (!this.attack) this.attack = time;
