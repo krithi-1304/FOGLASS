@@ -73,3 +73,13 @@ bounded stroke interpolation after four failing regressions demonstrated defects
 Retain tested One-Euro parameters rather than blindly increasing smoothing.
 Revisit using physical hand/audio recordings; automated inputs do not establish
 perfect recognition or the cause of every user's hardware failure.
+
+## D012 — Observation freshness before gesture inference (2026-10-12)
+
+A gesture hold must be supported by continuing observations. Reset gesture dwell
+and velocity after >400ms input gaps or non-increasing timestamps. An independent
+100ms watchdog releases stale input after 400ms without a result, even if camera
+callbacks stop; a 20s warmup / 3s steady-state in-flight timeout terminates hung processing with fallback UI.
+Cancel initialization, scheduling and watchdog timers on failure/stop. These
+bounds protect continuity; they are not a promised end-to-end latency. Revisit
+against real slow-device recordings, retaining the existing CPU/GPU comparison.

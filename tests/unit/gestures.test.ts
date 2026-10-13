@@ -135,3 +135,15 @@ it("unevenly spaced stroke samples do not overshoot a letter corner", () => {
     expect(p.y).toBeLessThanOrEqual(0.01);
   }
 });
+
+it("a camera gap cannot count as a held fist or continue writing", () => {
+  for (const name of ["fist", "index-draw-line"]) {
+    const hands = fixture(name).frames[0].hands;
+    const engine = new GestureEngine();
+    engine.update({ timestamp: 0, hands });
+    engine.update({ timestamp: 160, hands });
+    const resumed = engine.update({ timestamp: 1500, hands });
+    expect(resumed.action).toBeNull();
+    expect(resumed.gesture).toBe("none");
+  }
+});

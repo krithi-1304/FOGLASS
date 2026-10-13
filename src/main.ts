@@ -246,6 +246,9 @@ async function startHand(mock = false) {
   hand = new HandController(camera.video, (state, point) => {
     updateCalibration();
     interaction.update(state, point, hand?.calibration.active);
+    const trackingError = hand?.metrics().error;
+    if (trackingError)
+      ui.status.textContent = trackingError + " Drag to draw; B adds steam.";
     ui.cameraState.textContent =
       mode === "camera"
         ? "CAMERA ON · " +

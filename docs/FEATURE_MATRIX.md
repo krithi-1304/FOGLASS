@@ -28,3 +28,7 @@ Input audit (2026-10-12): floor-relative breath sensitivity/release, world-space
 pinch separation and bounded letter corners are regression covered. Webcam mode
 requires no headset; unsupported XR control hidden. Physical precision remains
 unverified on user hardware.
+
+Tracking freshness and lifecycle: regression covered for camera freeze, fresh
+recovery, initialization cancellation, worker timeout and held-gesture gaps.
+Fallback instructions now surface runtime tracking errors in the mirror.

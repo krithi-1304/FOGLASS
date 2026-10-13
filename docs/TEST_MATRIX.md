@@ -37,3 +37,9 @@ release into room noise; gesture regressions cover projected thumb overlap with
 separate 3D joints and interpolation corner overshoot. `breath.spec.ts` exercises
 slider/recalibration/release through real Web Audio; `lab.spec.ts` verifies the
 unsupported headset control stays hidden. Physical microphone/hand checks remain manual.
+
+Tracking lifecycle: `tracking-lifecycle.test.ts` covers frozen camera release,
+fresh-result recovery, pending initialization cancellation and hung-worker cleanup.
+`gestures.test.ts` verifies that a long observation gap cannot trigger a fist hold
+or resume an active writing gesture. Existing vision E2E covers model startup,
+real-photo detection, replay and failure fallback.

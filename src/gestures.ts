@@ -78,7 +78,15 @@ export class GestureEngine {
   private stationarySince = 0;
   private pinched = false;
   private primary: HandFeatures | null = null;
+  private lastTimestamp: number | null = null;
   update(frame: HandFrame): GestureState {
+    if (
+      this.lastTimestamp !== null &&
+      (frame.timestamp - this.lastTimestamp > 400 ||
+        frame.timestamp <= this.lastTimestamp)
+    )
+      this.reset();
+    this.lastTimestamp = frame.timestamp;
     const valid = frame.hands
       .filter(
         (h) => h.confidence >= this.confidence && h.landmarks.length === 21,
@@ -169,6 +177,7 @@ export class GestureEngine {
     };
   }
   reset() {
+    this.lastTimestamp = null;
     this.candidate = this.stable = "none";
     this.primary = null;
     this.prior = null;

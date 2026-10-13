@@ -5,6 +5,9 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private video: HTMLVideoElement | undefined;
   private callback = 0;
+  private initTimeout: ReturnType<typeof setTimeout> | undefined;
+  private watchdog: ReturnType<typeof setInterval> | undefined;
+  private hasHand = false;
   private stopped = false;
   private busy = false;
   private lastVideo = -1;
@@ -26,23 +29,23 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
       this.worker = new Worker(new URL("./hand.worker.ts", import.meta.url), {
         type: "module",
       });
-      const timeout = setTimeout(
+      this.initTimeout = setTimeout(
         () => this.fail("Hand model took too long to load"),
         30000,
       );
       this.worker.onerror = () => {
-        clearTimeout(timeout);
+        clearTimeout(this.initTimeout);
         this.fail("Hand tracking worker could not start");
       };
       this.worker.onmessage = ({ data }) => {
         if (this.stopped) return;
         if (data.type === "ready") {
-          clearTimeout(timeout);
+          clearTimeout(this.initTimeout);
           this.rejectInit = undefined;
           resolve();
         }
         if (data.type === "error") {
-          clearTimeout(timeout);
+          clearTimeout(this.initTimeout);
           this.fail(data.message);
         }
         if (data.type === "frame") {
@@ -66,6 +69,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
                 ? data.hands
                 : [],
           };
+          this.hasHand = frame.hands.length > 0;
           for (const cb of this.listeners) cb(frame);
         }
       };
@@ -75,7 +79,15 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
       });
     });
   }
+  private clearTimers() {
+    clearTimeout(this.initTimeout);
+    clearTimeout(this.timer);
+    clearInterval(this.watchdog);
+    this.video?.cancelVideoFrameCallback?.(this.callback);
+  }
   private fail(message: string) {
+    this.clearTimers();
+    this.hasHand = false;
     this.error = message;
     this.busy = false;
     this.rejectInit?.(new Error(message));
@@ -87,6 +99,23 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   }
   async start(video: HTMLVideoElement) {
     this.video = video;
+    clearInterval(this.watchdog);
+    // Independent of camera callbacks: frozen video must release the pen too.
+    this.watchdog = setInterval(() => {
+      const now = performance.now();
+      if (this.hasHand && (document.hidden || now - this.lastResult > 400)) {
+        this.hasHand = false;
+        this.handCount = 0;
+        this.fps = 0;
+        for (const cb of this.listeners) cb({ timestamp: now, hands: [] });
+      }
+      // Initial GPU shader compilation/backend comparison can take seconds.
+      const timeout = this.frames < 8 ? 20000 : 3000;
+      if (this.busy && now - this.lastSent > timeout)
+        this.fail(
+          "Hand tracking stalled. Use mouse/touch or restart the mirror.",
+        );
+    }, 100);
     const tick = () => {
       if (this.stopped || !this.worker) return;
       const now = performance.now();
@@ -126,8 +155,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   }
   stop() {
     this.stopped = true;
-    clearTimeout(this.timer);
-    this.video?.cancelVideoFrameCallback?.(this.callback);
+    this.clearTimers();
     this.rejectInit?.(new Error("Tracking stopped"));
     this.rejectInit = undefined;
     this.worker?.terminate();

@@ -291,3 +291,17 @@ Four regressions failed before the changes and pass afterward. The full browser
 suite additionally exercises the real model on a public hand photograph, mock
 moving landmarks and generated audio. Physical camera/microphone verification
 remains necessary; no user recording or live hardware measurement was available.
+
+## Temporal robustness follow-up — 2026-10-13
+
+Three failing regressions established that frozen camera callbacks retained a hand,
+a sparse pair of observations could trigger a held gesture, and stopping during
+model initialization left its timeout alive. Input freshness now has a watchdog
+independent of frame delivery; gesture dwell cannot span >400ms observation gaps.
+
+The first browser run caught an overly short 3s worker timeout: both real-model
+startup tests failed with an explicit stalled message. Initial GPU shader work
+needs a separate budget. The first eight results now have a bounded 20s timeout;
+steady-state work retains 3s. Neither timeout keeps stale pen input active. Unit
+tests verify both budgets, clean cancellation and recovery on fresh frames.
+This refinement adds reliability rather than claiming better landmark accuracy.

@@ -136,3 +136,9 @@
 - Webcam/microphone need no headset; unsupported optional XR control is hidden. Research with primary sources appended to RESEARCH.md.
 - Validation: 42 unit + 26 browser tests pass (1.2m), lint/build/diff checks and unchanged visual baselines pass. Physical input remains unverified.
 - Next: verify selected physical microphone; record a live writing sequence locally; tune against that recording rather than assumed hardware behavior.
+
+## Tracking lifecycle refinement — 2026-10-13
+- Reproduced frozen hand, gesture hold across a gap, and leaked initialization timer; added freshness watchdog, dwell reset and cleanup.
+- Browser regressions rejected the first 3s cold-start timeout; use 20s during first eight results, 3s afterward, independently release stale input.
+- Validation: 47 unit + 26 browser tests pass (1.2m); lint/build/diff and existing visual comparisons pass. Physical hand/mic remain unverified.
+- Next: record physical writing; compare precision on that replay; verify selected microphone with live breath.

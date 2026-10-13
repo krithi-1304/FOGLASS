@@ -46,3 +46,9 @@ XRGlass uses a separate compatible GL context for stereo presentation and transf
 the composed glass texture. A headset index joint touches a fixed plane with depth
 hysteresis; headset frames drive the renderer while its normal RAF is suspended.
 Lab and debug tools consume existing controllers, rather than duplicating vision.
+
+Tracking lifecycle: a timer independent of camera frame callbacks releases stale
+hand input after >400ms without a result. In-flight work times out after 20s during the first eight frames and 3s thereafter and
+terminates with a visible fallback message. Gesture dwell/velocity reset across
+observation gaps >400ms or non-increasing timestamps. Failure and stop clear all
+provider timers and callbacks, including pending model initialization.

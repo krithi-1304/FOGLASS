@@ -14,6 +14,11 @@ optional M sound, and capability-checked WebXR glass with index-joint contact.
 
 ## Latest input repair
 
+Freshness watchdog releases frozen-camera input; held gestures reset after gaps.
+All provider timers cancel on stop/failure. Cold-start inference has a 20s budget
+for the first eight results; established inference has 3s. The original 3s startup
+budget failed real-model tests and was corrected before commit.
+
 No headset required; unsupported XR control hidden. Four new failing regressions
 fixed floor-relative sensitivity/release, projected false pinches via world-space
 distance, and spline corner overshoot. See RESEARCH.md input algorithm audit.
@@ -25,7 +30,7 @@ These are controlled tests, not verification of the user's physical microphone/c
 
 ## Validation
 
-Input algorithm audit: 42 unit tests + 26 Playwright tests pass (browser suite 1.2m).
+Tracking lifecycle refinement: 47 unit tests + 26 Playwright tests pass (browser suite 1.2m).
 Lint, TypeScript, production build and diff checks pass.
 Six visual baselines reviewed: desktop/mobile invitation and four glass states.
 Latest software-GL measurement: 54.6 FPS at 0.74 resolution scale; hand-photo CPU inference sampled at 32.5ms versus ~199ms GPU.
