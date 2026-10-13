@@ -81,6 +81,10 @@ const interaction = new Interaction(
       renderer?.fog.finger(x, y, down, radius, palm);
       if (down) successfulStroke();
     },
+    wipe: (segments, begin) => {
+      renderer?.fog.wipe(segments, begin);
+      successfulStroke();
+    },
     clear: () => renderer?.fog.clear(),
     injectBreath: (strength, ms) => renderer?.fog.injectBreath(strength, ms),
   },
@@ -245,7 +249,13 @@ async function startHand(mock = false) {
   if (hand) return hand;
   hand = new HandController(camera.video, (state, point) => {
     updateCalibration();
-    interaction.update(state, point, hand?.calibration.active);
+    interaction.update(
+      state,
+      point,
+      hand?.calibration.active,
+      hand?.joints,
+      innerWidth / innerHeight,
+    );
     const trackingError = hand?.metrics().error;
     if (trackingError)
       ui.status.textContent = trackingError + " Drag to draw; B adds steam.";

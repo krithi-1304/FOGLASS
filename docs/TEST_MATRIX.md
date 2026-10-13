@@ -43,3 +43,10 @@ fresh-result recovery, pending initialization cancellation and hung-worker clean
 `gestures.test.ts` verifies that a long observation gap cannot trigger a fist hold
 or resume an active writing gesture. Existing vision E2E covers model startup,
 real-photo detection, replay and failure fallback.
+
+Full-hand quality: `hand-quality.spec.ts` checks all five fingertips and inter-finger
+gaps, portrait cover-crop alignment, active-hand render throughput and zero CPU
+readback during writing. `tracking-lifecycle.test.ts` checks result-driven fresh
+frame scheduling. `gestures.test.ts` covers a curled outer finger and two-frame
+point activation. The existing suite retains undo/redo, droplets, breath, real
+hand-photo inference, fallback controls and the four visual states.

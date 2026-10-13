@@ -3,6 +3,7 @@ import type { Vec2 } from "./filters";
 export type Gesture =
   "none" | "palm" | "point" | "pinch" | "fist" | "victory" | "two-palms";
 export interface HandFeatures {
+  landmarks: Point[];
   palm: Vec2;
   index: Vec2;
   thumb: Vec2;
@@ -40,6 +41,7 @@ export function features(hand: TrackedHand): HandFeatures {
       z: 0,
     });
   return {
+    landmarks: p,
     palm,
     index: p[8],
     thumb: p[4],
@@ -112,7 +114,7 @@ export class GestureEngine {
       else if (e.every((x) => !x)) raw = "fist";
       else if (e[0] && e[1] && !e[2] && !e[3]) raw = "victory";
       else if (e[0] && !e[1] && !e[2] && !e[3]) raw = "point";
-      else if (e.every(Boolean)) raw = "palm";
+      else if (e.filter(Boolean).length >= 3) raw = "palm";
     } else {
       this.pinched = false;
       this.prior = null;
@@ -131,7 +133,10 @@ export class GestureEngine {
     if ((raw === "none" || raw !== this.stable) && !keepWriting)
       this.stable = "none";
     if (!hand) this.stable = "none";
-    if (raw !== "none" && candidateAge >= (raw === "point" ? 60 : this.dwell)) {
+    if (
+      raw !== "none" &&
+      candidateAge >= (raw === "point" ? 30 : raw === "palm" ? 60 : this.dwell)
+    ) {
       if (this.stable !== raw) {
         this.stable = raw;
         this.since = this.candidateSince;

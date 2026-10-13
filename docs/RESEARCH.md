@@ -305,3 +305,61 @@ needs a separate budget. The first eight results now have a bounded 20s timeout;
 steady-state work retains 3s. Neither timeout keeps stale pen input active. Unit
 tests verify both budgets, clean cancellation and recovery on fresh frames.
 This refinement adds reliability rather than claiming better landmark accuracy.
+
+## Full-hand contact and latency audit — 2026-10-13
+
+### Reproduced experience failures
+
+- The prior palm implementation was a single circle around a centroid and required
+  motion before touching fog. It could not clear under fingertips. A new rendered
+  test checks all five tips, the palm, and preserved space between spread fingers;
+  it failed before the change and passes with joint-driven contact.
+- Twenty-four queued writing samples required 28 draw calls and one synchronous
+  GPU-to-CPU readback. The final implementation requires 5 calls (including its
+  instanced brush call and two composite frames) and zero readbacks in the same
+  test. Undo snapshots remain half-float textures on the GPU, capped at eight.
+- A provider scheduling test demonstrated that a 35ms inference result waited for
+  another video callback even when a newer frame already existed. On-result
+  scheduling now starts that fresh frame immediately, retaining one in-flight
+  bitmap, timestamps, 30Hz cap and stale-frame checks. It does not queue old frames.
+- A slightly curled outer finger previously cancelled a palm gesture. Three
+  extended fingers now suffice for palm contact; two-palm destructive clear still
+  requires all four fingers on both hands. Point onset is 30ms (two 30Hz samples),
+  palm onset 60ms; destructive actions retain their existing hold requirements.
+
+### Rendering decisions and measured iteration
+
+[MDN WebGL guidance](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices)
+identifies CPU readback as a synchronization hazard and recommends batching work.
+The first batching attempt looped over segments inside every fog pixel. It passed
+contact/undo tests, but was rejected after performance measurements. During heavy
+host load the original idle shader measured 6.3 FPS and that candidate 4.2 FPS;
+these stressed measurements cannot establish normal device throughput.
+
+The final brush stage renders bounded capsule regions with instanced triangles
+into an RGBA8 contact texture, using MAX blending to preserve finger gaps. The
+fog simulation reads one contact value per pixel. This avoids a full-pane
+per-joint loop. Palm pads and each of the five articulated finger chains follow
+smoothed, mirrored, cover-cropped landmarks; swept joints connect consecutive
+positions. This is a landmark-based approximation of contact, not depth sensing
+or pixel-perfect hand segmentation. Residual moisture and gentle edges remain.
+The final targeted run measured 56.0 FPS during full-hand motion at 0.70 quality;
+this is software-GL rendering with mock landmarks, not end-to-end physical latency.
+
+### Tracking decisions
+
+[Google's hand guide](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js)
+documents synchronous inference and the landmark outputs; retain the worker and
+self-hosted model instead of adding an unmeasured model dependency. CPU comparison
+now begins if GPU inference exceeds 45ms, rather than waiting until 90ms. Backend
+sample storage stops after comparison instead of growing for the whole session.
+
+[One-Euro tuning guidance](https://gery.casiez.net/1euro/) distinguishes jitter from
+speed-related lag. Horizontal filtering now uses viewport-height units, matching
+vertical filtering, so equal pixel speeds have equal sensitivity in portrait and
+landscape. All hand joints receive filtering for the contact footprint. No
+unobserved trajectory prediction was added; it can invent marks on a reversal.
+
+Physical acceptance still requires a real person's writing in good/dim light,
+slow loops, fast reversals and hand entry/exit. Neither the hand-photo inference
+test nor synthetic trajectories justify a promise of perfect live precision.

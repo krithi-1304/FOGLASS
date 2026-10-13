@@ -14,6 +14,12 @@ optional M sound, and capability-checked WebXR glass with index-joint contact.
 
 ## Latest input repair
 
+Full-hand contact includes all fingers, GPU instanced brush regions, GPU undo and
+result-driven inference scheduling. 24-point writing: 5 draws/0 CPU readbacks
+versus 28/1 before; active-hand rendering 54.8 FPS at .69 quality. Four states and
+handprint visually reviewed. User now requests repeat-use hardening, auto-hiding
+controls and GitHub Pages V1 publication; this release work is next.
+
 Freshness watchdog releases frozen-camera input; held gestures reset after gaps.
 All provider timers cancel on stop/failure. Cold-start inference has a 20s budget
 for the first eight results; established inference has 3s. The original 3s startup
@@ -30,7 +36,7 @@ These are controlled tests, not verification of the user's physical microphone/c
 
 ## Validation
 
-Tracking lifecycle refinement: 47 unit tests + 26 Playwright tests pass (browser suite 1.2m).
+Full-hand refinement: 50 unit tests + 30 Playwright tests pass (browser suite 1.4m).
 Lint, TypeScript, production build and diff checks pass.
 Six visual baselines reviewed: desktop/mobile invitation and four glass states.
 Latest software-GL measurement: 54.6 FPS at 0.74 resolution scale; hand-photo CPU inference sampled at 32.5ms versus ~199ms GPU.

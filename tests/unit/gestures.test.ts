@@ -147,3 +147,19 @@ it("a camera gap cannot count as a held fist or continue writing", () => {
     expect(resumed.gesture).toBe("none");
   }
 });
+
+it("an open hand remains a palm when one outer finger is slightly curled", () => {
+  const hand = structuredClone(fixture("open-palm-left").frames[0].hands[0]);
+  const curled = fixture("fist").frames[0].hands[0].landmarks;
+  for (let i = 17; i <= 20; i++)
+    hand.landmarks[i] = { ...curled[i], x: hand.landmarks[i].x };
+  const e = new GestureEngine();
+  e.update({ timestamp: 0, hands: [hand] });
+  expect(e.update({ timestamp: 70, hands: [hand] }).gesture).toBe("palm");
+});
+it("pointing begins on the second 30Hz observation without waiting a third frame", () => {
+  const hands = fixture("index-draw-line").frames[0].hands;
+  const e = new GestureEngine();
+  e.update({ timestamp: 0, hands });
+  expect(e.update({ timestamp: 34, hands }).gesture).toBe("point");
+});

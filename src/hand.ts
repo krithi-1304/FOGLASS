@@ -14,6 +14,11 @@ export class HandController {
   private provider: HandTrackingProvider | undefined;
   private filterX = new OneEuro();
   private filterY = new OneEuro();
+  private jointFilters = Array.from({ length: 21 }, () => [
+    new OneEuro(),
+    new OneEuro(),
+  ]);
+  joints: Vec2[] = [];
   private stopped = false;
   private tipMode = false;
   state: GestureState | null = null;
@@ -37,10 +42,28 @@ export class HandController {
       this.engine.pinchThreshold = this.profile.pinchThreshold;
     }
     if (!state.hand) {
+      this.joints = [];
+      this.jointFilters.forEach((pair) =>
+        pair.forEach((filter) => filter.reset()),
+      );
       this.filterX.reset();
       this.filterY.reset();
       this.point = null;
     } else {
+      const videoAspect =
+        (this.video.videoWidth || 1280) / (this.video.videoHeight || 720);
+      const screenAspect = innerWidth / innerHeight;
+      this.joints = state.hand.landmarks.map((p, i) => {
+        const mapped = mirrorPoint(p, videoAspect, screenAspect);
+        return {
+          x:
+            this.jointFilters[i][0].filter(
+              mapped.x * screenAspect,
+              frame.timestamp,
+            ) / screenAspect,
+          y: this.jointFilters[i][1].filter(mapped.y, frame.timestamp),
+        };
+      });
       const tipMode =
         state.gesture === "point" ||
         state.raw === "point" ||
@@ -59,7 +82,9 @@ export class HandController {
         innerWidth / innerHeight,
       );
       const next = {
-        x: this.filterX.filter(mapped.x, frame.timestamp),
+        x:
+          this.filterX.filter(mapped.x * screenAspect, frame.timestamp) /
+          screenAspect,
         y: this.filterY.filter(mapped.y, frame.timestamp),
       };
       if (
@@ -109,6 +134,10 @@ export class HandController {
     this.filterX.reset();
     this.filterY.reset();
     this.point = null;
+    this.jointFilters.forEach((pair) =>
+      pair.forEach((filter) => filter.reset()),
+    );
+    this.joints = [];
     await this.provider.replay(recording, realtime);
   }
   metrics() {

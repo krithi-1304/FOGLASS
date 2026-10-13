@@ -32,3 +32,8 @@ unverified on user hardware.
 Tracking freshness and lifecycle: regression covered for camera freeze, fresh
 recovery, initialization cancellation, worker timeout and held-gesture gaps.
 Fallback instructions now surface runtime tracking errors in the mirror.
+
+Full-hand contact, batched brush drawing and GPU undo: regression covered for five
+fingers, portrait alignment, finger gaps, history and actual GL call counts.
+Result-driven inference scheduling and relaxed open-hand recognition: unit covered.
+Physical writing accuracy and mouth-trigger reliability remain manually unverified.

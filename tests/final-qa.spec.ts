@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 test("review deterministic glass states and mobile invitation", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/?test=1&seed=7&visual=1");
   await expect(page).toHaveScreenshot("landing-desktop.png", {
     animations: "disabled",
@@ -26,6 +26,7 @@ test("review deterministic glass states and mobile invitation", async ({
       api.setTimeScale(0);
       api.seedCoverage(value);
     }, coverage);
+    await page.screenshot({ path: testInfo.outputPath(`review-${name}.png`) });
     await expect(page).toHaveScreenshot(`glass-${name}.png`, {
       animations: "disabled",
       maxDiffPixelRatio: 0.015,
@@ -53,6 +54,7 @@ test("review deterministic glass states and mobile invitation", async ({
     }
     api.injectFinger(0.5, 0.5, false);
   });
+  await page.screenshot({ path: testInfo.outputPath("review-writing.png") });
   await expect(page).toHaveScreenshot("glass-writing.png", {
     animations: "disabled",
     maxDiffPixelRatio: 0.015,

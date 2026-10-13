@@ -8,6 +8,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   private initTimeout: ReturnType<typeof setTimeout> | undefined;
   private watchdog: ReturnType<typeof setInterval> | undefined;
   private hasHand = false;
+  private capture: (() => void) | undefined;
   private stopped = false;
   private busy = false;
   private lastVideo = -1;
@@ -71,6 +72,8 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
           };
           this.hasHand = frame.hands.length > 0;
           for (const cb of this.listeners) cb(frame);
+          // Consume a fresh frame already available; do not wait another video tick.
+          this.capture?.();
         }
       };
       this.worker.postMessage({
@@ -87,6 +90,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   }
   private fail(message: string) {
     this.clearTimers();
+    this.capture = undefined;
     this.hasHand = false;
     this.error = message;
     this.busy = false;
@@ -116,7 +120,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
           "Hand tracking stalled. Use mouse/touch or restart the mirror.",
         );
     }, 100);
-    const tick = () => {
+    this.capture = () => {
       if (this.stopped || !this.worker) return;
       const now = performance.now();
       if (
@@ -143,6 +147,10 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
           })
           .catch(() => this.fail("Could not read the camera frame"));
       }
+    };
+    const tick = () => {
+      if (this.stopped || !this.worker) return;
+      this.capture?.();
       if (typeof video.requestVideoFrameCallback === "function")
         this.callback = video.requestVideoFrameCallback(tick);
       else this.timer = setTimeout(tick, this.interval);
@@ -155,6 +163,7 @@ export class MediaPipeHandProvider implements HandTrackingProvider {
   }
   stop() {
     this.stopped = true;
+    this.capture = undefined;
     this.clearTimers();
     this.rejectInit?.(new Error("Tracking stopped"));
     this.rejectInit = undefined;

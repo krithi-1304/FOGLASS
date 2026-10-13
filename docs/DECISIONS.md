@@ -83,3 +83,14 @@ callbacks stop; a 20s warmup / 3s steady-state in-flight timeout terminates hung
 Cancel initialization, scheduling and watchdog timers on failure/stop. These
 bounds protect continuity; they are not a promised end-to-end latency. Revisit
 against real slow-device recordings, retaining the existing CPU/GPU comparison.
+
+## D013 — Full-hand contact and measured rendering work (2026-10-13)
+
+Replace the palm-centroid circle with joint-driven palm pads, five finger chains
+and swept joints. Stationary open-hand contact also wipes. Relax palm recognition
+to three extended fingers, but retain strict two-hand clear and action dwell.
+Use instanced bounded brush regions and GPU undo snapshots; reject the initial
+full-pane segment-loop candidate after performance tests. Begin fresh inference
+on result arrival without another camera callback, preserving one in-flight frame.
+Compare CPU above 45ms GPU latency; bound backend samples. Revisit using physical
+writing recordings, not synthetic speed claims. See RESEARCH.md for measurements.

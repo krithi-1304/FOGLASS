@@ -120,3 +120,33 @@ it("uses the shorter stall budget after warmup completes", async () => {
   expect(vi.getTimerCount()).toBe(0);
   provider.stop();
 });
+
+it("starts inference on the newest available video frame immediately after a result", async () => {
+  const provider = new MediaPipeHandProvider();
+  const ready = provider.initialize();
+  WorkerStub.current.send({ type: "ready" });
+  await ready;
+  const video = {
+    readyState: 2,
+    currentTime: 1,
+    requestVideoFrameCallback: () => 1,
+    cancelVideoFrameCallback() {},
+  };
+  await provider.start(video as unknown as HTMLVideoElement);
+  await vi.advanceTimersByTimeAsync(40);
+  video.currentTime = 1.033;
+  WorkerStub.current.send({
+    type: "frame",
+    timestamp: 0,
+    inferenceMs: 35,
+    delegate: "CPU",
+    hands: [],
+  });
+  await Promise.resolve();
+  expect(
+    WorkerStub.current.postMessage.mock.calls.filter(
+      ([m]) => m.type === "frame",
+    ),
+  ).toHaveLength(2);
+  provider.stop();
+});

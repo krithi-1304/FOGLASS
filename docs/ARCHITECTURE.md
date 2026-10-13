@@ -52,3 +52,11 @@ hand input after >400ms without a result. In-flight work times out after 20s dur
 terminates with a visible fallback message. Gesture dwell/velocity reset across
 observation gaps >400ms or non-increasing timestamps. Failure and stop clear all
 provider timers and callbacks, including pending model initialization.
+
+Hand contact now maps/filter all 21 joints through the same mirrored cover crop.
+`brush.ts` forms palm pads, finger segments and swept-joint paths. `brushRenderer.ts`
+uses instanced bounded quads and MAX blending into a contact texture; the ping-pong
+fog shader samples it once per pixel. GPU texture copies hold undo/redo snapshots,
+with eight history entries. CPU readback is reserved for explicit test diagnostics.
+Provider result delivery immediately checks for a fresh video frame, without
+creating another scheduling loop or allowing concurrent inference.

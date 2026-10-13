@@ -29,10 +29,10 @@ self.onmessage = async (event: MessageEvent) => {
       const start = performance.now();
       const result = model.detectForVideo(data.bitmap, data.timestamp);
       const inferenceMs = performance.now() - start;
-      samples.push(inferenceMs);
+      if (!compared) samples.push(inferenceMs);
       if (!compared && samples.length >= 8) {
         const average = samples.slice(-4).reduce((a, b) => a + b, 0) / 4;
-        if (delegate === "GPU" && average > 90) {
+        if (delegate === "GPU" && average > 45) {
           gpuMs = average;
           delegate = "CPU";
           samples = [];

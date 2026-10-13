@@ -1,3 +1,4 @@
+import { handBrush, type BrushSegment } from "./brush";
 import type { GestureState } from "./gestures";
 import { catmullRom, type Vec2 } from "./filters";
 export type MirrorMode = "mirror" | "writing" | "reveal";
@@ -9,6 +10,7 @@ export interface GlassTarget {
     radius?: number,
     palm?: boolean,
   ): void;
+  wipe?(segments: BrushSegment[], begin: boolean): void;
   clear(): void;
   injectBreath(strength: number, ms: number): void;
 }
@@ -21,6 +23,7 @@ export class Interaction {
   private before: Vec2 | null = null;
   private drawing = false;
   private lastGesture = "";
+  private previousJoints: Vec2[] | undefined;
   private pinchOrigin: Vec2 | null = null;
   private pinchDensity = 0;
   constructor(
@@ -30,10 +33,17 @@ export class Interaction {
   lift() {
     if (this.drawing)
       this.target.finger(this.previous?.x || 0, this.previous?.y || 0, false);
+    this.previousJoints = undefined;
     this.drawing = false;
     this.previous = this.before = null;
   }
-  update(state: GestureState, point: Vec2 | null, calibrating = false) {
+  update(
+    state: GestureState,
+    point: Vec2 | null,
+    calibrating = false,
+    joints?: Vec2[],
+    aspect = 1,
+  ) {
     if (calibrating) {
       this.lift();
       return;
@@ -66,9 +76,7 @@ export class Interaction {
     }
     this.pinchOrigin = null;
     const palm = state.gesture === "palm" && this.mode !== "writing";
-    const draw =
-      !this.paused &&
-      (state.gesture === "point" || (palm && state.speed > 0.035));
+    const draw = !this.paused && (state.gesture === "point" || palm);
     if (!draw) {
       this.lift();
       return;
@@ -82,6 +90,16 @@ export class Interaction {
       Math.hypot(point.x - this.previous.x, point.y - this.previous.y) > 0.35
     )
       this.lift();
+    if (palm && joints?.length === 21 && this.target.wipe) {
+      this.target.wipe(
+        handBrush(joints, aspect, this.previousJoints),
+        !this.drawing,
+      );
+      this.previousJoints = joints.map((p) => ({ ...p }));
+      this.previous = { ...point };
+      this.drawing = true;
+      return;
+    }
     const radius = palm
       ? Math.max(
           0.05,

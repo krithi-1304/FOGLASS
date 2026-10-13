@@ -142,3 +142,9 @@
 - Browser regressions rejected the first 3s cold-start timeout; use 20s during first eight results, 3s afterward, independently release stale input.
 - Validation: 47 unit + 26 browser tests pass (1.2m); lint/build/diff and existing visual comparisons pass. Physical hand/mic remain unverified.
 - Next: record physical writing; compare precision on that replay; verify selected microphone with live breath.
+
+## Full-hand and latency milestone — 2026-10-13
+- Full-hand contact now includes five fingers; relaxed palm recognition and faster point onset, with crop-consistent joint filtering.
+- Replaced per-point simulation/readback with bounded instanced brush regions and GPU history; 24-point test: 28 calls/1 read → 5 calls/0 reads.
+- Validation: 50 unit + 30 browser tests pass (1.4m), lint/build clean; 54.8 FPS active hand, 50.9 FPS idle. Reviewed four fog states and handprint.
+- Next: repeat-use soak and accidental command prevention; auto-hiding aesthetic controls; GitHub Pages V1 release requested by user.
