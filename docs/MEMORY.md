@@ -166,3 +166,9 @@
 - Lower composite floor and GPU-resampled 256² fog preserve marks/history; resize assertion now checks adaptive dimensions.
 - Local validation: 51 unit + 35 browser tests pass (1.7m), lint/type/build pass; 60 FPS idle, 52.6 FPS active hand; no performance threshold reduced.
 - Next: rerun Linux CI; verify Pages live; physical hand/mouth checks remain pending.
+
+## V1 live — 2026-10-14
+- Published https://krithi-1304.github.io/FOGLASS/ from 95c203f; GitHub checks and deploy succeeded (run 38539413107).
+- Linux CI: 35 browser + 51 unit tests pass; 54.6 FPS idle and 56.0 FPS full-hand at .30 adaptive scale, up from 16 FPS.
+- Live Chromium smoke passes startup, steam/drawing, local model/WASM, lab and test-API isolation; no page errors.
+- Next: manual camera/mouth matrix; collect landmark replays for reported failures; tune with device evidence.

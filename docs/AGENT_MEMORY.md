@@ -57,3 +57,9 @@ No promise of perfect tracking, real headset passthrough or reconstructed reflec
 
 ## V1 release status — 2026-10-14
 51 unit / 34 browser tests passing; lint/typecheck/production build passing. Repeated-use, audio suspension and WebGL loss now covered. Extra hand commands opt-in; HUD hides away from bottom edge. GitHub Pages publication in progress. Next: publish, live smoke, manual hardware checks.
+
+## Current V1 — 2026-10-14
+Live: https://krithi-1304.github.io/FOGLASS/; repository krithi-1304/FOGLASS, deployed code 95c203f.
+51 unit + 35 browser tests pass locally and on Linux CI; live production smoke passes.
+Adaptive fog resampling preserves marks/history; Linux improved 16 → 54.6 idle / 56.0 active FPS.
+Next: physical camera/mouth matrix, recorded interaction evidence, evidence-based tuning. Physical hardware accuracy remains unverified.
