@@ -154,3 +154,9 @@
 - Added microphone suspend/resume and failure cleanup, bounded history soak tests, tracking restart and WebGL recovery.
 - Validation: 51 unit + 34 browser tests pass (1.8m); lint/type/build pass; reviewed desktop/mobile and four fog states.
 - Next: publish GitHub Pages; verify live assets and controls; physical camera/mouth tests remain device-dependent.
+
+## V1 publication verification — 2026-10-14
+- Public repository: github.com/krithi-1304/FOGLASS; Pages workflow enabled after tested release e650b69.
+- Production subpath smoke passes fallback, drawing, self-hosted model/WASM and lab; no page errors.
+- Performance: 56.5 FPS idle; 57.2 FPS full-hand rendering, adaptive scale .74 on this runner.
+- Next: verify GitHub workflow and live URL; finish physical camera/mouth matrix; tune from recorded interactions.

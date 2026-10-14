@@ -1,5 +1,7 @@
 # FOGLASS
 
+V1 website: https://krithi-1304.github.io/FOGLASS/
+
 A private, browser-based fog mirror. Blow to bloom condensation, point to write,
 or move your palm to wipe. Cleared marks gradually steam over again.
 
@@ -83,3 +85,7 @@ the increase above room noise; recalibrate in a quiet moment after changing room
 If the meter stays empty while blowing, check the browser’s selected microphone
 and system voice-isolation settings. Research and reproduced algorithm fixes are
 recorded in `docs/RESEARCH.md`.
+
+## Hosting
+
+Pushes to `master` run lint, type checks, unit and browser tests before publishing to GitHub Pages. The production build uses `VITE_BASE_PATH=/FOGLASS/`; `pnpm prepare:pages` creates the lab route and excludes local prompt notes. To preview it locally: `pnpm exec vite preview --base /FOGLASS/`.
