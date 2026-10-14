@@ -148,3 +148,9 @@
 - Replaced per-point simulation/readback with bounded instanced brush regions and GPU history; 24-point test: 28 calls/1 read → 5 calls/0 reads.
 - Validation: 50 unit + 30 browser tests pass (1.4m), lint/build clean; 54.8 FPS active hand, 50.9 FPS idle. Reviewed four fog states and handprint.
 - Next: repeat-use soak and accidental command prevention; auto-hiding aesthetic controls; GitHub Pages V1 release requested by user.
+
+## V1 release — 2026-10-14
+- Prevented accidental gesture pauses; quiet edge/touch/keyboard controls and softer landing page.
+- Added microphone suspend/resume and failure cleanup, bounded history soak tests, tracking restart and WebGL recovery.
+- Validation: 51 unit + 34 browser tests pass (1.8m); lint/type/build pass; reviewed desktop/mobile and four fog states.
+- Next: publish GitHub Pages; verify live assets and controls; physical camera/mouth tests remain device-dependent.

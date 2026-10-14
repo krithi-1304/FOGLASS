@@ -67,6 +67,7 @@ it("low confidence, calibration and pause cannot draw; actions fire once", () =>
   };
   const i = new Interaction(target),
     e = new GestureEngine();
+  i.gestureCommands = true;
   for (const f of fixture("low-confidence").frames) {
     const s = e.update(f);
     i.update(s, s.hand?.index || null);
@@ -84,4 +85,24 @@ it("low confidence, calibration and pause cannot draw; actions fire once", () =>
     i.update(s, s.hand?.index || null);
   }
   expect(draws).toBe(0);
+});
+
+it("resting gestures cannot pause or change the core mirror by default", () => {
+  const target = { finger() {}, clear() {}, injectBreath() {} };
+  const interaction = new Interaction(target);
+  for (const name of [
+    "fist",
+    "pinch",
+    "two-finger-palette",
+    "open-palm-hold",
+  ]) {
+    const e = new GestureEngine();
+    for (const f of fixture(name).frames) {
+      const s = e.update(f);
+      interaction.update(s, s.hand?.index || null);
+    }
+  }
+  expect(interaction.paused).toBe(false);
+  expect(interaction.palette).toBe(false);
+  expect(interaction.density).toBe(0.75);
 });

@@ -107,7 +107,7 @@ export class BreathMonitor {
   private spectrum: Float32Array<ArrayBuffer>;
   private timer: ReturnType<typeof setInterval>;
   constructor(
-    private context: AudioContext,
+    context: AudioContext,
     private stream: MediaStream,
     onBreath: (strength: number) => void,
   ) {
@@ -118,6 +118,10 @@ export class BreathMonitor {
     this.source.connect(this.analyser);
     this.spectrum = new Float32Array(this.analyser.frequencyBinCount);
     this.timer = setInterval(() => {
+      if (context.state !== "running") {
+        this.detector.recalibrate();
+        return;
+      }
       this.analyser.getFloatFrequencyData(this.spectrum);
       const strength = this.detector.update(
         this.spectrum,
@@ -133,6 +137,5 @@ export class BreathMonitor {
     this.source.disconnect();
     this.analyser.disconnect();
     this.stream.getTracks().forEach((t) => t.stop());
-    void this.context.close();
   }
 }

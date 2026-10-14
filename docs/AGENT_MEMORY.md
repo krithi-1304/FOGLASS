@@ -54,3 +54,6 @@ No promise of perfect tracking, real headset passthrough or reconstructed reflec
 1. Open the running preview at http://127.0.0.1:5174/.
 2. Run the manual camera/mouth/headset matrix on actual hardware.
 3. Tune only against recorded evidence; preserve the green replay/visual suites.
+
+## V1 release status — 2026-10-14
+51 unit / 34 browser tests passing; lint/typecheck/production build passing. Repeated-use, audio suspension and WebGL loss now covered. Extra hand commands opt-in; HUD hides away from bottom edge. GitHub Pages publication in progress. Next: publish, live smoke, manual hardware checks.

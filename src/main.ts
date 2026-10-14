@@ -1,3 +1,4 @@
+import { installHud } from "./hud";
 import "./style.css";
 import { RoomSound } from "./sound";
 import { installDebug } from "./debug";
@@ -16,6 +17,7 @@ import type { GestureRecording } from "./tracking/types";
 const params = new URLSearchParams(location.search);
 const isTest = params.get("test") === "1";
 const ui = createUI();
+const hud = installHud();
 const camera = new Camera();
 const recorder = new MirrorRecorder();
 const sound = new RoomSound();
@@ -63,6 +65,12 @@ function successfulStroke() {
 }
 new MutationObserver(() => {
   ui.status.style.opacity = "1";
+  if (
+    /unavailable|stalled|denied|could not|disconnected/i.test(
+      ui.status.textContent || "",
+    )
+  )
+    hud.reveal();
 }).observe(ui.status, { childList: true, characterData: true, subtree: true });
 try {
   renderer = new Renderer(
@@ -75,6 +83,7 @@ try {
   ui.start.disabled = true;
   mode = "unsupported";
 }
+ui.restartMirror.addEventListener("click", () => location.reload());
 const interaction = new Interaction(
   {
     finger: (x, y, down, radius, palm) => {
@@ -98,8 +107,24 @@ const interaction = new Interaction(
     ui.tools.hidden = !interaction.palette;
   },
 );
+ui.handShortcuts.addEventListener("change", () => {
+  interaction.gestureCommands = ui.handShortcuts.checked;
+});
+ui.restartTracking.addEventListener("click", async () => {
+  if (mode !== "camera") {
+    ui.status.textContent =
+      "Start with a camera to use hand tracking. Drag to draw here.";
+    return;
+  }
+  hand?.stop();
+  hand = undefined;
+  interaction.lift();
+  if (interaction.paused) interaction.togglePause();
+  await startHand();
+});
 let breath: BreathMonitor | undefined;
 let microphoneContext: AudioContext | undefined;
+let microphoneStream: MediaStream | undefined;
 let micState = "off",
   micAttempt = 0;
 let micPoll: ReturnType<typeof setInterval> | undefined;
@@ -108,8 +133,10 @@ function disableMicrophone() {
   clearInterval(micPoll);
   breath?.stop();
   breath = undefined;
+  microphoneStream?.getTracks().forEach((track) => track.stop());
+  microphoneStream = undefined;
   if (microphoneContext && microphoneContext.state !== "closed")
-    void microphoneContext.close();
+    void microphoneContext.close().catch(() => {});
   microphoneContext = undefined;
   micState = "off";
   ui.breathFeedback.hidden = true;
@@ -117,6 +144,13 @@ function disableMicrophone() {
   ui.microphone.setAttribute("aria-pressed", "false");
 }
 ui.microphone.addEventListener("click", async () => {
+  if (micState !== "off" && microphoneContext?.state === "suspended") {
+    await microphoneContext.resume().catch(() => {
+      ui.status.textContent =
+        "Microphone could not resume. Disable and enable it again.";
+    });
+    return;
+  }
   if (micState !== "off") {
     disableMicrophone();
     return;
@@ -132,6 +166,7 @@ ui.microphone.addEventListener("click", async () => {
       stream.getTracks().forEach((t) => t.stop());
       return;
     }
+    microphoneStream = stream;
     breath = new BreathMonitor(microphoneContext, stream, (strength) =>
       renderer?.fog.injectBreath(strength, 120),
     );
@@ -144,6 +179,12 @@ ui.microphone.addEventListener("click", async () => {
       "Stay quiet briefly while the microphone learns the room.";
     micPoll = setInterval(() => {
       if (!breath) return;
+      if (microphoneContext?.state === "suspended") {
+        ui.microphone.textContent = "Resume breath";
+        ui.breathMessage.textContent = "Microphone paused · tap Resume breath";
+        micState = "suspended";
+        return;
+      }
       const detector = breath.detector;
       ui.breathMeter.value = Math.min(
         3,
@@ -304,6 +345,7 @@ ui.exit.addEventListener("click", () => {
 });
 function enter() {
   document.body.classList.add("started");
+  hud.enter();
   ui.welcome.inert = true;
   mode = "fallback";
   ui.dock.hidden = false;
@@ -314,6 +356,7 @@ function enter() {
 ui.fallback.addEventListener("click", enter);
 ui.start.addEventListener("click", async () => {
   enter();
+  if (ui.breathOnStart.checked) ui.microphone.click();
   ui.status.textContent =
     "Allow camera access, or use B and drag while you wait.";
   const message = await camera.start();
@@ -332,7 +375,7 @@ const move = (e: PointerEvent) => {
   };
   if (pointer.down && !interaction.paused) successfulStroke();
   ui.cursor.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
-  ui.cursor.classList.add("visible");
+  ui.cursor.classList.toggle("visible", pointer.down);
   renderer?.fog.finger(
     pointer.x,
     pointer.y,
@@ -345,12 +388,12 @@ ui.canvas.addEventListener("pointerdown", (e) => {
   pointer.down = true;
   renderer?.fog.finger(pointer.x, pointer.y, !interaction.paused);
   ui.canvas.setPointerCapture(e.pointerId);
-  ui.cursor.classList.add("down");
+  ui.cursor.classList.add("down", "visible");
 });
 const release = () => {
   pointer.down = false;
   renderer?.fog.finger(pointer.x, pointer.y, false);
-  ui.cursor.classList.remove("down");
+  ui.cursor.classList.remove("down", "visible");
 };
 ui.canvas.addEventListener("pointerup", release);
 ui.canvas.addEventListener("pointercancel", release);
@@ -366,7 +409,9 @@ ui.canvas.addEventListener("webglcontextlost", (e) => {
   disableMicrophone();
   hand?.stop();
   renderer?.dispose();
-  ui.status.textContent = "The mirror paused. Reload this page to restore it.";
+  ui.graphicsRecovery.hidden = false;
+  ui.status.textContent =
+    "The glass needs a fresh start. Choose Restart mirror.";
 });
 addEventListener("keydown", (e) => {
   if (
@@ -452,6 +497,7 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         palette: interaction.palette,
         canUndo: renderer?.fog.canUndo,
         canRedo: renderer?.fog.canRedo,
+        history: renderer?.fog.historyUsage(),
         mediaPhase: camera.phase,
         tracking: hand?.metrics() || { status: "off" },
         gesture: hand?.state?.gesture || "none",
@@ -495,21 +541,20 @@ ui.vr.addEventListener("click", async () => {
   }
 });
 const disposeDebug = renderer ? installDebug(renderer, () => breath) : () => {};
-const disposeLab =
-  location.pathname.replace(/\/$/, "") === "/lab"
-    ? installLab(
-        () => hand,
-        async (record) => {
-          enter();
-          hand?.stop();
-          hand = undefined;
-          const replayHand = await startHand(true);
-          replayHand?.skipCalibration();
-          updateCalibration();
-          await replayHand?.replay(record as GestureRecording, true);
-        },
-      )
-    : () => {};
+const disposeLab = location.pathname.replace(/\/$/, "").endsWith("/lab")
+  ? installLab(
+      () => hand,
+      async (record) => {
+        enter();
+        hand?.stop();
+        hand = undefined;
+        const replayHand = await startHand(true);
+        replayHand?.skipCalibration();
+        updateCalibration();
+        await replayHand?.replay(record as GestureRecording, true);
+      },
+    )
+  : () => {};
 addEventListener("pagehide", () => {
   xr.stop();
   disposeLab();

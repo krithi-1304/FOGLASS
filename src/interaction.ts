@@ -15,6 +15,7 @@ export interface GlassTarget {
   injectBreath(strength: number, ms: number): void;
 }
 export class Interaction {
+  gestureCommands = false;
   paused = false;
   palette = false;
   mode: MirrorMode = "mirror";
@@ -48,7 +49,7 @@ export class Interaction {
       this.lift();
       return;
     }
-    if (state.action) {
+    if (state.action && this.gestureCommands) {
       this.lift();
       if (state.action === "pause") this.paused = !this.paused;
       if (state.action === "palette") this.palette = !this.palette;
@@ -62,6 +63,10 @@ export class Interaction {
       return;
     }
     if (state.gesture === "pinch") {
+      if (!this.gestureCommands) {
+        this.lift();
+        return;
+      }
       this.lift();
       if (!this.pinchOrigin) {
         this.pinchOrigin = { ...point };

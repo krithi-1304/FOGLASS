@@ -18,10 +18,12 @@ account, backend or media upload is involved.
 
 ## Use
 
-Start enables the front camera and tracking immediately. Optional hand calibration is in Tools.
+Start enables the front camera and tracking. Uncheck the microphone option to start without audio. Optional hand calibration is in Tools.
 Point with only your index finger extended to write; move an open palm to wipe.
-Hold a fist to pause; two palms clear; two fingers open Tools. Tracking needs a
+Extra hand shortcuts are off by default to prevent accidental pauses while writing. Enable them in Tools for fist pause, two-palm clear and two-finger Tools. Tracking needs a
 well-lit, visible hand and cannot guarantee accuracy through occlusion.
+
+Move to the bottom edge (or tap it on mobile) to reveal the floating controls; move away to leave only the glass. Tab also reveals controls. Tools includes **Restart tracking** for recovery.
 
 The mirror dock contains **Enable breath**. Stay quiet during calibration, then
 blow gently towards the microphone. This is an experimental local noise detector,

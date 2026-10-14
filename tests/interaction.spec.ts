@@ -64,6 +64,8 @@ test("palm wipe, low-confidence rejection and two-palm clear", async ({
   expect(await sample(page, 0.5, 0.58)).toBeGreaterThan(before * 0.9);
   await replay(page, "open-palm-left");
   await expect.poll(() => sample(page, 0.5, 0.58)).toBeLessThan(0.35);
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("checkbox", { name: /Extra hand shortcuts/ }).check();
   await replay(page, "two-palm-clear");
   await expect.poll(() => sample(page, 0.5, 0.58)).toBeLessThan(0.02);
 });
@@ -72,6 +74,9 @@ test("fist pauses, victory opens palette, lost hands release strokes", async ({
 }) => {
   await page.goto("/?test=1&mock=1");
   await page.getByRole("button", { name: "Try without camera" }).click();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("checkbox", { name: /Extra hand shortcuts/ }).check();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await replay(page, "fist");
   await page.getByRole("button", { name: "Tools", exact: true }).click();
   await expect(

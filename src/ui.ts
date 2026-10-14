@@ -4,11 +4,12 @@ export function createUI() {
     <div class="edge" aria-hidden="true"></div>
     <header><span>FOGLASS</span><span id="camera-state">CAMERA OFF</span></header>
     <main id="welcome">
-      <span class="little-star" aria-hidden="true">✧</span><h1>FOGLASS</h1>
-      <p class="invitation">a little space to leave a trace.</p>
-      <p class="instructions">Breathe. Draw. Let it disappear.</p>
+      <svg class="little-star" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2c1 7 3 9 10 10-7 1-9 3-10 10-1-7-3-9-10-10 7-1 9-3 10-10Z" stroke="currentColor" stroke-width="1"/></svg><h1 aria-label="FOGLASS">foglass</h1>
+      <p class="invitation">a moment, written in mist.</p>
+      <p class="instructions">Breathe on the glass. Leave a little of yourself.</p>
       <button id="start">Start <span aria-hidden="true">↗</span></button>
-      <p class="privacy">Just you and the glass. Camera stays on your device.</p>
+      <label class="start-option"><input id="breath-on-start" type="checkbox" checked> Enable breath with my microphone</label>
+      <p class="privacy">Camera &amp; sound stay on your device.</p>
       <button id="fallback" class="text-button">Try without camera</button>
     </main>
     <section id="calibration" hidden aria-label="Hand calibration">
@@ -33,7 +34,9 @@ export function createUI() {
       <label class="field">Breath sensitivity<input id="breath-sensitivity" aria-label="Breath sensitivity" type="range" min="0.5" max="4" step="0.1" value="1"></label>
       <button id="recalibrate-breath">Recalibrate breath</button>
       <p class="microphone-note">Blow toward your microphone. Audio stays on this device.</p>
+      <label class="shortcut-option"><input id="hand-shortcuts" type="checkbox"> Extra hand shortcuts <span>Fist to pause · two palms to clear</span></label>
       <button id="recalibrate">Calibrate hand</button>
+      <button id="restart-tracking">Restart tracking</button>
       <button id="sound" aria-pressed="false">Enable sound</button>
       <button id="vr" hidden disabled>Optional headset mode</button>
       <button id="photo">Save photo</button>
@@ -46,9 +49,19 @@ export function createUI() {
     </section>
     <div id="breath-feedback" hidden><meter id="breath-meter" aria-label="Microphone input relative to trigger" min="0" max="3" value="0"></meter><span id="breath-message">Listening</span></div>
     <p id="status" role="status" aria-live="polite"></p>
+    <section id="graphics-recovery" hidden aria-label="Graphics recovery"><p>The glass needs a fresh start.</p><button id="restart-mirror">Restart mirror</button></section>
     <div id="cursor" aria-hidden="true"></div>
     <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
   return {
+    graphicsRecovery:
+      document.querySelector<HTMLElement>("#graphics-recovery")!,
+    restartMirror:
+      document.querySelector<HTMLButtonElement>("#restart-mirror")!,
+    breathOnStart:
+      document.querySelector<HTMLInputElement>("#breath-on-start")!,
+    handShortcuts: document.querySelector<HTMLInputElement>("#hand-shortcuts")!,
+    restartTracking:
+      document.querySelector<HTMLButtonElement>("#restart-tracking")!,
     sound: document.querySelector<HTMLButtonElement>("#sound")!,
     vr: document.querySelector<HTMLButtonElement>("#vr")!,
     photo: document.querySelector<HTMLButtonElement>("#photo")!,

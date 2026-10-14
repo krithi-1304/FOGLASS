@@ -56,7 +56,17 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
   await expect(page.locator("#breath-message")).not.toHaveText(
     "Breath detected",
   );
+  await page.locator("#mirror").click({ position: { x: 40, y: 40 } });
   await page.keyboard.press("c");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (
+          window as unknown as { __foglass: { getFogCoverage(): number } }
+        ).__foglass.getFogCoverage(),
+      ),
+    )
+    .toBeLessThan(0.02);
   await page.evaluate(() =>
     (window as unknown as { testBlow: () => void }).testBlow(),
   );
@@ -77,6 +87,7 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
   await expect(page.locator("#breath-message")).not.toHaveText(
     "Breath detected",
   );
+  await page.getByRole("button", { name: "Tools", exact: true }).hover();
   await page
     .getByRole("button", { name: "Recalibrate breath", exact: true })
     .click();
@@ -108,4 +119,73 @@ test("microphone denied is recoverable without losing the mirror", async ({
   await expect(
     page.getByRole("button", { name: "Enable breath", exact: true }),
   ).toBeEnabled();
+});
+
+test("repeated microphone use closes resources and resumes after audio suspension", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.addInitScript(() => {
+    const contexts: AudioContext[] = [],
+      streams: MediaStream[] = [];
+    Object.assign(window, { audioTest: { contexts, streams } });
+    const Original = window.AudioContext;
+    window.AudioContext = class extends Original {
+      constructor(options?: AudioContextOptions) {
+        super(options);
+        contexts.push(this);
+      }
+    };
+    const get = navigator.mediaDevices.getUserMedia.bind(
+      navigator.mediaDevices,
+    );
+    navigator.mediaDevices.getUserMedia = async (constraints) => {
+      const stream = await get(constraints);
+      streams.push(stream);
+      return stream;
+    };
+  });
+  await page.goto("/?test=1");
+  await page.getByRole("button", { name: "Try without camera" }).click();
+  for (let i = 0; i < 6; i++) {
+    await page
+      .getByRole("button", { name: "Enable breath", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Breath on · disable" }),
+    ).toBeVisible();
+    if (i === 2) {
+      await page.evaluate(async () => {
+        await (
+          window as unknown as { audioTest: { contexts: AudioContext[] } }
+        ).audioTest.contexts
+          .at(-1)!
+          .suspend();
+      });
+      await page
+        .getByRole("button", { name: "Resume breath", exact: true })
+        .click();
+      await expect(
+        page.getByRole("button", { name: "Breath on · disable" }),
+      ).toBeVisible();
+    }
+    await page.getByRole("button", { name: "Breath on · disable" }).click();
+  }
+  const result = await page.evaluate(() => {
+    const state = (
+      window as unknown as {
+        audioTest: { contexts: AudioContext[]; streams: MediaStream[] };
+      }
+    ).audioTest;
+    return {
+      states: state.contexts.map((c) => c.state),
+      live: state.streams
+        .flatMap((s) => s.getTracks())
+        .filter((t) => t.readyState === "live").length,
+    };
+  });
+  expect(result.live).toBe(0);
+  expect(result.states.every((s) => s === "closed")).toBe(true);
+  expect(errors).toEqual([]);
 });

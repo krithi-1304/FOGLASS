@@ -37,3 +37,5 @@ Full-hand contact, batched brush drawing and GPU undo: regression covered for fi
 fingers, portrait alignment, finger gaps, history and actual GL call counts.
 Result-driven inference scheduling and relaxed open-hand recognition: unit covered.
 Physical writing accuracy and mouth-trigger reliability remain manually unverified.
+
+V1 release: repeated-use lifecycle, opt-in gesture shortcuts, quiet hover/touch/keyboard HUD and graphics recovery implemented with browser regression coverage. Physical camera/microphone verification remains pending.

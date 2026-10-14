@@ -20,6 +20,7 @@ export class Camera {
           stream.getTracks().forEach((t) => t.stop());
           throw new Error("Request ended");
         }
+        this.streams = this.streams.filter((s) => s.active);
         this.streams.push(stream);
         return stream;
       });

@@ -94,3 +94,6 @@ full-pane segment-loop candidate after performance tests. Begin fresh inference
 on result arrival without another camera callback, preserving one in-flight frame.
 Compare CPU above 45ms GPU latency; bound backend samples. Revisit using physical
 writing recordings, not synthetic speed claims. See RESEARCH.md for measurements.
+
+## D-014 — V1 interaction safety (2026-10-14)
+Extra gesture commands are opt-in: normal hand transitions must not pause writing. Controls reveal at the bottom edge, touch or keyboard focus. Microphone ownership includes failure cleanup and suspended-context recovery; WebGL loss offers a restart. GitHub Pages serves the static app with local model assets; no backend.

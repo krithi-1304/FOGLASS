@@ -50,3 +50,5 @@ readback during writing. `tracking-lifecycle.test.ts` checks result-driven fresh
 frame scheduling. `gestures.test.ts` covers a curled outer finger and two-frame
 point activation. The existing suite retains undo/redo, droplets, breath, real
 hand-photo inference, fallback controls and the four visual states.
+
+V1: `release.spec.ts` covers 32 strokes, bounded undo history, repeated pause/resume, hidden HUD and actual WebGL context loss. `breath.spec.ts` covers six microphone restarts, audio suspension/resume and closed resources.

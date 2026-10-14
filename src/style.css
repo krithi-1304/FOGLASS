@@ -665,3 +665,108 @@ body:has(#breath-feedback:not([hidden])) #status {
     white-space: nowrap;
   }
 }
+
+/* V1: a quiet invitation, then only glass until controls are approached. */
+h1 {
+  font-size: clamp(76px, 12vw, 126px);
+  letter-spacing: -0.035em;
+}
+.little-star {
+  margin-bottom: 28px;
+}
+.invitation {
+  font-size: clamp(21px, 2.5vw, 26px);
+}
+.instructions {
+  max-width: 250px;
+  margin-bottom: 28px;
+  line-height: 1.8;
+}
+.start-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  font-size: 11px;
+  color: #685360;
+}
+.start-option input,
+.shortcut-option input {
+  accent-color: #775569;
+  width: 14px;
+  height: 14px;
+}
+.privacy {
+  margin-top: 12px;
+}
+.shortcut-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  width: 100%;
+  font-size: 11px;
+  color: #614c58;
+}
+.shortcut-option span {
+  width: 100%;
+  padding-left: 23px;
+  font-size: 10px;
+  opacity: 0.8;
+}
+body.started #dock,
+body.started header,
+body.started #status,
+body.started #breath-feedback,
+body.started #tools {
+  transition:
+    opacity 0.35s ease,
+    translate 0.35s ease;
+}
+body.started:not(.hud-visible) #dock,
+body.started:not(.hud-visible) header,
+body.started:not(.hud-visible) #status,
+body.started:not(.hud-visible) #breath-feedback,
+body.started:not(.hud-visible) #tools {
+  opacity: 0 !important;
+  translate: 0 8px;
+}
+body.started:not(.hud-visible) #tools {
+  pointer-events: none;
+}
+body.started .edge {
+  opacity: 0;
+}
+#dock {
+  background: #f5edefcc;
+  box-shadow: 0 8px 30px #33243112;
+}
+#tools {
+  border-radius: 24px;
+  background: #f6eef0f5;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.started #dock,
+  body.started header,
+  body.started #status,
+  body.started #breath-feedback,
+  body.started #tools {
+    transition: none;
+  }
+}
+#graphics-recovery {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 20px;
+  background: #ebe0e5;
+  color: #58434e;
+}
+#graphics-recovery p {
+  font:
+    32px "Instrument Serif",
+    serif;
+}

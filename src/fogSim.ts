@@ -237,6 +237,9 @@ export class FogSim {
     this.gl.deleteTexture(snapshot);
     return true;
   }
+  historyUsage() {
+    return { undo: this.history.length, redo: this.future.length };
+  }
   get canUndo() {
     return this.history.length > 0;
   }
