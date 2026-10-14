@@ -55,7 +55,7 @@ landmark JSON locally. Upload a recording there to replay it through the same
 recognizer and fog engine; video is never included in a gesture recording.
 
 Core tuning lives in `src/filters.ts`, `src/gestures.ts`, `src/breath.ts`, and
-`src/shaders/`. Hand inference runs in a worker with one frame in flight. Slow GPU inference triggers a measured CPU comparison; stale queued results are dropped. Resolution adapts while the 512² fog state is preserved.
+`src/shaders/`. Hand inference runs in a worker with one frame in flight. Slow GPU inference triggers a measured CPU comparison; stale queued results are dropped. Resolution adapts; slow devices also resample the 512² fog state to 256² on the GPU, preserving marks and undo/redo.
 
 ## Verify
 

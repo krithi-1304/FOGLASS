@@ -117,16 +117,21 @@ export class Renderer {
     this.frameMs += (elapsed - this.frameMs) * 0.03;
     this.fps = 1000 / this.frameMs;
     if (
-      now - this.qualitySince > 1000 &&
+      now - this.qualitySince > 750 &&
       !document.hidden &&
       !(
         new URLSearchParams(location.search).get("visual") === "1" &&
         new URLSearchParams(location.search).get("test") === "1"
       )
     ) {
-      if (this.frameMs > 20) this.quality = Math.max(0.6, this.quality * 0.8);
+      if (this.frameMs > 20)
+        this.quality = Math.max(
+          0.25,
+          this.quality * Math.min(0.8, Math.sqrt(16.67 / this.frameMs)),
+        );
       else if (this.frameMs < 17.5)
         this.quality = Math.min(1, this.quality + 0.05);
+      if (this.quality < 0.6) this.fog.reduceResolution(256);
       this.qualitySince = now;
     }
     const dpr = Math.min(devicePixelRatio, 1.5) * this.quality;

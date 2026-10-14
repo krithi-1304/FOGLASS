@@ -114,3 +114,39 @@ test("lost WebGL context offers a working restart instead of a blank mirror", as
     page.getByRole("button", { name: "Start", exact: true }),
   ).toBeVisible();
 });
+
+test("adaptive fog resolution preserves marks and both history directions", async ({
+  page,
+}) => {
+  await page.goto("/?test=1");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/fogSim.ts";
+    const { FogSim } = await import(modulePath);
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2")!;
+    const fog = new FogSim(gl);
+    fog.seedCoverage(0.9);
+    fog.finger(0.3, 0.5, true);
+    fog.finger(0.7, 0.5, true);
+    fog.finger(0.7, 0.5, false);
+    fog.update(0, 1);
+    const before = fog.sample(0.5, 0.5);
+    fog.undo();
+    fog.reduceResolution(256);
+    const restored = fog.sample(0.5, 0.5);
+    fog.redo();
+    const after = fog.sample(0.5, 0.5);
+    fog.undo();
+    const undoAgain = fog.sample(0.5, 0.5);
+    const untouched = fog.sample(0.5, 0.2),
+      error = gl.getError();
+    fog.dispose();
+    return { before, after, restored, undoAgain, untouched, error };
+  });
+  expect(result.before).toBeLessThan(0.2);
+  expect(result.after).toBeLessThan(0.2);
+  expect(result.restored).toBeGreaterThan(0.8);
+  expect(result.undoAgain).toBeGreaterThan(0.8);
+  expect(result.untouched).toBeGreaterThan(0.8);
+  expect(result.error).toBe(0);
+});

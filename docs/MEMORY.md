@@ -160,3 +160,9 @@
 - Production subpath smoke passes fallback, drawing, self-hosted model/WASM and lab; no page errors.
 - Performance: 56.5 FPS idle; 57.2 FPS full-hand rendering, adaptive scale .74 on this runner.
 - Next: verify GitHub workflow and live URL; finish physical camera/mouth matrix; tune from recorded interactions.
+
+## Slow-device release correction — 2026-10-14
+- Linux CI passed 31/34 tests but exposed 16 FPS at the old adaptive floor and a resize assertion that ignored scaling.
+- Lower composite floor and GPU-resampled 256² fog preserve marks/history; resize assertion now checks adaptive dimensions.
+- Local validation: 51 unit + 35 browser tests pass (1.7m), lint/type/build pass; 60 FPS idle, 52.6 FPS active hand; no performance threshold reduced.
+- Next: rerun Linux CI; verify Pages live; physical hand/mouth checks remain pending.

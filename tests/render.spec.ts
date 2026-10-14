@@ -9,6 +9,7 @@ const state = (page: import("@playwright/test").Page) =>
             frames: number;
             uploads: number;
             width: number;
+            quality: number;
             height: number;
             pointer: { down: boolean };
           };
@@ -32,8 +33,15 @@ test("fallback renders varied pixels and resizes to portrait", async ({
   expect(pixels[0][3]).toBe(255);
   expect(pixels[0]).not.toEqual(pixels[1]);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(async () => (await state(page)).width).toBe(390);
-  expect((await state(page)).height).toBe(844);
+  await expect
+    .poll(async () => {
+      const current = await state(page);
+      return (
+        current.width === Math.round(390 * current.quality) &&
+        current.height === Math.round(844 * current.quality)
+      );
+    })
+    .toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     390,
   );

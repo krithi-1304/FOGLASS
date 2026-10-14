@@ -20,7 +20,7 @@ export class FogSim {
   private strength = 0;
   private until = 0;
   private bloomAge = 0;
-  readonly size = 512;
+  size = 512;
   private speed = Math.min(
     30,
     Math.max(
@@ -76,6 +76,78 @@ export class FogSim {
     this.snapshotBuffer = gl.createFramebuffer()!;
     this.brushes = new BrushRenderer(gl, this.size);
     this.clear();
+  }
+  /** Resample on the GPU, preserving live condensation and undo history. */
+  reduceResolution(size: number) {
+    if (size >= this.size) return;
+    const gl = this.gl,
+      previousSize = this.size;
+    const target = gl.createFramebuffer()!;
+    const resize = (source: WebGLTexture) => {
+      const texture = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA16F, size, size);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.snapshotBuffer);
+      gl.framebufferTexture2D(
+        gl.READ_FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        source,
+        0,
+      );
+      gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, target);
+      gl.framebufferTexture2D(
+        gl.DRAW_FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        texture,
+        0,
+      );
+      gl.blitFramebuffer(
+        0,
+        0,
+        previousSize,
+        previousSize,
+        0,
+        0,
+        size,
+        size,
+        gl.COLOR_BUFFER_BIT,
+        gl.LINEAR,
+      );
+      gl.deleteTexture(source);
+      return texture;
+    };
+    this.textures = this.textures.map(resize);
+    this.history = this.history.map(resize);
+    this.future = this.future.map(resize);
+    this.buffers.forEach((buffer, i) => {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.TEXTURE_2D,
+        this.textures[i],
+        0,
+      );
+    });
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.snapshotBuffer);
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      gl.TEXTURE_2D,
+      null,
+      0,
+    );
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.deleteFramebuffer(target);
+    this.size = size;
+    this.brushes.dispose();
+    this.brushes = new BrushRenderer(gl, size);
   }
   setTimeScale(value: number) {
     if (Number.isFinite(value)) this.speed = Math.max(0, Math.min(30, value));
