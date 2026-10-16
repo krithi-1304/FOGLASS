@@ -2,6 +2,12 @@
 
 Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
+## Letters continuation — 2026-10-16 (supersedes release steps below)
+Implemented air-writing continuity/pinch grip, local/portable letters, ghost/replay/rain/windows and optional Worker/D1; see PRODUCT_CONCEPT.md.
+67 unit + 43 browser tests passed; seven updated Letters checks validate copy isolation and async link readiness. Lint/type/build pass; desktop/mobile and four glass states reviewed.
+Software GL measured 53.1 FPS idle / 55.4 FPS full-hand; physical camera/mouth/headset remain unverified.
+Cloudflare whoami reports unauthenticated; real local D1 passes, production database still unconfigured. Next: frontend publication, live letter smoke, authenticated backend setup.
+
 ## State
 
 Implemented: local mirrored camera, half-float fog/writing/regrowth, palm gestures,

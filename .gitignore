@@ -7,3 +7,8 @@ playwright-report/
 .pnpm-store/
 
 public/models/MASTER_PROMPT.md
+
+.wrangler/
+.dev.vars*
+.env*
+!.env.example

@@ -1,3 +1,5 @@
+import { LetterEffects } from "./letters/effects";
+import { installLetters } from "./letters/ui";
 import { installHud } from "./hud";
 import "./style.css";
 import { RoomSound } from "./sound";
@@ -83,6 +85,8 @@ try {
   ui.start.disabled = true;
   mode = "unsupported";
 }
+const letterEffects = renderer ? new LetterEffects(renderer) : undefined;
+let letters: ReturnType<typeof installLetters> | undefined;
 ui.restartMirror.addEventListener("click", () => location.reload());
 const interaction = new Interaction(
   {
@@ -107,6 +111,17 @@ const interaction = new Interaction(
     ui.tools.hidden = !interaction.palette;
   },
 );
+ui.writingGrip.addEventListener("change", () => {
+  interaction.lift();
+  interaction.writingGrip =
+    ui.writingGrip.value === "pinch" ? "pinch" : "point";
+  if (interaction.writingGrip === "pinch") {
+    interaction.setMode("writing");
+    ui.modeSelect.value = "writing";
+    if (renderer) renderer.reveal = false;
+    ui.revealEditor.hidden = true;
+  }
+});
 ui.handShortcuts.addEventListener("change", () => {
   interaction.gestureCommands = ui.handShortcuts.checked;
 });
@@ -262,6 +277,8 @@ ui.revealFile.addEventListener("change", () => {
 });
 let revealResize: ReturnType<typeof setTimeout>;
 addEventListener("resize", () => {
+  interaction.lift();
+  release();
   clearTimeout(revealResize);
   if (interaction.mode === "reveal")
     revealResize = setTimeout(() => void refreshReveal(), 150);
@@ -289,6 +306,10 @@ function updateCalibration() {
 async function startHand(mock = false) {
   if (hand) return hand;
   hand = new HandController(camera.video, (state, point) => {
+    if (document.querySelector("dialog[open]")) {
+      interaction.lift();
+      return;
+    }
     updateCalibration();
     interaction.update(
       state,
@@ -349,7 +370,7 @@ function enter() {
   ui.welcome.inert = true;
   mode = "fallback";
   ui.dock.hidden = false;
-  renderer?.fog.injectBreath(0.85, 1200);
+  if (!letterEffects?.letter) renderer?.fog.injectBreath(0.85, 1200);
   if (isTest && params.get("mock") === "1") void startHand(true);
   ui.status.textContent = "Hold B to fog · drag to draw · C clear · S save";
 }
@@ -367,6 +388,27 @@ ui.start.addEventListener("click", async () => {
   if (mode === "camera" && (!isTest || params.get("vision") === "1"))
     void startHand();
 });
+if (letterEffects)
+  letters = installLetters(
+    letterEffects,
+    enter,
+    () => {
+      interaction.setMode("writing");
+      ui.modeSelect.value = "writing";
+      if (renderer) {
+        renderer.reveal = false;
+        renderer.fog.injectBreath(0.85, 1000);
+      }
+    },
+    import.meta.env.DEV && isTest && params.get("letters") === "local"
+      ? "http://127.0.0.1:8787"
+      : undefined,
+    () => {
+      ui.breathOnStart.checked = false;
+      ui.start.click();
+    },
+    () => hud.reveal(),
+  );
 const move = (e: PointerEvent) => {
   pointer = {
     x: e.clientX / innerWidth,
@@ -508,6 +550,7 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         mode,
         frames: renderer?.frames || 0,
         quality: renderer?.quality || 1,
+        letters: letters?.state,
         frameMs: renderer?.frameMs || 0,
         uploads: renderer?.uploads || 0,
         width: ui.canvas.width,

@@ -25,6 +25,7 @@ export function createUI() {
     </nav>
     <section id="tools" hidden aria-label="Mirror tools">
       <label class="field">Mode<select id="mirror-mode" aria-label="Mode"><option value="mirror">Real Mirror</option><option value="writing">Fog Writing</option><option value="reveal">Magic Reveal</option></select></label>
+      <label class="field">Writing gesture<select id="writing-grip" aria-label="Writing gesture"><option value="point">Point with index finger</option><option value="pinch">Pinch to write · release to lift</option></select></label>
       <label class="field">Steam strength<input aria-label="Steam strength" id="density" type="range" min="10" max="100" value="75"></label>
       <div id="reveal-editor" hidden>
         <label class="field">Hidden message<textarea aria-label="Hidden message" id="reveal-message" maxlength="180" rows="2">You are here. That is enough.</textarea></label>
@@ -53,6 +54,7 @@ export function createUI() {
     <div id="cursor" aria-hidden="true"></div>
     <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
   return {
+    writingGrip: document.querySelector<HTMLSelectElement>("#writing-grip")!,
     graphicsRecovery:
       document.querySelector<HTMLElement>("#graphics-recovery")!,
     restartMirror:

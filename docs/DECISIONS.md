@@ -100,3 +100,12 @@ Extra gesture commands are opt-in: normal hand transitions must not pause writin
 
 ## D-015 — Slow software-GPU recovery (2026-10-14)
 Linux CI exposed a 16 FPS ceiling at the old 0.6 quality floor. Adapt composite resolution down to 0.25 using measured frame cost and resample fog to 256² below 0.6. Preserve all current/history textures with GPU blits. Visual review mode retains full resolution; performance assertions stay above 45 FPS. Resize tests compare against actual adaptive pixel size.
+
+## D-016 — Optional mirror letters (2026-10-16)
+The expanded PRODUCT_CONCEPT adds bounded text/stroke letters, local collections,
+portable links and an optional Worker/D1 service. This extends D-002 for letters
+only; the core mirror remains local and independent. Never include camera/audio
+or landmarks in letter payloads. Online access uses bearer links, owner deletion
+keys and expiry, without an encryption claim. Deploy storage only with an
+authenticated Cloudflare account. Editing a saved letter as a copy preserves its
+original local identity and separates reply/remote metadata.

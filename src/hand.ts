@@ -21,6 +21,8 @@ export class HandController {
   joints: Vec2[] = [];
   private stopped = false;
   private tipMode = false;
+  private lastSample = 0;
+  private viewport = "";
   state: GestureState | null = null;
   point: Vec2 | null = null;
   status = "off";
@@ -33,6 +35,21 @@ export class HandController {
     this.engine.pinchThreshold = this.profile.pinchThreshold;
   }
   private receive = (frame: HandFrame) => {
+    const viewport = `${innerWidth}/${innerHeight}/${this.video.videoWidth}/${this.video.videoHeight}`;
+    if (
+      frame.timestamp - this.lastSample > 180 ||
+      frame.timestamp <= this.lastSample ||
+      viewport !== this.viewport
+    ) {
+      this.filterX.reset();
+      this.filterY.reset();
+      this.point = null;
+      this.jointFilters.forEach((pair) =>
+        pair.forEach((filter) => filter.reset()),
+      );
+    }
+    this.lastSample = frame.timestamp;
+    this.viewport = viewport;
     this.lastFrame = frame;
     const state = this.engine.update(frame);
     this.state = state;
@@ -88,6 +105,7 @@ export class HandController {
         y: this.filterY.filter(mapped.y, frame.timestamp),
       };
       if (
+        tipMode ||
         !this.point ||
         Math.hypot(next.x - this.point.x, next.y - this.point.y) >
           Math.max(0.0007, Math.min(0.002, this.profile.jitter * 0.5))

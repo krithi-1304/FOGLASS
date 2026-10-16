@@ -16,6 +16,8 @@ export interface GlassTarget {
 }
 export class Interaction {
   gestureCommands = false;
+  writingGrip: "point" | "pinch" = "point";
+  private lastTimestamp = 0;
   paused = false;
   palette = false;
   mode: MirrorMode = "mirror";
@@ -45,6 +47,23 @@ export class Interaction {
     joints?: Vec2[],
     aspect = 1,
   ) {
+    if (
+      this.lastTimestamp &&
+      (state.timestamp - this.lastTimestamp > 180 ||
+        state.timestamp <= this.lastTimestamp)
+    )
+      this.lift();
+    this.lastTimestamp = state.timestamp;
+    if (
+      point &&
+      (!Number.isFinite(point.x) ||
+        !Number.isFinite(point.y) ||
+        (state.gesture !== "palm" &&
+          (point.x < 0 || point.x > 1 || point.y < 0 || point.y > 1)))
+    ) {
+      this.lift();
+      return;
+    }
     if (calibrating) {
       this.lift();
       return;
@@ -62,7 +81,9 @@ export class Interaction {
       this.pinchOrigin = null;
       return;
     }
-    if (state.gesture === "pinch") {
+    const pinchWriting =
+      this.mode === "writing" && this.writingGrip === "pinch";
+    if (state.gesture === "pinch" && !pinchWriting) {
       if (!this.gestureCommands) {
         this.lift();
         return;
@@ -81,7 +102,11 @@ export class Interaction {
     }
     this.pinchOrigin = null;
     const palm = state.gesture === "palm" && this.mode !== "writing";
-    const draw = !this.paused && (state.gesture === "point" || palm);
+    const draw =
+      !this.paused &&
+      (pinchWriting
+        ? state.gesture === "pinch"
+        : state.gesture === "point" || palm);
     if (!draw) {
       this.lift();
       return;

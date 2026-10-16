@@ -128,14 +128,19 @@ export class GestureEngine {
     const keepWriting =
       this.stable === "point" &&
       hand?.extended[0] &&
-      raw !== "pinch" &&
+      (raw === "none" || raw === "victory") &&
       candidateAge < 75;
     if ((raw === "none" || raw !== this.stable) && !keepWriting)
       this.stable = "none";
     if (!hand) this.stable = "none";
     if (
       raw !== "none" &&
-      candidateAge >= (raw === "point" ? 30 : raw === "palm" ? 60 : this.dwell)
+      candidateAge >=
+        (raw === "point"
+          ? 30
+          : raw === "palm" || raw === "pinch"
+            ? 60
+            : this.dwell)
     ) {
       if (this.stable !== raw) {
         this.stable = raw;

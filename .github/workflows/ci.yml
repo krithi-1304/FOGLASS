@@ -28,6 +28,7 @@ jobs:
       - run: pnpm build && pnpm prepare:pages
         env:
           VITE_BASE_PATH: /FOGLASS/
+          VITE_LETTERS_API: ${{ vars.FOGLASS_LETTERS_API }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

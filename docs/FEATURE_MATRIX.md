@@ -21,7 +21,9 @@ Automated coverage does not imply physical camera/headset verification.
 | Lab recording / replay                       | REGRESSION COVERED | replay and landmark-only JSON export                            |
 | WebXR hand-contact mirror                    | IMPLEMENTED        | projection unit tests; headset NOT VERIFIED                     |
 | Minimal rose/pearl UI                        | TESTED             | reviewed desktop/mobile and four glass states                   |
-| Backend / accounts / sharing                 | NOT STARTED        | intentionally unnecessary for local core                        |
+| Portable letters / local collection          | REGRESSION COVERED | schema, save/import/share/reply, copy isolation, browser journeys |
+| Optional letters Worker / D1                 | LOCAL TESTED       | real local database create/read/reply/delete; deployment pending authentication |
+| Ghost writing / path rain / closed windows   | REGRESSION COVERED | memory/effects units and composite pixel checks                  |
 | Future frost/rain/neon modes                 | NOT STARTED        | outside V1                                                      |
 
 Input audit (2026-10-12): floor-relative breath sensitivity/release, world-space
@@ -39,3 +41,7 @@ Result-driven inference scheduling and relaxed open-hand recognition: unit cover
 Physical writing accuracy and mouth-trigger reliability remain manually unverified.
 
 V1 release: repeated-use lifecycle, opt-in gesture shortcuts, quiet hover/touch/keyboard HUD and graphics recovery implemented with browser regression coverage. Physical camera/microphone verification remains pending.
+
+Letters release: point/pinch writing options and gap/offscreen continuity covered;
+rose, moon and rain appearances implemented. No account or backend is needed for
+the core mirror or portable letters. Online storage is optional and not yet deployed.

@@ -52,3 +52,12 @@ point activation. The existing suite retains undo/redo, droplets, breath, real
 hand-photo inference, fallback controls and the four visual states.
 
 V1: `release.spec.ts` covers 32 strokes, bounded undo history, repeated pause/resume, hidden HUD and actual WebGL context loss. `breath.spec.ts` covers six microphone restarts, audio suspension/resume and closed resources.
+
+Letters: `letters.test.ts` validates schema, compressed links, bounds and storage
+failures; `letter-effects.test.ts` covers stroke memory, rain paths and fitting.
+`letters-api.test.ts` uses SQLite for access, expiry, rate limits and cascades;
+`letters-api.spec.ts` exercises the real local Worker/D1. `letters.spec.ts` covers
+portable/online journeys, malformed files, mobile dismissal, ghost/window pixels
+and preserving saved originals when editing a copy. Desktop/mobile sheets reviewed.
+`air-writing.test.ts` and `air-writing.spec.ts` cover gesture-to-mask continuity.
+Production Cloudflare and physical camera/mouth/headset checks remain pending.

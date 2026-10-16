@@ -9,3 +9,7 @@
 - Original user-supplied public/models/MASTER_PROMPT.md is preserved; MASTER_BUILD_PROMPT.md is its documentation copy.
 
 - 2026-10-12: real-hand-photo inference now tested through a canvas camera stream. This validates the model/input path but not live occlusion or physical mouth accuracy.
+
+- Letters backend passes real local Worker/D1 tests but is not deployed: Cloudflare authentication and a production D1 ID are missing. Portable sharing and downloads remain available.
+- Portable links contain readable letter content and cannot expire or be revoked. Online letters are bearer links, not encrypted storage; link holders can read and reply.
+- Letter rain and closed windows are artistic stroke effects. Real fluid simulation and physical input precision are not established by these tests.

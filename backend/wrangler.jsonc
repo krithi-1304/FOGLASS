@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "foglass-letters",
+  "main": "index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://krithi-1304.github.io,http://127.0.0.1:5173,http://127.0.0.1:5174",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "foglass-letters",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "triggers": { "crons": ["17 3 * * *"] },
+}

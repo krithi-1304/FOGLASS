@@ -15,6 +15,12 @@ export class FogSim {
   private held = false;
   private history: WebGLTexture[] = [];
   private future: WebGLTexture[] = [];
+  observer?: {
+    mark(segments: BrushSegment[], begin: boolean): void;
+    clear(): void;
+    history(direction: "undo" | "redo"): void;
+    breath(): void;
+  };
   paused = false;
   density = 1;
   private strength = 0;
@@ -156,10 +162,12 @@ export class FogSim {
     return this.textures[this.index];
   }
   injectBreath(strength: number, ms: number) {
+    this.observer?.breath();
     this.strength = Math.min(1, Math.max(0, strength));
     this.until = performance.now() + Math.max(0, ms);
   }
   setBreathing(value: boolean) {
+    if (value) this.observer?.breath();
     this.held = value;
   }
   finger(x: number, y: number, down: boolean, radius = 0.028, palm = false) {
@@ -172,10 +180,20 @@ export class FogSim {
       begin: !this.last,
       segments: [{ from: this.last || point, to: point, radius, palm }],
     });
+    this.observer?.mark(
+      [{ from: this.last || point, to: point, radius, palm }],
+      !this.last,
+    );
     this.last = point;
   }
   wipe(segments: BrushSegment[], begin: boolean) {
-    if (segments.length) this.operations.push({ segments, begin });
+    if (segments.length) {
+      this.operations.push({ segments, begin });
+      this.observer?.mark(segments, begin);
+    }
+  }
+  effect(segments: BrushSegment[]) {
+    if (segments.length) this.operations.push({ segments, begin: false });
   }
   private drop(snapshots: WebGLTexture[]) {
     for (const texture of snapshots) this.gl.deleteTexture(texture);
@@ -194,6 +212,7 @@ export class FogSim {
   update(dt: number, aspect: number) {
     const gl = this.gl;
     const breathing = this.held || performance.now() < this.until;
+    if (this.held) this.observer?.breath();
     if (!this.paused)
       this.bloomAge = breathing ? this.bloomAge + dt * this.speed : 0;
     const groups: { segments: BrushSegment[]; begin: boolean }[] = [];
@@ -296,6 +315,7 @@ export class FogSim {
   undo() {
     const snapshot = this.history.pop();
     if (!snapshot) return false;
+    this.observer?.history("undo");
     this.future.push(this.snapshot());
     this.restoreSnapshot(snapshot);
     this.gl.deleteTexture(snapshot);
@@ -304,6 +324,7 @@ export class FogSim {
   redo() {
     const snapshot = this.future.pop();
     if (!snapshot) return false;
+    this.observer?.history("redo");
     this.history.push(this.snapshot());
     this.restoreSnapshot(snapshot);
     this.gl.deleteTexture(snapshot);
@@ -371,6 +392,7 @@ export class FogSim {
     );
   }
   clear() {
+    this.observer?.clear();
     const gl = this.gl;
     for (const buffer of this.buffers) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);

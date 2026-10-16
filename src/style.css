@@ -770,3 +770,233 @@ body.started .edge {
     32px "Instrument Serif",
     serif;
 }
+
+/* Letters are a quiet sheet over the existing glass, never another dashboard. */
+#letter-sheet {
+  color-scheme: light;
+  color: #51434b;
+  background: #f4eded;
+  width: min(580px, calc(100vw - 28px));
+  max-height: calc(100svh - 36px);
+  padding: clamp(22px, 4vw, 38px);
+  border: 0;
+  border-radius: 16px;
+  box-shadow: 0 24px 80px #241c2940;
+  overflow-y: auto;
+  font:
+    13px/1.6 Inter,
+    sans-serif;
+  scrollbar-color: #bea4b2 #f4eded;
+}
+#letter-sheet::backdrop {
+  background: #201b274d;
+  backdrop-filter: blur(5px);
+}
+#letter-sheet [hidden] {
+  display: none !important;
+}
+.letter-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#letter-sheet h2 {
+  font:
+    clamp(32px, 6vw, 44px)/1.05 "Instrument Serif",
+    serif;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.letter-intro {
+  margin: 12px 0 24px;
+  color: #705b68;
+}
+.letter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #d8c8d0;
+  margin-bottom: 22px;
+}
+#letter-sheet button,
+.letter-file {
+  border: 1px solid #c6b2be;
+  border-radius: 24px;
+  background: transparent;
+  color: #594250;
+  padding: 9px 14px;
+  min-height: 40px;
+  font: inherit;
+  cursor: pointer;
+}
+#letter-sheet button:hover,
+.letter-file:hover {
+  background: #e7d6df;
+}
+#letter-sheet button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+#letter-sheet :focus-visible {
+  outline: 2px solid #775569;
+  outline-offset: 3px;
+}
+#letter-sheet label {
+  display: grid;
+  gap: 6px;
+  color: #614c59;
+}
+#letter-sheet label span,
+.letter-note {
+  color: #715c69;
+  font-size: 12px;
+}
+#letter-form {
+  display: grid;
+  gap: 16px;
+}
+#letter-sheet input:not([type="file"]),
+#letter-sheet textarea,
+#letter-sheet select {
+  width: 100%;
+  background: #fffafa;
+  color: #51434b;
+  border: 1px solid #cdbbc5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  caret-color: #775569;
+}
+#letter-sheet textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+#letter-sheet textarea::placeholder {
+  color: #806b77;
+}
+.letter-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.letter-fields label:last-child {
+  grid-column: 1 / -1;
+}
+.letter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#letter-sheet .letter-primary {
+  color: #fff8fc;
+  background: #775569;
+  border-color: #775569;
+}
+.letter-actions {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid #d8c8d0;
+}
+.letter-actions label {
+  margin: 16px 0;
+}
+.letter-file {
+  position: relative;
+  overflow: hidden;
+}
+.letter-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: pointer;
+}
+.letter-file:focus-within {
+  outline: 2px solid #775569;
+  outline-offset: 3px;
+}
+.letter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #dfd0d8;
+  padding: 14px 0;
+}
+#letter-sheet .letter-row button:first-child {
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  font:
+    24px "Instrument Serif",
+    serif;
+  padding-left: 0;
+  overflow-wrap: anywhere;
+}
+.letter-reply-row {
+  display: block;
+  margin: 10px 0;
+  width: 100%;
+  text-align: left;
+}
+#letter-viewer {
+  margin-top: 18px;
+}
+#letter-status {
+  margin-bottom: 0;
+  min-height: 1.6em;
+}
+@media (max-width: 420px) {
+  #letter-sheet {
+    padding: 22px;
+  }
+  .letter-fields {
+    grid-template-columns: 1fr;
+  }
+  #dock {
+    max-width: calc(100vw - 20px);
+    gap: 3px;
+  }
+  #dock button {
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+}
+#letter-sheet button {
+  min-width: 0;
+}
+#letter-close {
+  flex-shrink: 0;
+}
+#letter-options summary {
+  cursor: pointer;
+  padding: 9px 0;
+  color: #684c5d;
+}
+#letter-options[open] {
+  display: grid;
+  gap: 16px;
+}
+#letter-options .letter-fields {
+  margin-top: 16px;
+}
+#letter-envelope {
+  padding: 8px 0 20px;
+}
+#letter-envelope h3 {
+  font:
+    36px/1.15 "Instrument Serif",
+    serif;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+#letter-envelope-from {
+  color: #715c69;
+}
+#letter-envelope-hint {
+  max-width: 36ch;
+  margin: 24px 0;
+}

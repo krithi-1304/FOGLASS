@@ -23,7 +23,7 @@ void main(){
  fog=1.-(1.-fog)*exp(-deposition);
  // Residual water gathers at wet strokes, then advects down the glass.
  vec2 flow=vec2(sin(uv.y*83.+uv.x*41.)*.002, .045+old.b*.045)*dt;
- float water=texture(previous,uv+flow).b*exp(-dt*.55);
+ float water=max(texture(previous,uv+flow).b*exp(-dt*.55),texture(wipeMask,uv).g);
  vec2 cell=floor(uv*vec2(90.*aspect,90.));
  float bead=1.-smoothstep(.09,.3,length(fract(uv*vec2(90.*aspect,90.))-.5));
  water=max(water,wipe*old.r*bead*step(.94,hash(cell)));

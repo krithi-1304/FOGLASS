@@ -17,9 +17,16 @@ export default defineConfig({
       ],
     },
   },
-  webServer: {
-    command: "pnpm dev --port 5173 --strictPort",
-    url: "http://127.0.0.1:5173",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: "pnpm dev --port 5173 --strictPort",
+      url: "http://127.0.0.1:5173",
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: "pnpm api:migrate && pnpm api:dev",
+      url: "http://127.0.0.1:8787/health",
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });

@@ -70,7 +70,14 @@ export class BrushRenderer {
       this.data = new Float32Array(segments.length * 6);
     segments.forEach((s, i) =>
       this.data.set(
-        [s.from.x, 1 - s.from.y, s.to.x, 1 - s.to.y, s.radius, s.palm ? 1 : 0],
+        [
+          s.from.x,
+          1 - s.from.y,
+          s.to.x,
+          1 - s.to.y,
+          s.radius,
+          s.water ? 2 : s.palm ? 1 : 0,
+        ],
         i * 6,
       ),
     );

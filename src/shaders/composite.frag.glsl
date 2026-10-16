@@ -6,6 +6,12 @@ uniform sampler2D camera;
 uniform sampler2D fogMask;
 uniform sampler2D revealImage;
 uniform float revealMode;
+uniform sampler2D letterImage;
+uniform float letterMode;
+uniform float memoryGlow;
+uniform float letterAspect;
+uniform float windowMode;
+uniform float themeTone;
 uniform vec2 resolution;
 uniform vec2 videoSize;
 uniform float cameraMix;
@@ -41,6 +47,15 @@ vec3 feed(vec2 p,float fog){
 void main(){
  vec3 mask=texture(fogMask,uv).rgb;
  float fog=mask.r;
+ vec3 letter=vec3(0.);
+ if(letterMode>.5){
+   float aspect=resolution.x/resolution.y;
+   vec2 fit=vec2(min(1.,letterAspect/aspect),min(1.,aspect/letterAspect));
+   vec2 p=(uv-.5)/fit+.5;
+   if(all(greaterThanEqual(p,vec2(0.))) && all(lessThanEqual(p,vec2(1.))))letter=texture(letterImage,p).rgb;
+   if(letterMode>1.5)fog*=1.-letter.r*memoryGlow*.94;
+   fog*=1.-letter.g*windowMode*.96;
+ }
  vec2 texel=1./vec2(textureSize(fogMask,0));
  vec2 grad=vec2(texture(fogMask,uv+vec2(texel.x,0)).r-texture(fogMask,uv-vec2(texel.x,0)).r,
  texture(fogMask,uv+vec2(0,texel.y)).r-texture(fogMask,uv-vec2(0,texel.y)).r);
@@ -57,7 +72,11 @@ void main(){
  float clouds=.82+.18*noise(glass*8.)+.06*noise(glass*34.);
  vec3 frost=mix(vec3(.56,.64,.68),vec3(.86,.87,.87),uv.y);
  float opacity=(1.-exp(-fog*2.5))*clouds;
+ if(letterMode>.5 && letterMode<1.5)c=mix(c,vec3(.78,.51,.58),letter.r*.9);
  c=mix(c,frost,clamp(opacity,0.,.95));
+ if(themeTone>.5 && themeTone<1.5)c=mix(c,c*vec3(1.08,.94,.99),.5);
+ if(themeTone>1.5 && themeTone<2.5)c=mix(c,c*vec3(.83,.94,1.12),.65);
+ if(themeTone>2.5)c=mix(c,vec3(dot(c,vec3(.25,.55,.2)))*vec3(.91,1.,1.04),.5);
  c+=rim*.038*(local.y>offset.y?1.:-.5);
  c+=length(grad)*.09*vec3(.85,.91,1.);
  c+=mask.b*.10*vec3(.8,.89,.94);

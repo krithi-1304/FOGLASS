@@ -172,3 +172,9 @@
 - Linux CI: 35 browser + 51 unit tests pass; 54.6 FPS idle and 56.0 FPS full-hand at .30 adaptive scale, up from 16 FPS.
 - Live Chromium smoke passes startup, steam/drawing, local model/WASM, lab and test-API isolation; no page errors.
 - Next: manual camera/mouth matrix; collect landmark replays for reported failures; tune with device evidence.
+
+## Letters final QA — 2026-10-16
+- Continued existing air-writing, letter UI/effects and optional Worker/D1 implementation; fixed Edit a copy overwriting saved originals and stale reply context.
+- 67 unit + 43 browser checks pass; updated Letters suite adds copy isolation and waits for compressed link readiness. Lint/types/build clean; desktop/mobile and four fog states reviewed.
+- Software GL: 53.1 FPS idle, 55.4 FPS active hand. Local real D1 covers sharing/replies/deletion; Cloudflare unauthenticated, production database unconfigured.
+- Next: publish frontend; verify live portable letters; connect hosted storage after Cloudflare login. Physical camera/mouth/headset remain unverified.

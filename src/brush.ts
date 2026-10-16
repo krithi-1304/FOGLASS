@@ -4,6 +4,7 @@ export interface BrushSegment {
   to: Vec2;
   radius: number;
   palm: boolean;
+  water?: boolean;
 }
 // Joint-driven contact footprint, not a circle around the palm centroid.
 export function handBrush(

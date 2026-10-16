@@ -9,6 +9,13 @@ export class Renderer {
   private vao: WebGLVertexArrayObject;
   private revealTexture: WebGLTexture;
   reveal = false;
+  private letterTexture: WebGLTexture;
+  letterMode = 0;
+  memoryGlow = 0;
+  letterAspect = 1;
+  windowMode = false;
+  themeTone = 0;
+  frameHook?: (dt: number) => void;
   private locations = new Map<string, WebGLUniformLocation>();
   private frame = 0;
   private externalFrame = false;
@@ -92,7 +99,30 @@ export class Renderer {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    this.letterTexture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, this.letterTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([0, 0, 0, 255]),
+    );
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     for (const name of [
+      "letterImage",
+      "letterMode",
+      "memoryGlow",
+      "letterAspect",
+      "windowMode",
+      "themeTone",
       "camera",
       "resolution",
       "videoSize",
@@ -141,6 +171,7 @@ export class Renderer {
       this.canvas.width = w;
       this.canvas.height = h;
     }
+    if (!this.fog.paused) this.frameHook?.(dt);
     this.fog.update(dt, w / h);
     gl.viewport(0, 0, w, h);
     gl.useProgram(this.program);
@@ -183,6 +214,14 @@ export class Renderer {
     gl.bindTexture(gl.TEXTURE_2D, this.revealTexture);
     gl.uniform1i(this.locations.get("revealImage")!, 2);
     gl.uniform1f(this.locations.get("revealMode")!, this.reveal ? 1 : 0);
+    gl.activeTexture(gl.TEXTURE4);
+    gl.bindTexture(gl.TEXTURE_2D, this.letterTexture);
+    gl.uniform1i(this.locations.get("letterImage")!, 4);
+    gl.uniform1f(this.locations.get("letterMode")!, this.letterMode);
+    gl.uniform1f(this.locations.get("memoryGlow")!, this.memoryGlow);
+    gl.uniform1f(this.locations.get("letterAspect")!, this.letterAspect);
+    gl.uniform1f(this.locations.get("windowMode")!, this.windowMode ? 1 : 0);
+    gl.uniform1f(this.locations.get("themeTone")!, this.themeTone);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.frames++;
     if (!this.externalFrame) this.frame = requestAnimationFrame(this.render);
@@ -195,6 +234,13 @@ export class Renderer {
   }
   renderExternal(now: number) {
     this.render(now);
+  }
+  setLetter(source: HTMLCanvasElement) {
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE4);
+    gl.bindTexture(gl.TEXTURE_2D, this.letterTexture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
   }
   setReveal(source: HTMLCanvasElement) {
     const gl = this.gl;
@@ -221,6 +267,7 @@ export class Renderer {
     this.fog.dispose();
     this.gl.deleteTexture(this.texture);
     this.gl.deleteTexture(this.revealTexture);
+    this.gl.deleteTexture(this.letterTexture);
     this.gl.deleteVertexArray(this.vao);
     this.gl.deleteProgram(this.program);
   }
