@@ -8,6 +8,11 @@ Implemented air-writing continuity/pinch grip, local/portable letters, ghost/rep
 Software GL measured 53.1 FPS idle / 55.4 FPS full-hand; physical camera/mouth/headset remain unverified.
 Cloudflare whoami reports unauthenticated; real local D1 passes, production database still unconfigured. Next: frontend publication, live letter smoke, authenticated backend setup.
 
+## CI recovery — 2026-10-17
+Release c9ebec7 was held by CI: 43/44 browser checks passed; microphone calibration hid the tracking-error hint.
+Fixed status priority; seven camera/microphone tests and lint/types/build pass locally. Updated Letters suite passed all seven checks.
+Next: Linux CI retry, public portable-letter smoke, Cloudflare setup when authenticated.
+
 ## State
 
 Implemented: local mirrored camera, half-float fog/writing/regrowth, palm gestures,

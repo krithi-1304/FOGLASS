@@ -190,8 +190,9 @@ ui.microphone.addEventListener("click", async () => {
     ui.breathFeedback.hidden = false;
     ui.microphone.textContent = "Calibrating…";
     ui.microphone.setAttribute("aria-pressed", "true");
-    ui.status.textContent =
-      "Stay quiet briefly while the microphone learns the room.";
+    if (hand?.metrics().status !== "unavailable")
+      ui.status.textContent =
+        "Stay quiet briefly while the microphone learns the room.";
     micPoll = setInterval(() => {
       if (!breath) return;
       if (microphoneContext?.state === "suspended") {
@@ -215,8 +216,9 @@ ui.microphone.addEventListener("click", async () => {
       if (detector.calibrated && micState !== "on") {
         micState = "on";
         ui.microphone.textContent = "Breath on · disable";
-        ui.status.textContent =
-          "Blow gently toward your microphone to add steam. B also works.";
+        if (hand?.metrics().status !== "unavailable")
+          ui.status.textContent =
+            "Blow gently toward your microphone to add steam. B also works.";
       }
     }, 100);
   } catch {

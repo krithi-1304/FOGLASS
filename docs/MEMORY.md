@@ -178,3 +178,9 @@
 - 67 unit + 43 browser checks pass; updated Letters suite adds copy isolation and waits for compressed link readiness. Lint/types/build clean; desktop/mobile and four fog states reviewed.
 - Software GL: 53.1 FPS idle, 55.4 FPS active hand. Local real D1 covers sharing/replies/deletion; Cloudflare unauthenticated, production database unconfigured.
 - Next: publish frontend; verify live portable letters; connect hosted storage after Cloudflare login. Physical camera/mouth/headset remain unverified.
+
+## Letters CI recovery — 2026-10-17
+- Linux passed 43/44 browser checks; microphone calibration could replace the hand-model failure hint before the assertion observed it.
+- Preserve tracking failure hints during microphone calibration/success; regression restarts the microphone after model failure.
+- Seven camera/microphone checks, lint/types/build pass locally; Linux measured 55.1 FPS idle / 53.0 FPS full-hand before this status-only fix.
+- Next: rerun Linux CI; verify live portable letters; hosted storage still needs Cloudflare authentication.

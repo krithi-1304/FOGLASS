@@ -88,6 +88,15 @@ test("model failure retains conventional controls", async ({ page }) => {
     "Hand tracking unavailable",
     { timeout: 30000 },
   );
+  // A later microphone calibration must not replace the tracking recovery hint.
+  await page.mouse.move(640, 700);
+  await expect(page.locator("#microphone")).toHaveText("Breath on · disable");
+  await page.locator("#microphone").click();
+  await page.locator("#microphone").click();
+  await expect(page.locator("#microphone")).toHaveText("Breath on · disable");
+  await expect(page.locator("#status")).toContainText(
+    "Hand tracking unavailable",
+  );
   await page.getByRole("button", { name: "Tools", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Close mirror" }),
