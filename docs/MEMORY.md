@@ -184,3 +184,9 @@
 - Preserve tracking failure hints during microphone calibration/success; regression restarts the microphone after model failure.
 - Seven camera/microphone checks, lint/types/build pass locally; Linux measured 55.1 FPS idle / 53.0 FPS full-hand before this status-only fix.
 - Next: rerun Linux CI; verify live portable letters; hosted storage still needs Cloudflare authentication.
+
+## Letters live — 2026-10-17
+- Published 134a910 to https://krithi-1304.github.io/FOGLASS/; checks and deployment succeeded in run 39011943133.
+- Linux: 67 unit + 44 browser tests pass; lint/types/build pass; 53.6 FPS idle / 54.8 FPS full-hand with adaptive .30/.25 quality.
+- Live portable-letter creation, deployment-path share links, recipient opening and test-API isolation pass without page errors.
+- Next: authenticated Cloudflare/D1 deployment for hosted replies/expiry; real camera/mouth matrix; headset checks. Portable letters are available now.

@@ -2,6 +2,12 @@
 
 Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
+## Current live release — 2026-10-17
+Published 134a910 at https://krithi-1304.github.io/FOGLASS/; GitHub run 39011943133 passed checks and deployment.
+67 unit + 44 browser tests pass on Linux; lint/types/build pass. Software GL: 53.6 FPS idle / 54.8 FPS full-hand at adaptive .30/.25 quality.
+Live portable-letter creation, /FOGLASS/ share-link preservation, recipient opening and test-API isolation pass.
+Next: Cloudflare authentication and production D1 configuration for hosted replies/expiry; physical camera/mouth/headset matrix remains unverified.
+
 ## Letters continuation — 2026-10-16 (supersedes release steps below)
 Implemented air-writing continuity/pinch grip, local/portable letters, ghost/replay/rain/windows and optional Worker/D1; see PRODUCT_CONCEPT.md.
 67 unit + 43 browser tests passed; seven updated Letters checks validate copy isolation and async link readiness. Lint/type/build pass; desktop/mobile and four glass states reviewed.
