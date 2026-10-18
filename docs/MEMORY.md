@@ -190,3 +190,9 @@
 - Linux: 67 unit + 44 browser tests pass; lint/types/build pass; 53.6 FPS idle / 54.8 FPS full-hand with adaptive .30/.25 quality.
 - Live portable-letter creation, deployment-path share links, recipient opening and test-API isolation pass without page errors.
 - Next: authenticated Cloudflare/D1 deployment for hosted replies/expiry; real camera/mouth matrix; headset checks. Portable letters are available now.
+
+## Hosted letters deployment — 2026-10-18
+- Cloudflare authorization succeeded; provisioned/migrated foglass-letters D1 and deployed https://foglass-letters.foglass.workers.dev with daily expiry cleanup.
+- Live API create/read/reply, parent-bounded expiry, CORS, owner authorization and cascading deletion pass; temporary test letters removed.
+- GitHub FOGLASS_LETTERS_API now points to production; frontend rebuild pending. No camera/audio/landmark uploads or billing changes.
+- Next: publish connected frontend; verify live sender/recipient/reply/delete UI; physical input matrix remains pending.

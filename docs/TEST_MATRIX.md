@@ -60,4 +60,5 @@ failures; `letter-effects.test.ts` covers stroke memory, rain paths and fitting.
 portable/online journeys, malformed files, mobile dismissal, ghost/window pixels
 and preserving saved originals when editing a copy. Desktop/mobile sheets reviewed.
 `air-writing.test.ts` and `air-writing.spec.ts` cover gesture-to-mask continuity.
-Production Cloudflare and physical camera/mouth/headset checks remain pending.
+Production Cloudflare create/read/reply/delete, expiry bounds and CORS pass as of
+2026-10-18; test letters removed. Physical camera/mouth/headset checks remain pending.

@@ -13,6 +13,11 @@ Playwright automatically starts the API for its D1 integration test.
 
 ## Deploy (requires your Cloudflare account)
 
+Production API: `https://foglass-letters.foglass.workers.dev` (deployed 2026-10-18).
+The configured D1 database is provisioned and migrated. GitHub's
+`FOGLASS_LETTERS_API` variable points to this API. For updates, use step 4 when
+migrations change and step 5 to deploy; database creation is only for a new environment.
+
 1. Run `pnpm exec wrangler login` locally. Never paste tokens into chat.
 2. Create D1: `pnpm exec wrangler d1 create foglass-letters --config backend/wrangler.jsonc`.
 3. Replace the zero database_id in wrangler.jsonc with the returned ID.

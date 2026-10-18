@@ -22,7 +22,7 @@ Automated coverage does not imply physical camera/headset verification.
 | WebXR hand-contact mirror                    | IMPLEMENTED        | projection unit tests; headset NOT VERIFIED                     |
 | Minimal rose/pearl UI                        | TESTED             | reviewed desktop/mobile and four glass states                   |
 | Portable letters / local collection          | REGRESSION COVERED | schema, save/import/share/reply, copy isolation, browser journeys |
-| Optional letters Worker / D1                 | LOCAL TESTED       | real local database create/read/reply/delete; deployment pending authentication |
+| Optional letters Worker / D1                 | LIVE API TESTED    | production create/read/reply/delete, expiry bounds, CORS and owner authorization |
 | Ghost writing / path rain / closed windows   | REGRESSION COVERED | memory/effects units and composite pixel checks                  |
 | Future frost/rain/neon modes                 | NOT STARTED        | outside V1                                                      |
 
@@ -44,4 +44,4 @@ V1 release: repeated-use lifecycle, opt-in gesture shortcuts, quiet hover/touch/
 
 Letters release: point/pinch writing options and gap/offscreen continuity covered;
 rose, moon and rain appearances implemented. No account or backend is needed for
-the core mirror or portable letters. Online storage is optional and not yet deployed.
+the core mirror or portable letters. Optional online storage deployed 2026-10-18.

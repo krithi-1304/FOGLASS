@@ -2,6 +2,11 @@
 
 Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
+## Hosted letters — 2026-10-18
+Cloudflare authorized; production D1 provisioned/migrated and Worker live at https://foglass-letters.foglass.workers.dev.
+Live API create/read/reply, bounded expiry, CORS and owner/cascading deletion pass; test letters removed.
+GitHub FOGLASS_LETTERS_API configured. Next: connected frontend rebuild, live UI smoke, physical input matrix.
+
 ## Current live release — 2026-10-17
 Published 134a910 at https://krithi-1304.github.io/FOGLASS/; GitHub run 39011943133 passed checks and deployment.
 67 unit + 44 browser tests pass on Linux; lint/types/build pass. Software GL: 53.6 FPS idle / 54.8 FPS full-hand at adaptive .30/.25 quality.

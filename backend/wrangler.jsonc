@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "foglass-letters",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "a3223b1a-01f3-45e7-b02c-40be001d0c4e",
       "migrations_dir": "migrations",
     },
   ],
