@@ -2,6 +2,12 @@
 
 Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
+## Current connected release — 2026-10-18
+Frontend 9fa37bd and hosted letters API are live; GitHub run 39119455017 passed checks and deployment.
+67 unit + 44 browser tests pass; live separate-session sharing, expiry selection, reply/listing and owner cascading deletion pass. Temporary letters removed.
+Linux software GL: 55.0 FPS idle / 53.8 FPS full-hand at .25/.30 adaptive quality. Lint/types/build pass.
+Next: physical camera/mouth/headset checks; observe expiry/cleanup over their full waiting periods; tune only from recorded evidence.
+
 ## Hosted letters — 2026-10-18
 Cloudflare authorized; production D1 provisioned/migrated and Worker live at https://foglass-letters.foglass.workers.dev.
 Live API create/read/reply, bounded expiry, CORS and owner/cascading deletion pass; test letters removed.

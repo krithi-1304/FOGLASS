@@ -196,3 +196,9 @@
 - Live API create/read/reply, parent-bounded expiry, CORS, owner authorization and cascading deletion pass; temporary test letters removed.
 - GitHub FOGLASS_LETTERS_API now points to production; frontend rebuild pending. No camera/audio/landmark uploads or billing changes.
 - Next: publish connected frontend; verify live sender/recipient/reply/delete UI; physical input matrix remains pending.
+
+## Hosted letters live — 2026-10-18
+- Published connected frontend 9fa37bd; GitHub run 39119455017 succeeded with 67 unit + 44 browser tests and lint/types/build passing.
+- Live separate-session sender/recipient sharing, expiry selection, replies, conversation listing and owner cascading deletion pass; test letters removed.
+- Linux software GL: 55.0 FPS idle / 53.8 FPS full-hand at .25/.30 adaptive quality. API stores text/strokes only.
+- Next: physical camera/mouth/headset checks; observe full-duration expiry/cleanup; evidence-based tuning.

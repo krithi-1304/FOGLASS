@@ -62,3 +62,5 @@ and preserving saved originals when editing a copy. Desktop/mobile sheets review
 `air-writing.test.ts` and `air-writing.spec.ts` cover gesture-to-mask continuity.
 Production Cloudflare create/read/reply/delete, expiry bounds and CORS pass as of
 2026-10-18; test letters removed. Physical camera/mouth/headset checks remain pending.
+Published UI smoke also passes sharing, expiry selection, replies from a separate
+browser session, conversation listing and owner cascading deletion (2026-10-18).
