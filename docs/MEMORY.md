@@ -208,3 +208,8 @@
 - Explicit persistent controls, native Space activation, microphone selection/opt-in and Test my breath; default wipes stay clear, optional natural regrowth delayed; wipe/clear requires quiet before a new mic burst.
 - 72 unit + 46 browser tests pass; lint/types/build/diff pass. Desktop/mobile and four fog states reviewed; software GL 59.0 FPS idle / 54.8 full-hand.
 - Next: publish and smoke live controls; physical hand/mouth checks using updated manual guide; tune only from recorded device evidence.
+
+## Input repair live — 2026-10-20
+- Published 93e0b05; GitHub run 39388517862 succeeded, following 72 unit + 46 browser tests locally.
+- Live persistent controls, microphone opt-in/selection, isolated breath setup and production test-API isolation pass with fake media.
+- Physical hand/mouth accuracy remains unverified; next: run manual hardware matrix, record device feedback, tune only evidenced failures.

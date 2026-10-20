@@ -97,3 +97,9 @@ Live: https://krithi-1304.github.io/FOGLASS/; repository krithi-1304/FOGLASS, de
 51 unit + 35 browser tests pass locally and on Linux CI; live production smoke passes.
 Adaptive fog resampling preserves marks/history; Linux improved 16 → 54.6 idle / 56.0 active FPS.
 Next: physical camera/mouth matrix, recorded interaction evidence, evidence-based tuning. Physical hardware accuracy remains unverified.
+
+## Current input repair — 2026-10-20
+- Live code 93e0b05; GitHub run 39388517862 passed and deployed. Local validation: 72 unit + 46 browser tests, lint/types/build.
+- Controls stay visible until explicitly hidden; microphone opt-in/selection and Test my breath available; wipes stay clear by default.
+- Finger/palm classification and GPU fallback repaired; ongoing audio must return quiet after wiping before steaming again.
+- Live fake-media smoke passed; next: physical hand/mouth matrix, recorded device feedback, evidence-based tuning.
