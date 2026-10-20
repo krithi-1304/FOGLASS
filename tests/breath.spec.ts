@@ -56,6 +56,7 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
   await expect(page.locator("#breath-message")).not.toHaveText(
     "Breath detected",
   );
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await page.locator("#mirror").click({ position: { x: 40, y: 40 } });
   await page.keyboard.press("c");
   await expect
@@ -67,6 +68,20 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
       ),
     )
     .toBeLessThan(0.02);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              __foglass: {
+                getState(): { breathSignal: { waitingForQuiet: boolean } };
+              };
+            }
+          ).__foglass.getState().breathSignal.waitingForQuiet,
+      ),
+    )
+    .toBe(false);
   await page.evaluate(() =>
     (window as unknown as { testBlow: () => void }).testBlow(),
   );
@@ -81,13 +96,29 @@ test("low-frequency airflow reaches the real analyser from the visible breath co
       { timeout: 4000 },
     )
     .toBeGreaterThan(0.3);
+  // Wipe while the sound is still present: the old burst cannot immediately refog it.
+  await page.mouse.move(550, 280);
+  await page.mouse.down();
+  await page.mouse.move(730, 280, { steps: 8 });
+  await page.mouse.up();
+  const sample = () =>
+    page.evaluate(() =>
+      (
+        window as unknown as {
+          __foglass: { sampleMask(x: number, y: number): number };
+        }
+      ).__foglass.sampleMask(0.5, 280 / 720),
+    );
+  await expect.poll(sample).toBeLessThan(0.15);
+  await page.waitForTimeout(500);
+  expect(await sample()).toBeLessThan(0.15);
   await page.evaluate(() =>
     (window as unknown as { testQuiet: () => void }).testQuiet(),
   );
   await expect(page.locator("#breath-message")).not.toHaveText(
     "Breath detected",
   );
-  await page.getByRole("button", { name: "Tools", exact: true }).hover();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await page
     .getByRole("button", { name: "Recalibrate breath", exact: true })
     .click();

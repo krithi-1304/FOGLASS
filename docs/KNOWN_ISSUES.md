@@ -13,3 +13,8 @@
 - Letters backend deployed 2026-10-18; live create/read/reply, expiry bounds, origin restrictions and owner/cascading deletion pass. Real-time expiry and daily scheduled cleanup have not been observed over their full waiting periods.
 - Portable links contain readable letter content and cannot expire or be revoked. Online letters are bearer links, not encrypted storage; link holders can read and reply.
 - Letter rain and closed windows are artistic stroke effects. Real fluid simulation and physical input precision are not established by these tests.
+
+- Input repair 2026-10-20 bounds each detected noise burst to 2.5 seconds and requires
+  a quiet pause after wiping. Speech/fan noise can still resemble breath; choose the
+  correct microphone and recalibrate in a quiet room. Full-duration blowing is not
+  treated as an unlimited steam source. Actual device behavior remains a manual check.

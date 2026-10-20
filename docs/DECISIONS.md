@@ -109,3 +109,14 @@ or landmarks in letter payloads. Online access uses bearer links, owner deletion
 keys and expiry, without an encryption claim. Deploy storage only with an
 authenticated Cloudflare account. Editing a saved letter as a copy preserves its
 original local identity and separates reply/remote metadata.
+
+## D-017 — Input recovery and deliberate fog (2026-10-20)
+User-reported detection failures and disappearing controls supersede D-014's
+hover HUD. Controls stay visible until explicitly hidden; touch/keyboard use the
+same button. Microphone startup is opt-in. Wipes stay clear by default; natural
+regrowth is optional and delayed locally. Clear/wipe cancels existing steam and
+requires quiet before another microphone burst; sustained noise cannot steam
+indefinitely. Test my breath clears the pane, calibrates and disables regrowth.
+Restore palm wiping in Writing mode, use finger-local extension geometry and
+retry CPU when worker GPU initialization fails. See RESEARCH.md for primary
+references and reproduced regressions; physical precision still needs device evidence.

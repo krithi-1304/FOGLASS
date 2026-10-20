@@ -22,6 +22,7 @@ export class FogSim {
     breath(): void;
   };
   paused = false;
+  autoRegrow = false;
   density = 1;
   private strength = 0;
   private until = 0;
@@ -170,6 +171,11 @@ export class FogSim {
     if (value) this.observer?.breath();
     this.held = value;
   }
+  cancelBreath() {
+    this.until = 0;
+    this.held = false;
+    this.bloomAge = 0;
+  }
   finger(x: number, y: number, down: boolean, radius = 0.028, palm = false) {
     if (!down) {
       this.last = null;
@@ -248,6 +254,7 @@ export class FogSim {
           Math.min(1.5, 0.18 + this.bloomAge * 1.1),
         );
         gl.uniform1f(loc("dt"), this.paused ? 0 : (dt * this.speed) / steps);
+        gl.uniform1f(loc("autoRegrow"), this.autoRegrow ? 1 : 0);
         gl.uniform1f(
           loc("breath"),
           this.paused

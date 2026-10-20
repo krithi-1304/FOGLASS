@@ -724,15 +724,68 @@ body.started #tools {
     translate 0.35s ease;
 }
 body.started:not(.hud-visible) #dock,
-body.started:not(.hud-visible) header,
-body.started:not(.hud-visible) #status,
-body.started:not(.hud-visible) #breath-feedback,
 body.started:not(.hud-visible) #tools {
   opacity: 0 !important;
   translate: 0 8px;
 }
+body.started:not(.hud-visible) #dock,
 body.started:not(.hud-visible) #tools {
   pointer-events: none;
+  visibility: hidden;
+}
+#controls-toggle {
+  position: fixed;
+  top: 64px;
+  right: 24px;
+  z-index: 6;
+  min-height: 44px;
+  background: #f5edef;
+  color: #51434b;
+  border-color: #cbb8c2;
+}
+.input-note {
+  width: 100%;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #614c58;
+}
+#tools select {
+  font-size: 16px;
+  min-width: 0;
+}
+#tools .field {
+  min-width: 0;
+}
+#tools {
+  max-height: min(65dvh, 560px);
+  bottom: 155px;
+  overscroll-behavior: contain;
+}
+@media (max-width: 600px) {
+  #dock {
+    flex-wrap: wrap;
+    width: calc(100% - 32px);
+  }
+  #dock button {
+    min-height: 44px;
+    padding-inline: 10px;
+  }
+  #controls-toggle {
+    right: 16px;
+  }
+  #tools {
+    bottom: 195px;
+    max-height: calc(100dvh - 315px);
+  }
+  #breath-feedback {
+    bottom: 120px;
+    max-width: calc(100% - 32px);
+    white-space: normal;
+  }
+  body:has(#breath-feedback:not([hidden])) #status {
+    bottom: 150px;
+  }
 }
 body.started .edge {
   opacity: 0;

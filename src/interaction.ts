@@ -101,12 +101,13 @@ export class Interaction {
       return;
     }
     this.pinchOrigin = null;
-    const palm = state.gesture === "palm" && this.mode !== "writing";
+    const palm =
+      state.gesture === "palm" ||
+      (state.gesture === "two-palms" && !this.gestureCommands);
     const draw =
       !this.paused &&
-      (pinchWriting
-        ? state.gesture === "pinch"
-        : state.gesture === "point" || palm);
+      (palm ||
+        (pinchWriting ? state.gesture === "pinch" : state.gesture === "point"));
     if (!draw) {
       this.lift();
       return;

@@ -2,6 +2,12 @@
 
 Read with AGENTS.md and DECISIONS.md; historical entries are in MEMORY.md.
 
+## Input repair — 2026-10-20
+Fixed reproduced finger/palm/noise regressions, GPU startup fallback, persistent controls and Space activation; researched MediaPipe/MDN primary docs.
+Microphone opt-in, device selection and Test my breath; wipes persist by default, natural regrowth is optional, wipe/clear waits for quiet before another mic burst.
+72 unit + 46 browser tests and lint/types/build pass; desktop/mobile/four fog states reviewed. Software GL 59.0 idle / 54.8 full-hand FPS.
+Next: publish, live smoke, physical device matrix. Automated fixtures do not prove the user's real hand/mouth accuracy.
+
 ## Current connected release — 2026-10-18
 Frontend 9fa37bd and hosted letters API are live; GitHub run 39119455017 passed checks and deployment.
 67 unit + 44 browser tests pass; live separate-session sharing, expiry selection, reply/listing and owner cascading deletion pass. Temporary letters removed.

@@ -8,7 +8,7 @@ export function createUI() {
       <p class="invitation">a moment, written in mist.</p>
       <p class="instructions">Breathe on the glass. Leave a little of yourself.</p>
       <button id="start">Start <span aria-hidden="true">↗</span></button>
-      <label class="start-option"><input id="breath-on-start" type="checkbox" checked> Enable breath with my microphone</label>
+      <label class="start-option"><input id="breath-on-start" type="checkbox"> Enable breath with my microphone</label>
       <p class="privacy">Camera &amp; sound stay on your device.</p>
       <button id="fallback" class="text-button">Try without camera</button>
     </main>
@@ -17,13 +17,19 @@ export function createUI() {
       <p class="calibration-detail">Keep your hand in the camera view. We’ll learn your comfortable range.</p>
       <button id="skip-calibration">Skip calibration</button>
     </section>
+    <button id="controls-toggle" aria-controls="dock tools" aria-expanded="true" hidden>Hide controls</button>
     <nav id="dock" aria-label="Mirror controls" hidden>
       <button id="microphone" aria-pressed="false">Enable breath</button>
       <button id="refog">Add steam</button>
-      <button id="tool-toggle" aria-controls="tools">Tools</button>
+      <button id="tool-toggle" aria-controls="tools" aria-expanded="false">Tools</button>
       
     </nav>
     <section id="tools" hidden aria-label="Mirror tools">
+      <p id="tracking-feedback" class="input-note">Camera off · use Start camera to track your hand.</p>
+      <button id="start-camera">Start camera</button>
+      <label class="field">Fog returns<select id="fog-return"><option value="breath">Only with breath or Add steam</option><option value="natural">Slowly after wiping</option></select></label>
+      <button id="test-breath">Test my breath</button>
+      <p class="input-note">Test clears the glass and pauses automatic regrowth. Stay quiet for calibration, then blow toward your microphone.</p>
       <label class="field">Mode<select id="mirror-mode" aria-label="Mode"><option value="mirror">Real Mirror</option><option value="writing">Fog Writing</option><option value="reveal">Magic Reveal</option></select></label>
       <label class="field">Writing gesture<select id="writing-grip" aria-label="Writing gesture"><option value="point">Point with index finger</option><option value="pinch">Pinch to write · release to lift</option></select></label>
       <label class="field">Steam strength<input aria-label="Steam strength" id="density" type="range" min="10" max="100" value="75"></label>
@@ -33,6 +39,8 @@ export function createUI() {
         <label class="file-label">Use a photo<input id="reveal-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
       </div>
       <label class="field">Breath sensitivity<input id="breath-sensitivity" aria-label="Breath sensitivity" type="range" min="0.5" max="4" step="0.1" value="1"></label>
+      <label class="field">Microphone<select id="microphone-device"><option value="">System default</option></select></label>
+      <p id="microphone-source" class="input-note">Enable breath to see the active microphone.</p>
       <button id="recalibrate-breath">Recalibrate breath</button>
       <p class="microphone-note">Blow toward your microphone. Audio stays on this device.</p>
       <label class="shortcut-option"><input id="hand-shortcuts" type="checkbox"> Extra hand shortcuts <span>Fist to pause · two palms to clear</span></label>
@@ -54,6 +62,15 @@ export function createUI() {
     <div id="cursor" aria-hidden="true"></div>
     <footer><span>nothing to keep. unless you want to.</span><span id="footer-note"></span></footer>`;
   return {
+    startCamera: document.querySelector<HTMLButtonElement>("#start-camera")!,
+    trackingFeedback:
+      document.querySelector<HTMLElement>("#tracking-feedback")!,
+    fogReturn: document.querySelector<HTMLSelectElement>("#fog-return")!,
+    testBreath: document.querySelector<HTMLButtonElement>("#test-breath")!,
+    microphoneDevice:
+      document.querySelector<HTMLSelectElement>("#microphone-device")!,
+    microphoneSource:
+      document.querySelector<HTMLElement>("#microphone-source")!,
     writingGrip: document.querySelector<HTMLSelectElement>("#writing-grip")!,
     graphicsRecovery:
       document.querySelector<HTMLElement>("#graphics-recovery")!,

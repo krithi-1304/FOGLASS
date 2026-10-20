@@ -202,3 +202,9 @@
 - Live separate-session sender/recipient sharing, expiry selection, replies, conversation listing and owner cascading deletion pass; test letters removed.
 - Linux software GL: 55.0 FPS idle / 53.8 FPS full-hand at .25/.30 adaptive quality. API stores text/strokes only.
 - Next: physical camera/mouth/headset checks; observe full-duration expiry/cleanup; evidence-based tuning.
+
+## Input and controls repair — 2026-10-20
+- Reproduced/fixed wrist-distance finger rejection, disabled Writing-mode palms and endless noise-triggered steam; added GPU startup CPU fallback and documented primary research.
+- Explicit persistent controls, native Space activation, microphone selection/opt-in and Test my breath; default wipes stay clear, optional natural regrowth delayed; wipe/clear requires quiet before a new mic burst.
+- 72 unit + 46 browser tests pass; lint/types/build/diff pass. Desktop/mobile and four fog states reviewed; software GL 59.0 FPS idle / 54.8 full-hand.
+- Next: publish and smoke live controls; physical hand/mouth checks using updated manual guide; tune only from recorded device evidence.

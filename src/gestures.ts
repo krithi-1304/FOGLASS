@@ -29,9 +29,7 @@ export function features(hand: TrackedHand): HandFeatures {
     const cosine =
       (u.x * v.x + u.y * v.y + u.z * v.z) /
       Math.max(1e-8, Math.hypot(u.x, u.y, u.z) * Math.hypot(v.x, v.y, v.z));
-    return (
-      cosine < -0.45 && length(c, geometry[0]) > length(b, geometry[0]) * 1.08
-    );
+    return cosine < -0.45 && length(c, a) > length(b, a) * 1.3;
   });
   const palm = [0, 5, 9, 13, 17]
     .map((i) => p[i])

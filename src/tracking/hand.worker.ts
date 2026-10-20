@@ -1,4 +1,5 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
+import { createHandModel } from "./model";
 let model: HandLandmarker | undefined;
 let delegate: "GPU" | "CPU" = "GPU";
 let samples: number[] = [];
@@ -12,17 +13,13 @@ self.onmessage = async (event: MessageEvent) => {
         data.base + "wasm",
         true,
       );
-      model = await HandLandmarker.createFromOptions(files, {
-        baseOptions: {
-          modelAssetPath: data.base + "models/hand_landmarker.task",
-          delegate: "GPU",
-        },
-        runningMode: "VIDEO",
-        numHands: 2,
-        minHandDetectionConfidence: 0.6,
-        minHandPresenceConfidence: 0.6,
-        minTrackingConfidence: 0.6,
-      });
+      const initialized = await createHandModel(
+        files,
+        data.base + "models/hand_landmarker.task",
+      );
+      model = initialized.model;
+      delegate = initialized.delegate;
+      compared = delegate === "CPU";
       self.postMessage({ type: "ready" });
     } else if (data.type === "frame" && model) {
       const inferenceDelegate = delegate;

@@ -64,3 +64,12 @@ Production Cloudflare create/read/reply/delete, expiry bounds and CORS pass as o
 2026-10-18; test letters removed. Physical camera/mouth/headset checks remain pending.
 Published UI smoke also passes sharing, expiry selection, replies from a separate
 browser session, conversation listing and owner cascading deletion (2026-10-18).
+
+Input repair (2026-10-20): `model-fallback.test.ts` covers GPU initialization failure;
+gesture/interaction fixtures reproduce wrist-distance rejection and disabled palm
+wiping. Breath units cover sustained noise and quiet re-arm; `breath.spec.ts`
+verifies a real analyser cannot immediately refill a wipe during the same sound.
+`input-recovery.spec.ts` covers sixteen simulated seconds without passive refog,
+explicit breath, microphone opt-in/feedback and touch selection without hover.
+`release.spec.ts` covers explicit visibility and Space-key button activation.
+Natural regrowth and existing provider/model/landmark regression checks are retained.

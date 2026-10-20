@@ -10,6 +10,17 @@ export class BreathDetector {
   flatness = 0;
   noiseLike = false;
   sensitivity = 1;
+  waitingForQuiet = false;
+  private activeSince = 0;
+  private quietSince = -1;
+  private lastTime = -1;
+  suppressUntilQuiet() {
+    this.waitingForQuiet = true;
+    this.quietSince = -1;
+    this.active = false;
+    this.strength = 0;
+    this.attack = this.release = 0;
+  }
   private calibration: number[] = [];
   recalibrate() {
     this.started = -1;
@@ -18,6 +29,8 @@ export class BreathDetector {
     this.calibrated = false;
     this.attack = this.release = 0;
     this.strength = 0;
+    this.waitingForQuiet = false;
+    this.quietSince = this.lastTime = -1;
   }
   private started = -1;
   private attack = 0;
@@ -29,6 +42,11 @@ export class BreathDetector {
     time: number,
   ) {
     if (this.started < 0) this.started = time;
+    if (this.lastTime >= 0 && time - this.lastTime > 300) {
+      this.active = false;
+      this.attack = this.release = 0;
+    }
+    this.lastTime = time;
     let sum = 0,
       weights = 0,
       log = 0,
@@ -77,12 +95,25 @@ export class BreathDetector {
     this.noiseLike = noise;
     // Hysteresis applies to the excess above room noise, never below it.
     const releaseThreshold = this.floor + (threshold - this.floor) * 0.58;
+    if (this.active && time - this.activeSince > 2500)
+      this.suppressUntilQuiet();
+    if (this.waitingForQuiet) {
+      if (energy <= releaseThreshold) {
+        if (this.quietSince < 0) this.quietSince = time;
+        if (time - this.quietSince >= 200) this.waitingForQuiet = false;
+      } else this.quietSince = -1;
+      this.strength = 0;
+      return 0;
+    }
     const above =
       energy > (this.active ? releaseThreshold : threshold) && noise;
     if (above) {
       this.release = 0;
       if (!this.attack) this.attack = time;
-      if (time - this.attack >= 60) this.active = true;
+      if (time - this.attack >= 60 && !this.active) {
+        this.active = true;
+        this.activeSince = time;
+      }
     } else {
       this.attack = 0;
       if (!this.release) this.release = time;

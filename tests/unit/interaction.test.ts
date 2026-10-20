@@ -12,6 +12,25 @@ const fixture = (n: string) =>
       ),
     ),
   );
+it("palm wiping works in writing mode and with two open hands", () => {
+  for (const name of ["open-palm-left", "two-palm-clear"]) {
+    let wipes = 0;
+    const interaction = new Interaction({
+      finger(_x, _y, down, _r, palm) {
+        if (down && palm) wipes++;
+      },
+      clear() {},
+      injectBreath() {},
+    });
+    interaction.setMode("writing");
+    const engine = new GestureEngine();
+    for (const frame of fixture(name).frames) {
+      const state = engine.update(frame);
+      interaction.update(state, state.hand?.palm || null);
+    }
+    expect(wipes).toBeGreaterThan(0);
+  }
+});
 it("palm and point create different continuous brushes", () => {
   const strokes: { radius: number; palm: boolean; x: number }[] = [];
   const target = {

@@ -45,3 +45,10 @@ V1 release: repeated-use lifecycle, opt-in gesture shortcuts, quiet hover/touch/
 Letters release: point/pinch writing options and gap/offscreen continuity covered;
 rose, moon and rain appearances implemented. No account or backend is needed for
 the core mirror or portable letters. Optional online storage deployed 2026-10-18.
+
+Input repair (2026-10-20): explicit Controls button replaces hover-only visibility;
+touch and native keyboard activation covered. Palm wiping works in Writing mode
+and two-palm poses without shortcuts. Finger extension uses local joint geometry;
+worker startup falls back to CPU. Microphone selection/settings feedback, explicit
+startup opt-in, bounded noise bursts, quiet re-arm after wiping, breath-only default
+fog and Test my breath are implemented. Physical accuracy still needs live evidence.

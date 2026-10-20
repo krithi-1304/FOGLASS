@@ -37,3 +37,8 @@ In-session dock contains only Add steam and Tools; other actions are tucked away
 Glass preserves the camera colours, with cold condensation and a restrained warm bloom.
 Writing radius .011 viewport height; mask 512²; wet edge offset .014 × mask gradient.
 Microbeads use bounded procedural cells; residual stroke water drains downward and fades.
+
+## Input access — 2026-10-20
+Controls stay visible until explicitly hidden; a persistent Controls button reopens
+them. Tools scroll independently and never close on pointer movement. Preserve
+rose/pearl tokens; keep microphone signal and status readable below the panel.

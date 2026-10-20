@@ -8,7 +8,10 @@ test("review deterministic glass states and mobile invitation", async ({
     maxDiffPixelRatio: 0.015,
   });
   await page.getByRole("button", { name: "Try without camera" }).click();
-  await page.mouse.move(100,100);
+  await page
+    .getByRole("button", { name: "Hide controls", exact: true })
+    .click();
+  await page.mouse.move(100, 100);
   await page.waitForTimeout(1000);
   for (const [name, coverage] of [
     ["none", 0],

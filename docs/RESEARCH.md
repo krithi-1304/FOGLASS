@@ -363,3 +363,20 @@ unobserved trajectory prediction was added; it can invent marks on a reversal.
 Physical acceptance still requires a real person's writing in good/dim light,
 slow loops, fast reversals and hand entry/exit. Neither the hand-photo inference
 test nor synthetic trajectories justify a promise of perfect live precision.
+# Input recovery research — 2026-10-20
+
+Primary references checked online:
+- [MediaPipe Hand Landmarker for Web](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js): VIDEO mode, 21 image/world joints, default 0.5 detection/presence/tracking thresholds. Tracking confidence is bounding-box overlap, not a gesture score. Synchronous inference belongs in the existing worker.
+- [MDN media constraints](https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Constraints) and [getSettings](https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamTrack/getSettings): requested audio constraints are not proof of actual device settings. Inspect the selected track and expose microphone selection.
+
+Local evidence: failing regressions reproduced wrist-distance rejection of a straight
+index, palms disabled in Writing mode/two-hand poses, and endless steam from sustained
+noise. Use MCP-relative finger extension; allow palm wiping in every mode; bound
+audio bursts and require quiet after a wipe. GPU initialization now retries CPU,
+and the model uses documented default confidence thresholds. These changes do not
+prove accuracy on an unseen live hand or distinguish all speech/fans from breath.
+
+Fog regrowth is now a separate opt-in control. Manual/breath-only default keeps
+wipes clear; natural mode delays each wiped pixel for three seconds before gradual
+regrowth. Controls use explicit visibility, not pointer proximity. The microphone
+is unchecked at startup and Test my breath isolates audio from automatic regrowth.

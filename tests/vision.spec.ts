@@ -83,6 +83,7 @@ test("MediaPipe model and WASM load locally and infer fake frames", async ({
 test("model failure retains conventional controls", async ({ page }) => {
   await page.route("**/models/hand_landmarker.task", (r) => r.abort());
   await page.goto("/?test=1&vision=1");
+  await page.getByLabel("Enable breath with my microphone").check();
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(page.getByRole("status")).toContainText(
     "Hand tracking unavailable",

@@ -15,6 +15,9 @@ test("breath, continuous wipe, regrowth, resize, clear and snapshot", async ({
 }) => {
   await page.goto("/?test=1&seed=7&speed=4");
   await page.getByRole("button", { name: "Try without camera" }).click();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByLabel("Fog returns").selectOption("natural");
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
   await run(page, (a) => a.injectBreath(1, 600));
   await expect
     .poll(() => run(page, (a) => a.getFogCoverage()))

@@ -1,56 +1,23 @@
-/** Controls live at the bottom edge; the mirror stays empty while drawing. */
+/** Visibility is explicit; moving across the glass never closes controls. */
 export function installHud() {
-  let keyboard = false;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const show = (visible: boolean) =>
+  const toggle = document.querySelector<HTMLButtonElement>("#controls-toggle")!;
+  const show = (visible: boolean) => {
     document.body.classList.toggle("hud-visible", visible);
-  const inside = (target: EventTarget | null) =>
-    target instanceof Element && !!target.closest("#dock,#tools");
-  document.addEventListener("pointermove", (event) => {
-    if (!document.body.classList.contains("started")) return;
-    keyboard = false;
-    clearTimeout(timer);
-    show(
-      !event.buttons &&
-        (inside(event.target) || event.clientY > innerHeight - 105),
-    );
-  });
-  document.addEventListener("pointerdown", (event) => {
-    if (!document.body.classList.contains("started")) return;
-    keyboard = false;
-    if (event.pointerType === "touch" && event.clientY > innerHeight - 105) {
-      show(true);
-      clearTimeout(timer);
-      timer = setTimeout(() => show(false), 5000);
-    } else if (!inside(event.target)) show(false);
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Tab") {
-      keyboard = true;
-      show(true);
-    }
-    if (event.key === "Escape") {
-      keyboard = false;
-      show(false);
-    }
-  });
-  document.addEventListener("focusin", (event) => {
-    if (keyboard && inside(event.target)) show(true);
-  });
+    toggle.textContent = visible ? "Hide controls" : "Controls";
+    toggle.setAttribute("aria-expanded", String(visible));
+    for (const id of ["dock", "tools"])
+      document.getElementById(id)!.inert = !visible;
+  };
+  toggle.addEventListener("click", () =>
+    show(!document.body.classList.contains("hud-visible")),
+  );
   return {
     enter() {
+      toggle.hidden = false;
       show(true);
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        if (!keyboard) show(false);
-      }, 4500);
     },
     reveal() {
-      show(true);
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        if (!keyboard) show(false);
-      }, 4500);
+      if (document.body.classList.contains("started")) show(true);
     },
   };
 }

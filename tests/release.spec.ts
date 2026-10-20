@@ -77,19 +77,25 @@ test("repeated use retains bounded undo, drawing and default gesture safety", as
     .toBeLessThan(0.3);
   expect(errors).toEqual([]);
 });
-test("controls float in at the edge and vanish when returning to the glass", async ({
+test("controls stay available until explicitly hidden, including while choosing options", async ({
   page,
 }) => {
   await page.goto("/?test=1");
   await page.getByRole("button", { name: "Try without camera" }).click();
   await page.mouse.move(500, 280);
-  await expect(page.locator("#dock")).toHaveCSS("opacity", "0");
+  await expect(page.locator("#dock")).toHaveCSS("opacity", "1");
   await page.mouse.move(640, 680);
   await expect(page.locator("#dock")).toHaveCSS("opacity", "1");
-  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("button", { name: "Tools", exact: true }).focus();
+  await page.keyboard.press("Space");
   await page.mouse.move(200, 200);
-  await expect(page.locator("#tools")).toHaveCSS("opacity", "0");
-  await page.keyboard.press("Tab");
+  await expect(page.locator("#tools")).toHaveCSS("opacity", "1");
+  await page.getByLabel("Mode", { exact: true }).selectOption("writing");
+  await page
+    .getByRole("button", { name: "Hide controls", exact: true })
+    .click();
+  await expect(page.locator("#tools")).toBeHidden();
+  await page.getByRole("button", { name: "Controls", exact: true }).click();
   await expect(page.locator("#dock")).toHaveCSS("opacity", "1");
 });
 test("lost WebGL context offers a working restart instead of a blank mirror", async ({

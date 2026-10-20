@@ -1,6 +1,29 @@
 import { it, expect } from "vitest";
 import { BreathDetector } from "../../src/breath";
 const spectrum = (db: number) => new Float32Array(1024).fill(db);
+it("sustained background noise cannot keep depositing steam indefinitely", () => {
+  const d = new BreathDetector();
+  for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-80), 48000, 2048, t);
+  for (let t = 1025; t <= 5000; t += 25)
+    d.update(spectrum(-40), 48000, 2048, t);
+  expect(d.active).toBe(false);
+  expect(d.strength).toBe(0);
+});
+it("wiping requires a quiet pause before a fresh breath can deposit steam", () => {
+  const d = new BreathDetector();
+  for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-80), 48000, 2048, t);
+  for (let t = 1025; t <= 1200; t += 25)
+    d.update(spectrum(-40), 48000, 2048, t);
+  d.suppressUntilQuiet();
+  for (let t = 1225; t <= 2200; t += 25)
+    d.update(spectrum(-40), 48000, 2048, t);
+  expect(d.strength).toBe(0);
+  for (let t = 2225; t <= 2600; t += 25)
+    d.update(spectrum(-80), 48000, 2048, t);
+  for (let t = 2625; t <= 2800; t += 25)
+    d.update(spectrum(-40), 48000, 2048, t);
+  expect(d.active).toBe(true);
+});
 it("calibrates room noise, detects sustained broad noise and releases with hysteresis", () => {
   const d = new BreathDetector();
   for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-80), 48000, 2048, t);

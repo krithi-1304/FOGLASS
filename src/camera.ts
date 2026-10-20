@@ -39,6 +39,8 @@ export class Camera {
     }
   }
   async start(): Promise<string> {
+    if (this.phase === "ready" && this.video.srcObject)
+      return "Camera ready · show your hand.";
     if (!navigator.mediaDevices?.getUserMedia)
       return "Camera unavailable. Hold B to fog; drag to draw.";
     this.phase = "requesting";
@@ -62,12 +64,13 @@ export class Camera {
       return "Camera unavailable or permission denied. Hold B to fog; drag to draw.";
     }
   }
-  async microphone() {
+  async microphone(deviceId = "") {
     return this.request({
       audio: {
         echoCancellation: false,
         noiseSuppression: false,
         autoGainControl: false,
+        ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
       },
       video: false,
     });

@@ -56,8 +56,14 @@ let mode = "onboarding";
 let hand: HandController | undefined;
 let pointer = { x: 0.5, y: 0.5, down: false };
 let hintInteracted = false;
+function clearGlass() {
+  renderer?.fog.clear();
+  breath?.detector.suppressUntilQuiet();
+}
 function successfulStroke() {
   sound.stroke();
+  renderer?.fog.cancelBreath();
+  breath?.detector.suppressUntilQuiet();
   if (hintInteracted) return;
   hintInteracted = true;
   const text = ui.status.textContent;
@@ -98,7 +104,7 @@ const interaction = new Interaction(
       renderer?.fog.wipe(segments, begin);
       successfulStroke();
     },
-    clear: () => renderer?.fog.clear(),
+    clear: clearGlass,
     injectBreath: (strength, ms) => renderer?.fog.injectBreath(strength, ms),
   },
   () => {
@@ -109,6 +115,7 @@ const interaction = new Interaction(
     ui.pause.textContent = interaction.paused ? "Resume" : "Pause";
     ui.density.value = String(Math.round(interaction.density * 100));
     ui.tools.hidden = !interaction.palette;
+    ui.toolToggle.setAttribute("aria-expanded", String(interaction.palette));
   },
 );
 ui.writingGrip.addEventListener("change", () => {
@@ -176,12 +183,43 @@ ui.microphone.addEventListener("click", async () => {
   try {
     microphoneContext = new AudioContext();
     await microphoneContext.resume();
-    const stream = await camera.microphone();
+    const stream = await camera.microphone(ui.microphoneDevice.value);
     if (attempt !== micAttempt) {
       stream.getTracks().forEach((t) => t.stop());
       return;
     }
     microphoneStream = stream;
+    const track = stream.getAudioTracks()[0];
+    const settings = track?.getSettings();
+    ui.microphoneSource.textContent = `Using ${track?.label || "system microphone"}.${settings?.noiseSuppression || settings?.autoGainControl ? " Browser audio processing is enabled; try another microphone if breath is suppressed." : " Audio stays on this device."}`;
+    track?.addEventListener(
+      "ended",
+      () => {
+        if (attempt !== micAttempt) return;
+        disableMicrophone();
+        ui.status.textContent =
+          "Microphone disconnected. Select a microphone and enable breath again.";
+      },
+      { once: true },
+    );
+    void navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        if (attempt !== micAttempt) return;
+        const selected = settings?.deviceId || ui.microphoneDevice.value;
+        ui.microphoneDevice.replaceChildren(new Option("System default", ""));
+        for (const device of devices.filter((d) => d.kind === "audioinput"))
+          ui.microphoneDevice.add(
+            new Option(device.label || "Microphone", device.deviceId),
+          );
+        if (
+          Array.from(ui.microphoneDevice.options).some(
+            (o) => o.value === selected,
+          )
+        )
+          ui.microphoneDevice.value = selected;
+      })
+      .catch(() => {});
     breath = new BreathMonitor(microphoneContext, stream, (strength) =>
       renderer?.fog.injectBreath(strength, 120),
     );
@@ -208,11 +246,13 @@ ui.microphone.addEventListener("click", async () => {
       );
       ui.breathMessage.textContent = !detector.calibrated
         ? "Stay quiet for a moment…"
-        : detector.active
-          ? "Breath detected"
-          : detector.energy < 0.00001
-            ? "No sound reaching the microphone"
-            : "Listening · blow toward your microphone";
+        : detector.waitingForQuiet
+          ? "Pause sound briefly, then blow again · recalibrate if needed"
+          : detector.active
+            ? "Breath detected"
+            : detector.energy < 0.00001
+              ? "No sound reaching the microphone"
+              : "Listening · blow toward your microphone";
       if (detector.calibrated && micState !== "on") {
         micState = "on";
         ui.microphone.textContent = "Breath on · disable";
@@ -227,6 +267,32 @@ ui.microphone.addEventListener("click", async () => {
     ui.status.textContent =
       "Microphone unavailable or permission denied. Hold B or choose Add steam.";
   }
+});
+ui.microphoneDevice.addEventListener("change", () => {
+  if (micState === "off") return;
+  disableMicrophone();
+  ui.microphone.click();
+});
+ui.fogReturn.addEventListener("change", () => {
+  if (renderer) renderer.fog.autoRegrow = ui.fogReturn.value === "natural";
+});
+ui.testBreath.addEventListener("click", () => {
+  hud.reveal();
+  if (interaction.paused) interaction.togglePause();
+  ui.fogReturn.value = "breath";
+  if (renderer) {
+    renderer.fog.autoRegrow = false;
+    renderer.fog.clear();
+  }
+  if (micState === "off") ui.microphone.click();
+  else {
+    breath?.detector.recalibrate();
+    micState = "calibrating";
+    if (microphoneContext?.state === "suspended")
+      void microphoneContext.resume();
+  }
+  ui.status.textContent =
+    "Breath test: stay quiet for a moment, then blow toward your microphone. Automatic regrowth is off.";
 });
 ui.breathSensitivity.addEventListener("input", () => {
   if (breath) breath.detector.sensitivity = Number(ui.breathSensitivity.value);
@@ -286,7 +352,7 @@ addEventListener("resize", () => {
     revealResize = setTimeout(() => void refreshReveal(), 150);
 });
 ui.pause.addEventListener("click", () => interaction.togglePause());
-ui.clear.addEventListener("click", () => renderer?.fog.clear());
+ui.clear.addEventListener("click", clearGlass);
 ui.refog.addEventListener("click", () => renderer?.fog.injectBreath(1, 1800));
 ui.undo.addEventListener("click", () => {
   interaction.lift();
@@ -299,6 +365,7 @@ ui.redo.addEventListener("click", () => {
 ui.toolToggle.addEventListener("click", () => {
   interaction.palette = !interaction.palette;
   ui.tools.hidden = !interaction.palette;
+  ui.toolToggle.setAttribute("aria-expanded", String(interaction.palette));
 });
 function updateCalibration() {
   if (!hand) return;
@@ -307,6 +374,8 @@ function updateCalibration() {
 }
 async function startHand(mock = false) {
   if (hand) return hand;
+  ui.trackingFeedback.textContent =
+    "Loading hand tracking… Keep your whole hand in the camera view.";
   hand = new HandController(camera.video, (state, point) => {
     if (document.querySelector("dialog[open]")) {
       interaction.lift();
@@ -321,6 +390,13 @@ async function startHand(mock = false) {
       innerWidth / innerHeight,
     );
     const trackingError = hand?.metrics().error;
+    ui.trackingFeedback.textContent = trackingError
+      ? "Tracking unavailable · choose Restart tracking. Mouse and touch still work."
+      : !state.hand
+        ? "No hand detected · show your whole hand in good light."
+        : state.gesture === "none"
+          ? "Hand detected · straighten your index to write, or open your palm to wipe."
+          : `Hand detected · ${state.gesture === "palm" || state.gesture === "two-palms" ? "palm wipe" : state.gesture === "point" ? "finger writing" : state.gesture}`;
     if (trackingError)
       ui.status.textContent = trackingError + " Drag to draw; B adds steam.";
     ui.cameraState.textContent =
@@ -340,10 +416,12 @@ async function startHand(mock = false) {
         : "REPLAY · " + state.gesture.toUpperCase();
   });
   await hand.start(mock);
-  if (hand.status === "unavailable")
+  if (hand.status === "unavailable") {
     ui.status.textContent =
       "Hand tracking unavailable. Hold B to fog; drag to draw.";
-  else if (!isTest) {
+    ui.trackingFeedback.textContent =
+      "Hand tracking unavailable · choose Restart tracking.";
+  } else if (!isTest) {
     ui.status.textContent =
       "Point to write · open palm to wipe · Enable breath to fog.";
   }
@@ -378,6 +456,8 @@ function enter() {
 }
 ui.fallback.addEventListener("click", enter);
 ui.start.addEventListener("click", async () => {
+  if (ui.start.disabled) return;
+  ui.start.disabled = ui.startCamera.disabled = true;
   enter();
   if (ui.breathOnStart.checked) ui.microphone.click();
   ui.status.textContent =
@@ -387,9 +467,13 @@ ui.start.addEventListener("click", async () => {
   ui.status.textContent = message;
   ui.cameraState.textContent =
     mode === "camera" ? "CAMERA ON" : "CAMERA OFF · FALLBACK";
+  ui.start.disabled = ui.startCamera.disabled = false;
+  ui.startCamera.textContent = mode === "camera" ? "Camera on" : "Start camera";
+  if (mode !== "camera") ui.trackingFeedback.textContent = message;
   if (mode === "camera" && (!isTest || params.get("vision") === "1"))
     void startHand();
 });
+ui.startCamera.addEventListener("click", () => ui.start.click());
 if (letterEffects)
   letters = installLetters(
     letterEffects,
@@ -430,6 +514,7 @@ ui.canvas.addEventListener("pointermove", move);
 ui.canvas.addEventListener("pointerdown", (e) => {
   move(e);
   pointer.down = true;
+  if (!interaction.paused) successfulStroke();
   renderer?.fog.finger(pointer.x, pointer.y, !interaction.paused);
   ui.canvas.setPointerCapture(e.pointerId);
   ui.cursor.classList.add("down", "visible");
@@ -465,6 +550,13 @@ addEventListener("keydown", (e) => {
   )
     return;
   const key = e.key.toLowerCase();
+  // Preserve native Space activation for buttons and disclosure controls.
+  if (
+    key === " " &&
+    e.target instanceof HTMLElement &&
+    e.target.closest("button,summary,a")
+  )
+    return;
   if (key === "m") void toggleSound();
   if (key === "h") {
     ui.status.style.opacity = "1";
@@ -486,7 +578,7 @@ addEventListener("keydown", (e) => {
     renderer?.fog.redo();
   }
   if (key === "b") renderer?.fog.setBreathing(true);
-  if (key === "c") renderer?.fog.clear();
+  if (key === "c") clearGlass();
   if (key === "s") {
     e.preventDefault();
     photo();
@@ -527,10 +619,12 @@ if (new URLSearchParams(location.search).get("test") === "1") {
         paused: interaction.paused,
         mirrorMode: interaction.mode,
         microphone: micState,
+        autoRegrow: renderer?.fog.autoRegrow,
         breathStrength: breath?.detector.strength || 0,
         breathSignal: breath
           ? {
               energy: breath.detector.energy,
+              waitingForQuiet: breath.detector.waitingForQuiet,
               floor: breath.detector.floor,
               threshold: breath.detector.threshold,
               flatness: breath.detector.flatness,

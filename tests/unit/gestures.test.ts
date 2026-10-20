@@ -163,3 +163,12 @@ it("pointing begins on the second 30Hz observation without waiting a third frame
   e.update({ timestamp: 0, hands });
   expect(e.update({ timestamp: 34, hands }).gesture).toBe("point");
 });
+it("a straight index aimed across the palm is not rejected by wrist distance", () => {
+  const hand = structuredClone(fixture("index-draw-line").frames[0].hands[0]);
+  hand.worldLandmarks = structuredClone(hand.landmarks);
+  const p = hand.worldLandmarks;
+  const root = p[5];
+  for (let i = 1; i <= 3; i++)
+    p[5 + i] = { x: root.x + i * 0.035, y: root.y, z: root.z };
+  expect(features(hand).extended[0]).toBe(true);
+});

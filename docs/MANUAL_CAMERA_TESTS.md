@@ -23,3 +23,19 @@ Record device/browser/date, light, result and observed limitation for each row.
 - Steam/clear/exit strip, system exit, re-entry, camera mode restoration.
 - No webcam passthrough assumption; verify both procedural and reveal backgrounds.
 - Measure frame rate and comfort on actual headset; test both hands and occlusion.
+# Quick input check after the 2026-10-20 repair
+
+1. Start the camera with the microphone unchecked. Open Tools; confirm the hand
+   feedback changes from no hand to detected. Point to write and open your palm
+   to wipe, including in Fog Writing mode. Clear the glass to check camera framing.
+2. Choose Test my breath. Check the microphone name, stay quiet for calibration,
+   then blow toward that microphone (not necessarily toward the screen). The meter
+   should rise and say Breath detected. Try another input if its meter stays flat.
+3. Wipe while noise is present: the cleared trail must remain clear. Stop blowing
+   briefly, then blow again. Default fog returns only with new breath/Add steam/B;
+   select Slowly after wiping only when automatic regrowth is wanted.
+4. Keep Tools open while moving the pointer or selecting options. On mobile tap
+   Controls to reopen it; no hovering is needed. Test Tab/Space on buttons.
+
+Record device/browser, selected camera/mic, feedback text and failure conditions.
+No real camera/mouth result is inferred from automated fixtures.
