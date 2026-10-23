@@ -225,3 +225,9 @@
 - Gitleaks 8.30.1: no secrets detected across 31 reachable commits, build output or both retained GitHub test artifacts; GitHub secret alerts empty; no tracked credentials/database files found.
 - Every build now strips local model notes and verifies an asset allowlist; rejection tested with an injected .env and renamed model. Added credential/database ignore patterns and RELEASE_V1.md.
 - Next: verify published CI/live build, prepare draft V1 announcement, complete physical input matrix before general-availability claims.
+
+## Standard V1 prepared — 2026-10-23
+- Release commit 1626084 deployed successfully by GitHub run 39955976377; final reachable-history scan covered 32 commits with no secrets detected.
+- Live fake-media controls/breath smoke passes; local prompt, .env and backend config URLs return 404. Final production artifact scan also reports no leaks.
+- GitHub v1.0.0 draft contains the checked Pages ZIP and SHA-256 checksum; public announcement intentionally remains draft pending maintainer hardware checks.
+- Next: physical camera/microphone matrix, publish draft after acceptance, observe full-duration hosted expiry/cleanup.
