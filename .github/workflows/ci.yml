@@ -25,7 +25,7 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm lint && pnpm typecheck && pnpm test:unit
       - run: pnpm test --reporter=line
-      - run: pnpm build && pnpm prepare:pages
+      - run: pnpm build
         env:
           VITE_BASE_PATH: /FOGLASS/
           VITE_LETTERS_API: ${{ vars.FOGLASS_LETTERS_API }}

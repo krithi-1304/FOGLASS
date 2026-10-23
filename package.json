@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && pnpm prepare:pages && pnpm verify:release",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "playwright test",
@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit && tsc --project backend/tsconfig.json",
     "check": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test --reporter=line && pnpm build",
     "prepare:pages": "node scripts/prepare-pages.mjs",
+    "verify:release": "node scripts/verify-release.mjs",
     "api:dev": "wrangler dev --config backend/wrangler.jsonc --ip 127.0.0.1 --port 8787",
     "api:migrate": "wrangler d1 migrations apply foglass-letters --local --config backend/wrangler.jsonc",
     "api:deploy": "wrangler deploy --config backend/wrangler.jsonc"

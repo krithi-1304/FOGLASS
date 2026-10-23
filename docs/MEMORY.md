@@ -219,3 +219,9 @@
 - Moved unchanged build brief to docs/reference; updated references and README structure/current input instructions; no runtime code changes.
 - Lint, types, 72 unit tests, production build and Pages packaging pass; removed regenerated dist afterward. Browser suite not rerun for documentation/cache-only changes.
 - Next: physical input matrix, record device feedback, tune evidenced failures.
+
+## Standard V1 release audit — 2026-10-23
+- 72 unit + 46 browser tests, lint/types/build pass; dependency audit has zero known advisories. WASM files match installed package.
+- Gitleaks 8.30.1: no secrets detected across 31 reachable commits, build output or both retained GitHub test artifacts; GitHub secret alerts empty; no tracked credentials/database files found.
+- Every build now strips local model notes and verifies an asset allowlist; rejection tested with an injected .env and renamed model. Added credential/database ignore patterns and RELEASE_V1.md.
+- Next: verify published CI/live build, prepare draft V1 announcement, complete physical input matrix before general-availability claims.

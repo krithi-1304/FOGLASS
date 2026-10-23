@@ -12,3 +12,12 @@ public/models/MASTER_PROMPT.md
 .dev.vars*
 .env*
 !.env.example
+
+# Local credentials, database copies and export archives never belong in Git.
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite*
+*.db
+*.db-*

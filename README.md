@@ -2,6 +2,9 @@
 
 V1 website: https://krithi-1304.github.io/FOGLASS/
 
+Version 1.0.0 release scope, validation and remaining hardware checks:
+[V1 release notes](docs/RELEASE_V1.md).
+
 A private, browser-based fog mirror. Blow to bloom condensation, point to write,
 or move your palm to wipe. Cleared marks stay clear by default; optional natural
 regrowth is available in Tools.
@@ -117,4 +120,9 @@ recorded in `docs/RESEARCH.md`.
 
 ## Hosting
 
-Pushes to `master` run lint, type checks, unit and browser tests before publishing to GitHub Pages. The production build uses `VITE_BASE_PATH=/FOGLASS/`; `pnpm prepare:pages` creates the lab route and excludes local prompt notes. To preview it locally: `pnpm exec vite preview --base /FOGLASS/`.
+Pushes to `master` run lint, type checks, unit and browser tests before publishing to GitHub Pages. The production build uses `VITE_BASE_PATH=/FOGLASS/`.
+Every `pnpm build` also prepares the lab route, excludes local model-directory
+notes and verifies the distributable file list. Unexpected files, missing models,
+missing runtime variants or missing licenses fail the build. This packaging check
+does not replace secret scanning. To preview a Pages build locally:
+`pnpm exec vite preview --base /FOGLASS/`.
