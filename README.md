@@ -3,7 +3,8 @@
 V1 website: https://krithi-1304.github.io/FOGLASS/
 
 A private, browser-based fog mirror. Blow to bloom condensation, point to write,
-or move your palm to wipe. Cleared marks gradually steam over again.
+or move your palm to wipe. Cleared marks stay clear by default; optional natural
+regrowth is available in Tools.
 
 ## Run
 
@@ -16,21 +17,49 @@ pnpm dev
 
 Open the localhost address shown by Vite. Camera, microphone and WebXR require
 localhost or HTTPS. All models, WASM and fonts are served locally; no API key,
-account, backend or media upload is involved.
+account or media upload is involved in the core mirror. Optional shared Letters
+use a separate backend; see [backend/README.md](backend/README.md).
 
 ## Use
 
-Start enables the front camera and tracking. Uncheck the microphone option to start without audio. Optional hand calibration is in Tools.
+Start enables the front camera and tracking. Microphone access is off by default;
+enable it explicitly for breath input. Optional hand calibration is in Tools.
 Point with only your index finger extended to write; move an open palm to wipe.
 Extra hand shortcuts are off by default to prevent accidental pauses while writing. Enable them in Tools for fist pause, two-palm clear and two-finger Tools. Tracking needs a
 well-lit, visible hand and cannot guarantee accuracy through occlusion.
 
-Move to the bottom edge (or tap it on mobile) to reveal the floating controls; move away to leave only the glass. Tab also reveals controls. Tools includes **Restart tracking** for recovery.
+Controls stay visible until you choose **Hide controls**; choose **Controls** to
+reopen them. Tools includes **Restart tracking** for recovery.
 
 The mirror dock contains **Enable breath**. Stay quiet during calibration, then
 blow gently towards the microphone. This is an experimental local noise detector,
 not speech recognition. A live meter confirms the microphone is receiving input. Tools contains sensitivity and quiet-room recalibration. Disable it anytime. A laptop mic may respond to fans or
-speech, and hardware testing is still required.
+speech, and hardware testing is still required. **Test my breath** clears the
+pane and calibrates the selected microphone. After wiping, let the microphone
+hear quiet before blowing again.
+
+## Project structure
+
+| Path | Purpose |
+| --- | --- |
+| `src/` | Mirror application, input handling and rendering |
+| `src/tracking/` | Hand model, worker and replay provider |
+| `src/shaders/` | GPU fog, brush and glass effects |
+| `src/letters/` | Letter creation, local storage and API client |
+| `public/` | Required local model, WASM runtimes and licenses |
+| `backend/` | Optional Letters API, database migrations and deployment config |
+| `tests/` | Browser/unit tests, gesture fixtures and visual baselines |
+| `scripts/` | Fixture generation and Pages packaging |
+| `docs/` | Architecture, decisions, research, test guides and working history |
+| `docs/reference/` | Preserved original build brief |
+| `.github/workflows/` | CI checks and Pages deployment |
+
+Root configuration files support the build, tests and tooling. Keep `pnpm-lock.yaml`
+for reproducible installs. `dist/`, `test-results/` and `playwright-report/` are
+generated and can be removed when their outputs are no longer needed.
+Keep `backend/.wrangler/` when preserving local database data, and retain local
+environment files and original user notes. Model/WASM variants, test fixtures,
+screenshots and licenses are intentional project assets.
 
 **Try without camera** supports mouse/touch drawing. Hold **B** to add steam,
 **C** to clear, **S** to save PNG, **H** to toggle hints, **Space** to pause, **M** to toggle optional synthesized sound (off by default).

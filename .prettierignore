@@ -5,5 +5,5 @@ test-results
 playwright-report
 public/wasm
 public/models/MASTER_PROMPT.md
-MASTER_BUILD_PROMPT.md
+docs/reference/MASTER_BUILD_PROMPT.md
 tests/fixtures/gestures

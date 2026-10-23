@@ -213,3 +213,9 @@
 - Published 93e0b05; GitHub run 39388517862 succeeded, following 72 unit + 46 browser tests locally.
 - Live persistent controls, microphone opt-in/selection, isolated breath setup and production test-API isolation pass with fake media.
 - Physical hand/mouth accuracy remains unverified; next: run manual hardware matrix, record device feedback, tune only evidenced failures.
+
+## Conservative project cleanup — 2026-10-23
+- Removed generated dist/test-results and unused project .pnpm-store (~181 MB); installed dependencies, local database, original notes and required assets preserved.
+- Moved unchanged build brief to docs/reference; updated references and README structure/current input instructions; no runtime code changes.
+- Lint, types, 72 unit tests, production build and Pages packaging pass; removed regenerated dist afterward. Browser suite not rerun for documentation/cache-only changes.
+- Next: physical input matrix, record device feedback, tune evidenced failures.
