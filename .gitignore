@@ -21,3 +21,7 @@ public/models/MASTER_PROMPT.md
 *.sqlite*
 *.db
 *.db-*
+
+# Local working notes; excluded from the public repository.
+/AGENTS.md
+/docs/
