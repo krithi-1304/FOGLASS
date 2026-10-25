@@ -4,6 +4,29 @@ type FogAPI = {
   seedCoverage(value: number): void;
   sampleMask(x: number, y: number): number;
 };
+test("Add steam resumes a paused mirror on repeated use", async ({ page }) => {
+  await page.goto("/?test=1&speed=10");
+  await page.getByRole("button", { name: "Try without camera" }).click();
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  for (let i = 0; i < 3; i++) {
+    await page.getByRole("button", { name: "Clear", exact: true }).click();
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    await page.getByRole("button", { name: "Add steam", exact: true }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window as unknown as { __foglass: FogAPI }).__foglass.sampleMask(
+            0.5,
+            0.5,
+          ),
+        ),
+      )
+      .toBeGreaterThan(0.4);
+    await expect(
+      page.getByRole("button", { name: "Pause", exact: true }),
+    ).toBeVisible();
+  }
+});
 test("wiped glass stays clear until an explicit breath and microphone starts only by choice", async ({
   page,
 }, testInfo) => {

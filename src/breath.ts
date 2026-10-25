@@ -15,6 +15,7 @@ export class BreathDetector {
   private quietSince = -1;
   private lastTime = -1;
   suppressUntilQuiet() {
+    if (this.waitingForQuiet) return;
     this.waitingForQuiet = true;
     this.quietSince = -1;
     this.active = false;

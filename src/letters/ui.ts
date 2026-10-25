@@ -20,6 +20,7 @@ export function installLetters(
   apiBase?: string,
   onCamera?: () => void,
   onClose?: () => void,
+  onOpen?: () => void,
 ) {
   const service = new LetterService(apiBase),
     collection = new LetterCollection();
@@ -63,6 +64,31 @@ export function installLetters(
     parentId: string | undefined,
     remoteId: string | undefined,
     busy = false;
+  let prepared: { key: string; url: string; expiresAt: number } | undefined;
+  function invalidateLink() {
+    prepared = undefined;
+    el<HTMLTextAreaElement>("letter-link").value = "";
+    el("letter-link").hidden = true;
+  }
+  form.addEventListener("input", invalidateLink);
+  el("letter-days").addEventListener("change", invalidateLink);
+  async function copyLink(url: string) {
+    const output = el<HTMLTextAreaElement>("letter-link");
+    output.value = url;
+    output.hidden = false;
+    try {
+      await navigator.clipboard.writeText(url);
+      notify("Link copied. Anyone with this link can uncover the letter.");
+    } catch {
+      output.focus();
+      output.select();
+      output.setSelectionRange(0, output.value.length);
+      notify(
+        "Link ready. Tap Copy share link again, or copy the selected text.",
+      );
+    }
+    output.scrollIntoView({ block: "nearest" });
+  }
   const notify = (message: string) => {
     status.textContent = message;
   };
@@ -82,6 +108,7 @@ export function installLetters(
     }
   };
   function fill(letter: Letter) {
+    invalidateLink();
     draft = structuredClone(letter);
     el<HTMLInputElement>("letter-title").value = letter.title;
     el<HTMLTextAreaElement>("letter-message").value = letter.message;
@@ -140,6 +167,7 @@ export function installLetters(
   };
   async function open(letter: Letter, id?: string) {
     if (!document.body.classList.contains("started")) enter();
+    onOpen?.();
     remoteId = id;
     await effects.open(letter);
     fill(letter);
@@ -238,6 +266,7 @@ export function installLetters(
       dialog.querySelector<HTMLElement>(".letter-actions")!.hidden = true;
     });
   el("letter-draw").onclick = () => {
+    invalidateLink();
     draft = read();
     if (effects.letter) {
       const aspect = Math.max(0.25, Math.min(4, innerWidth / innerHeight));
@@ -277,15 +306,23 @@ export function installLetters(
     void guard(async () => {
       const letter = read(),
         url = new URL(import.meta.env.BASE_URL, location.origin);
+      const days = Number(el<HTMLSelectElement>("letter-days").value);
+      const key = JSON.stringify([letter, days, parentId]);
+      // A second click must copy synchronously within the new user activation,
+      // not create another online letter or wait for compression/network again.
+      if (prepared?.key === key && prepared.expiresAt > Date.now()) {
+        await copyLink(prepared.url);
+        return;
+      }
+      invalidateLink();
+      notify("Preparing your share link…");
+      status.scrollIntoView({ block: "nearest" });
+      let expiresAt = Infinity;
       url.search = "";
       url.hash = "";
       if (service.available) {
-        entry = collection.save(letter);
-        const remote = await service.create(
-          letter,
-          Number(el<HTMLSelectElement>("letter-days").value),
-          parentId,
-        );
+        entry = collection.save(letter, entry?.remoteId ? undefined : entry);
+        const remote = await service.create(letter, days, parentId);
         entry = {
           ...entry,
           remoteId: remote.id,
@@ -293,6 +330,7 @@ export function installLetters(
           expiresAt: remote.expiresAt,
         };
         remoteId = remote.id;
+        expiresAt = remote.expiresAt;
         try {
           collection.save(letter, entry);
         } catch {
@@ -310,17 +348,8 @@ export function installLetters(
           );
         url.hash = "mist=" + data;
       }
-      const output = el<HTMLTextAreaElement>("letter-link");
-      output.value = url.href;
-      output.hidden = false;
-      try {
-        await navigator.clipboard.writeText(url.href);
-        notify("Link copied. Anyone with this link can uncover the letter.");
-      } catch {
-        output.focus();
-        output.select();
-        notify("Your link is ready. Copy the selected text.");
-      }
+      prepared = { key, url: url.href, expiresAt };
+      await copyLink(url.href);
     });
   el("letter-replay").onclick = () => {
     effects.replay();

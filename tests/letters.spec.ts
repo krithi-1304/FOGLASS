@@ -7,6 +7,73 @@ const sheet = async (page: import("@playwright/test").Page) => {
   await page.mouse.move(640, 700);
   await page.getByRole("button", { name: "Letters", exact: true }).click();
 };
+test("previewing a letter resumes paused glass so it can be uncovered", async ({
+  page,
+}) => {
+  await begin(page);
+  await page.getByRole("button", { name: "Tools", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await sheet(page);
+  await page.getByLabel("Title", { exact: true }).fill("Still here");
+  await page.getByLabel("A note beneath the mist").fill("Find me");
+  await page.getByRole("button", { name: "Try this letter" }).click();
+  await expect(
+    page.getByRole("button", { name: "Pause", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Clear", exact: true }).click();
+  await page.getByRole("button", { name: "Add steam", exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (
+          window as unknown as {
+            __foglass: { sampleMask(x: number, y: number): number };
+          }
+        ).__foglass.sampleMask(0.5, 0.5),
+      ),
+    )
+    .toBeGreaterThan(0.4);
+});
+test("copy retry reuses the prepared link after clipboard permission fails", async ({
+  page,
+}) => {
+  let creates = 0;
+  await page.route("http://127.0.0.1:8787/letters", async (route) => {
+    creates++;
+    await route.fulfill({
+      json: {
+        id: creates.toString(16).padStart(32, "0"),
+        deleteToken: "test-owner",
+        expiresAt: Date.now() + 86400000,
+      },
+    });
+  });
+  await page.addInitScript(() => {
+    let attempts = 0;
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: async (value: string) => {
+          if (++attempts === 1)
+            throw new DOMException("Blocked", "NotAllowedError");
+          (window as unknown as { copied: string }).copied = value;
+        },
+      },
+    });
+  });
+  await page.goto("/?test=1&letters=local");
+  await page.getByRole("button", { name: "Try without camera" }).click();
+  await sheet(page);
+  await page.getByLabel("Title", { exact: true }).fill("Copy retry");
+  await page.getByRole("button", { name: "Copy share link" }).click();
+  await expect(page.getByLabel("Letter share link")).toBeVisible();
+  const link = await page.getByLabel("Letter share link").inputValue();
+  await page.getByRole("button", { name: "Copy share link" }).click();
+  await expect(page.locator("#letter-status")).toContainText("Link copied");
+  expect(creates).toBe(1);
+  expect(
+    await page.evaluate(() => (window as unknown as { copied: string }).copied),
+  ).toBe(link);
+});
 test("editing a saved letter as a copy preserves the original", async ({
   page,
 }) => {

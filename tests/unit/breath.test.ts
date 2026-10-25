@@ -1,6 +1,19 @@
 import { it, expect } from "vitest";
 import { BreathDetector } from "../../src/breath";
 const spectrum = (db: number) => new Float32Array(1024).fill(db);
+it("repeated wipe observations do not restart an ongoing quiet recovery", () => {
+  const d = new BreathDetector();
+  for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-80), 48000, 2048, t);
+  d.suppressUntilQuiet();
+  for (let t = 1025; t <= 1225; t += 25) {
+    d.suppressUntilQuiet();
+    d.update(spectrum(-80), 48000, 2048, t);
+  }
+  expect(d.waitingForQuiet).toBe(false);
+  for (let t = 1250; t <= 1450; t += 25)
+    d.update(spectrum(-40), 48000, 2048, t);
+  expect(d.active).toBe(true);
+});
 it("sustained background noise cannot keep depositing steam indefinitely", () => {
   const d = new BreathDetector();
   for (let t = 0; t <= 1000; t += 25) d.update(spectrum(-80), 48000, 2048, t);

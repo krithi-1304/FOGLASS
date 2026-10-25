@@ -56,7 +56,20 @@ let mode = "onboarding";
 let hand: HandController | undefined;
 let pointer = { x: 0.5, y: 0.5, down: false };
 let hintInteracted = false;
+let manualSteamUntil = 0;
+let manualSteamHeld = false;
+const manualSteaming = () =>
+  manualSteamHeld || performance.now() < manualSteamUntil;
+function addSteam(ms = 1800) {
+  if (interaction.paused) interaction.togglePause();
+  interaction.lift();
+  renderer?.fog.finger(0, 0, false);
+  manualSteamUntil = performance.now() + ms;
+  renderer?.fog.injectBreath(1, ms);
+}
 function clearGlass() {
+  manualSteamUntil = 0;
+  manualSteamHeld = false;
   renderer?.fog.clear();
   breath?.detector.suppressUntilQuiet();
 }
@@ -97,15 +110,17 @@ ui.restartMirror.addEventListener("click", () => location.reload());
 const interaction = new Interaction(
   {
     finger: (x, y, down, radius, palm) => {
+      if (down && manualSteaming()) return;
       renderer?.fog.finger(x, y, down, radius, palm);
       if (down) successfulStroke();
     },
     wipe: (segments, begin) => {
+      if (manualSteaming()) return;
       renderer?.fog.wipe(segments, begin);
       successfulStroke();
     },
     clear: clearGlass,
-    injectBreath: (strength, ms) => renderer?.fog.injectBreath(strength, ms),
+    injectBreath: (_strength, ms) => addSteam(ms),
   },
   () => {
     if (renderer) {
@@ -353,7 +368,7 @@ addEventListener("resize", () => {
 });
 ui.pause.addEventListener("click", () => interaction.togglePause());
 ui.clear.addEventListener("click", clearGlass);
-ui.refog.addEventListener("click", () => renderer?.fog.injectBreath(1, 1800));
+ui.refog.addEventListener("click", () => addSteam());
 ui.undo.addEventListener("click", () => {
   interaction.lift();
   renderer?.fog.undo();
@@ -377,7 +392,7 @@ async function startHand(mock = false) {
   ui.trackingFeedback.textContent =
     "Loading hand tracking… Keep your whole hand in the camera view.";
   hand = new HandController(camera.video, (state, point) => {
-    if (document.querySelector("dialog[open]")) {
+    if (manualSteaming() || document.querySelector("dialog[open]")) {
       interaction.lift();
       return;
     }
@@ -479,6 +494,7 @@ if (letterEffects)
     letterEffects,
     enter,
     () => {
+      if (interaction.paused) interaction.togglePause();
       interaction.setMode("writing");
       ui.modeSelect.value = "writing";
       if (renderer) {
@@ -494,6 +510,11 @@ if (letterEffects)
       ui.start.click();
     },
     () => hud.reveal(),
+    () => {
+      if (interaction.paused) interaction.togglePause();
+      interaction.lift();
+      renderer?.fog.finger(0, 0, false);
+    },
   );
 const move = (e: PointerEvent) => {
   pointer = {
@@ -577,7 +598,11 @@ addEventListener("keydown", (e) => {
     interaction.lift();
     renderer?.fog.redo();
   }
-  if (key === "b") renderer?.fog.setBreathing(true);
+  if (key === "b") {
+    addSteam(0);
+    manualSteamHeld = true;
+    renderer?.fog.setBreathing(true);
+  }
   if (key === "c") clearGlass();
   if (key === "s") {
     e.preventDefault();
@@ -585,9 +610,13 @@ addEventListener("keydown", (e) => {
   }
 });
 addEventListener("keyup", (e) => {
-  if (e.key.toLowerCase() === "b") renderer?.fog.setBreathing(false);
+  if (e.key.toLowerCase() === "b") {
+    manualSteamHeld = false;
+    renderer?.fog.setBreathing(false);
+  }
 });
 addEventListener("blur", () => {
+  manualSteamHeld = false;
   renderer?.fog.setBreathing(false);
   release();
 });
@@ -598,6 +627,10 @@ addEventListener("pagehide", () => {
   disableMicrophone();
   hand?.stop();
   renderer?.dispose();
+});
+// A back/forward-cache restore must not resume disposed GPU/media resources.
+addEventListener("pageshow", (event) => {
+  if (event.persisted) location.reload();
 });
 if (new URLSearchParams(location.search).get("test") === "1") {
   Object.assign(window, {
